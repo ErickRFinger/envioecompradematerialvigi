@@ -1523,6 +1523,25 @@
       const items = order.shipment_items || [];
       const totalPcs = items.reduce((a, b) => a + (b.quantity || 0), 0);
 
+      let cleanNotes = order.notes || "";
+      let originalMap = {};
+      const origMatch = cleanNotes.match(/\[ORIG:(.*?)\]/);
+      if (origMatch) {
+        try {
+          originalMap = JSON.parse(origMatch[1]);
+        } catch(e) {}
+        cleanNotes = cleanNotes.replace(origMatch[0], "").trim();
+      }
+
+      let ajusteTexto = "";
+      const ajMatch = cleanNotes.match(/\[AJUSTE:(.*?)\]/);
+      if (ajMatch) {
+        ajusteTexto = ajMatch[1];
+        cleanNotes = cleanNotes.replace(ajMatch[0], "").trim();
+      }
+
+      const hasAdjustment = Object.keys(originalMap).length > 0 || !!ajusteTexto;
+
       // Normaliza Filial
       let branchLabel = "Francisco Beltrão";
       let branchColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
@@ -1566,12 +1585,18 @@
       }
       pipelineBar += '</div>';
 
-      const previewItems = items.slice(0, 3).map(it => `
-        <li class="flex justify-between text-[11px] text-slate-300 py-0.5">
-          <span class="truncate">${it.product_name}</span>
-          <span class="font-mono font-bold text-orange-300 ml-2">x${it.quantity}</span>
-        </li>
-      `).join('');
+      const previewItems = items.slice(0, 3).map(it => {
+        const origQtd = originalMap[it.product_name];
+        const isItemAdj = origQtd !== undefined && it.quantity !== origQtd;
+        return `
+          <li class="flex justify-between text-[11px] text-slate-300 py-0.5">
+            <span class="truncate">${it.product_name}</span>
+            <span class="font-mono font-bold ${isItemAdj ? 'text-amber-300' : 'text-orange-300'} ml-2">
+              x${it.quantity} ${isItemAdj ? `<span class="text-[9px] text-slate-500 line-through">(${origQtd})</span>` : ''}
+            </span>
+          </li>
+        `;
+      }).join('');
 
       // REGRA DE PERMISSÃO PARA EXCLUSÃO:
       // O botão de exclusão SÓ É RENDERIZADO para Administradores (erick, daniel, thiago, klaus)!
@@ -1608,16 +1633,29 @@
 
         <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
           <div class="flex justify-between text-[10px] uppercase font-bold text-slate-400">
-            <span>Itens Solicitados</span>
+            <div class="flex items-center gap-1.5">
+              <span>Itens na Carga</span>
+              ${hasAdjustment ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-bold">Ajustado</span>' : ''}
+            </div>
             <span class="text-orange-400 font-mono">${totalPcs} un</span>
           </div>
           <ul>${previewItems}</ul>
           ${items.length > 3 ? `<p class="text-[10px] text-slate-500 text-center pt-0.5">+ ${items.length - 3} outros itens</p>` : ''}
         </div>
 
-        ${order.notes ? `
+        ${ajusteTexto ? `
+          <div class="text-[11px] text-amber-300 bg-amber-500/10 p-2 rounded-lg border border-amber-500/20 flex items-start gap-1.5">
+            <i class="fa-solid fa-triangle-exclamation text-amber-400 mt-0.5 shrink-0"></i>
+            <div>
+              <span class="font-bold">Ajuste de Estoque Almoxarifado:</span>
+              <p class="text-[10px] text-amber-200/90">${ajusteTexto}</p>
+            </div>
+          </div>
+        ` : ''}
+
+        ${cleanNotes ? `
           <p class="text-[11px] text-slate-400 bg-slate-900/40 p-2 rounded-lg border border-white/5 truncate">
-            <i class="fa-solid fa-quote-left text-slate-600 mr-1"></i>${order.notes}
+            <i class="fa-solid fa-quote-left text-slate-600 mr-1"></i>${cleanNotes}
           </p>
         ` : ''}
 

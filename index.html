@@ -1032,14 +1032,14 @@
   <!-- MODAL: FICHA DETALHADA / ROMANEIO DE SEPARAÇÃO & CHECKLIST -->
   <!-- ======================================================== -->
   <div id="modal-card-details" style="display: none;" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-    <div class="glass-surface w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10">
+    <div class="glass-surface w-full max-w-4xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-white/10">
       
       <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <img src="vigi-logo.png" alt="VIGI" class="h-7 object-contain" />
           <span id="detail-code-badge" class="font-mono text-xs font-black bg-orange-500/20 text-orange-400 border border-orange-500/40 px-3 py-1 rounded-xl">#ENV-000</span>
           <div>
-            <h2 id="detail-title" class="text-base font-extrabold text-white">Ficha de Separação de Materiais</h2>
+            <h2 id="detail-title" class="text-base font-extrabold text-white">Conferência & Separação de Materiais</h2>
             <p id="detail-subtitle" class="text-xs text-slate-400">Filial</p>
           </div>
         </div>
@@ -1052,11 +1052,11 @@
         <!-- Injected by JS -->
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center gap-2">
           <button id="btn-whatsapp-action" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/20 transition cursor-pointer">
             <i class="fa-brands fa-whatsapp text-sm"></i>
-            <span>Copiar p/ WhatsApp</span>
+            <span>WhatsApp</span>
           </button>
           <button onclick="printSeparacao()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl font-bold text-xs border border-white/10 transition cursor-pointer">
             <i class="fa-solid fa-print"></i>
@@ -1069,7 +1069,17 @@
             <span>Excluir Ordem</span>
           </button>
         </div>
-        <button onclick="closeCardDetailsModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Fechar</button>
+        <div class="flex items-center gap-2" id="modal-details-right-actions">
+          <button onclick="closeCardDetailsModal()" class="px-3.5 py-2 rounded-xl font-semibold text-slate-400 hover:text-white text-xs cursor-pointer">Fechar</button>
+          <button id="btn-save-conference" onclick="saveCurrentConference()" class="flex items-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-orange-600/30 transition cursor-pointer">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Salvar Ajustes</span>
+          </button>
+          <button id="btn-advance-conference" onclick="saveAndAdvanceCurrentConference()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition cursor-pointer">
+            <i class="fa-solid fa-circle-check"></i>
+            <span id="btn-advance-label">Salvar & Avançar</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -1575,17 +1585,68 @@
               }
             }
 
+            let rawNotes = row.notes || "";
+            let cleanObs = rawNotes;
+
             let urgencia = "Normal";
-            let cleanObs = row.notes || "";
             if (cleanObs.includes("[URGENTE]")) { urgencia = "Urgente"; cleanObs = cleanObs.replace("[URGENTE]", "").trim(); }
             else if (cleanObs.includes("[ALTA]")) { urgencia = "Alta"; cleanObs = cleanObs.replace("[ALTA]", "").trim(); }
             else if (cleanObs.includes("[NORMAL]")) { cleanObs = cleanObs.replace("[NORMAL]", "").trim(); }
+
+            let originalMap = {};
+            const origMatch = cleanObs.match(/\[ORIG:(.*?)\]/);
+            if (origMatch) {
+              try {
+                originalMap = JSON.parse(origMatch[1]);
+              } catch (e) {}
+              cleanObs = cleanObs.replace(origMatch[0], "").trim();
+            }
+
+            let ajusteHistorico = "";
+            const ajMatch = cleanObs.match(/\[AJUSTE:(.*?)\]/);
+            if (ajMatch) {
+              ajusteHistorico = ajMatch[1];
+              cleanObs = cleanObs.replace(ajMatch[0], "").trim();
+            }
 
             const dateObj = new Date(row.created_at);
             const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
             let st = row.status || 'aguardando';
             if (st === 'recebido') st = 'chegou';
+
+            const parsedItens = (row.shipment_items || []).map(it => {
+              const orig = (originalMap && originalMap[it.product_name] !== undefined)
+                ? originalMap[it.product_name]
+                : (it.quantity || 1);
+              return {
+                id: it.id,
+                productId: it.product_id,
+                categoria: it.product_category || 'OUTROS',
+                nome: it.product_name,
+                qtd: it.quantity || 1,
+                qtdOriginal: orig,
+                checked: false
+              };
+            });
+
+            // Se algum item estava no pedido original mas foi zerado (não consta em shipment_items)
+            if (originalMap && typeof originalMap === 'object') {
+              Object.keys(originalMap).forEach(origNome => {
+                const found = parsedItens.find(it => it.nome.toLowerCase() === origNome.toLowerCase());
+                if (!found && originalMap[origNome] > 0) {
+                  parsedItens.push({
+                    id: null,
+                    productId: null,
+                    categoria: 'OUTROS',
+                    nome: origNome,
+                    qtd: 0,
+                    qtdOriginal: originalMap[origNome],
+                    checked: false
+                  });
+                }
+              });
+            }
 
             return {
               id: 'ENV-' + row.id.slice(0, 6).toUpperCase(),
@@ -1595,11 +1656,11 @@
               urgencia: urgencia,
               data: dataStr,
               obs: cleanObs,
+              rawNotes: rawNotes,
+              originalMap: originalMap,
+              ajusteHistorico: ajusteHistorico,
               status: st,
-              itens: (row.shipment_items || []).map(it => ({
-                nome: it.product_name,
-                qtd: it.quantity || 1
-              }))
+              itens: parsedItens
             };
           });
 
@@ -1791,6 +1852,8 @@
         if (!colContainer) return;
 
         const totalItens = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
+        const totalSolicitado = pedido.itens.reduce((acc, cur) => acc + (cur.qtdOriginal !== undefined ? cur.qtdOriginal : cur.qtd), 0);
+        const hasDivergence = pedido.itens.some(it => it.qtd !== it.qtdOriginal);
         const colIndex = ENVIOS_COLUNAS.findIndex(c => c.id === pedido.status);
         const prevCol = colIndex > 0 ? ENVIOS_COLUNAS[colIndex - 1] : null;
         const nextCol = colIndex < ENVIOS_COLUNAS.length - 1 ? ENVIOS_COLUNAS[colIndex + 1] : null;
@@ -1809,15 +1872,18 @@
         }
         pipelineStepsHtml += '</div>';
 
-        const previewItens = pedido.itens.slice(0, 3).map(it => 
-          `<li class="truncate flex justify-between text-slate-300 text-[11px] py-1 border-b border-white/[0.04] last:border-none">
-            <span class="truncate text-slate-300 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+        const previewItens = pedido.itens.slice(0, 3).map(it => {
+          const isItemDivergent = it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal;
+          return `<li class="truncate flex justify-between text-slate-300 text-[11px] py-1 border-b border-white/[0.04] last:border-none">
+            <span class="truncate ${it.qtd === 0 ? 'text-slate-500 line-through' : 'text-slate-300'} flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full ${isItemDivergent ? 'bg-amber-400' : 'bg-orange-400'}"></span>
               ${it.nome}
             </span> 
-            <span class="font-mono font-bold text-orange-300 ml-1.5 shrink-0 bg-slate-900/80 px-1.5 py-0.2 rounded border border-white/5">x${it.qtd}</span>
-          </li>`
-        ).join('');
+            <span class="font-mono font-bold ${isItemDivergent ? 'text-amber-300 bg-amber-500/20 border-amber-500/30' : 'text-orange-300 bg-slate-900/80 border-white/5'} ml-1.5 shrink-0 px-1.5 py-0.2 rounded border text-[10px]">
+              ${it.qtd} un ${isItemDivergent ? `<span class="opacity-60 line-through text-[9px]">(${it.qtdOriginal})</span>` : ''}
+            </span>
+          </li>`;
+        }).join('');
         const maisItens = pedido.itens.length > 3 ? `<div class="text-[10px] text-slate-400 font-semibold pt-1 text-center bg-slate-900/40 rounded py-0.5 mt-1 border border-white/5">+ ${pedido.itens.length - 3} itens adicionais...</div>` : '';
 
         // Botão de Excluir: RENDERIZADO EXCLUSIVAMENTE PARA ADMINS
@@ -1861,8 +1927,11 @@
           <!-- Preview da Lista de Materiais -->
           <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5">
             <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 flex justify-between items-center">
-              <span>Materiais Requisitados</span>
-              <span class="text-orange-300 font-mono font-bold bg-orange-500/15 px-2 py-0.5 rounded-md text-[10px]">${totalItens} un</span>
+              <span>Materiais na Carga</span>
+              <div class="flex items-center gap-1">
+                ${hasDivergence ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Pedido com quantidades ajustadas"><i class="fa-solid fa-sliders mr-0.5"></i>Ajustado</span>` : ''}
+                <span class="text-orange-300 font-mono font-bold bg-orange-500/15 px-2 py-0.5 rounded-md text-[10px]">${totalItens} un</span>
+              </div>
             </div>
             <ul>
               ${previewItens}
@@ -1979,8 +2048,11 @@
           <td class="py-3 px-4 font-medium text-slate-300">${pedido.solicitante}</td>
           <td class="py-3 px-4">${getUrgenciaBadge(pedido.urgencia)}</td>
           <td class="py-3 px-4">
-            <span class="font-mono text-orange-300 font-bold bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-lg text-[11px]">${totalItens} un</span>
-            <span class="text-slate-400 text-[10px] ml-1">(${pedido.itens.length} tipos)</span>
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono text-orange-300 font-bold bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-lg text-[11px]">${totalItens} un</span>
+              ${pedido.itens.some(it => it.qtd !== it.qtdOriginal) ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded font-bold">Ajustado</span>' : ''}
+            </div>
+            <span class="text-slate-400 text-[10px] block mt-0.5">(${pedido.itens.length} tipos)</span>
           </td>
           <td class="py-3 px-4">
             <span class="bg-orange-500/15 text-orange-300 border border-orange-500/30 px-2.5 py-1 rounded-xl text-[11px] font-bold">
@@ -2527,32 +2599,167 @@
       showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
     }
 
-    // 18. ROMANEIO, CONFERÊNCIA FÍSICA & IMPRESSÃO
+    // 18. ROMANEIO, CONFERÊNCIA FÍSICA & AJUSTE DE QUANTIDADES
+    let currentDetailPedidoId = null;
+    let currentDetailItems = [];
+    let showInlineAddMaterial = false;
+
     function openCardDetails(id) {
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (!pedido) return;
 
+      currentDetailPedidoId = id;
+      showInlineAddMaterial = false;
+
+      // Garante que o mapa de quantidades originais esteja inicializado
+      if (!pedido.originalMap || typeof pedido.originalMap !== 'object') {
+        pedido.originalMap = {};
+        pedido.itens.forEach(it => {
+          pedido.originalMap[it.nome] = it.qtdOriginal !== undefined ? it.qtdOriginal : it.qtd;
+        });
+      }
+
+      // Clona os itens para edição em buffer local no modal
+      currentDetailItems = pedido.itens.map(it => ({
+        id: it.id || null,
+        productId: it.productId || null,
+        categoria: it.categoria || 'OUTROS',
+        nome: it.nome,
+        qtd: it.qtd,
+        qtdOriginal: it.qtdOriginal !== undefined ? it.qtdOriginal : (pedido.originalMap[it.nome] || it.qtd),
+        checked: it.checked || false
+      }));
+
+      renderCardDetailsModal();
+
+      const el = document.getElementById('modal-card-details');
+      el.style.display = 'flex';
+    }
+
+    function renderCardDetailsModal() {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
+      if (!pedido) return;
+
       document.getElementById('detail-code-badge').innerText = pedido.id;
-      document.getElementById('detail-title').innerText = `Romaneio de Separação • ${pedido.id}`;
-      document.getElementById('detail-subtitle').innerText = `Destino: ${pedido.filial} • Solicitado por ${pedido.solicitante} em ${pedido.data}`;
+      document.getElementById('detail-title').innerText = `Romaneio & Conferência de Carga • ${pedido.id}`;
+      document.getElementById('detail-subtitle').innerText = `Destino: ${pedido.filial} • Solicitante: ${pedido.solicitante} (${pedido.data})`;
 
       const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
+      const totalSolicitado = currentDetailItems.reduce((acc, cur) => acc + (cur.qtdOriginal !== undefined ? cur.qtdOriginal : cur.qtd), 0);
+      const totalSeparado = currentDetailItems.reduce((acc, cur) => acc + (cur.qtd || 0), 0);
+      const diffTotal = totalSeparado - totalSolicitado;
+      const hasDivergence = currentDetailItems.some(it => it.qtd !== it.qtdOriginal);
 
-      let itemsRows = pedido.itens.map((it, idx) => `
-        <tr id="check-row-${idx}" class="checklist-row border-b border-white/5 transition duration-150">
-          <td class="py-2.5 px-3 text-slate-500 font-mono text-center">${idx + 1}</td>
-          <td class="py-2.5 px-3 font-semibold text-white item-label">${it.nome}</td>
-          <td class="py-2.5 px-3 text-right font-mono font-black text-orange-300 text-sm">${it.qtd} un</td>
-          <td class="py-2.5 px-3 text-center">
-            <input type="checkbox" onchange="toggleCheckItem(this, 'check-row-${idx}', ${pedido.itens.length})" 
-                   class="w-4 h-4 rounded bg-slate-900 border-white/20 text-orange-600 focus:ring-0 cursor-pointer">
-          </td>
-        </tr>
-      `).join('');
+      const conferidosCount = currentDetailItems.filter(it => it.checked).length;
+      const totalItensCount = currentDetailItems.length;
+      const pctConferido = totalItensCount > 0 ? Math.round((conferidosCount / totalItensCount) * 100) : 0;
 
-      const totalUnidades = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
+      // Controle de botões de avanço de fase
+      const advanceBtn = document.getElementById('btn-advance-conference');
+      const advanceLabel = document.getElementById('btn-advance-label');
+      if (advanceBtn && advanceLabel) {
+        if (!isAdmin()) {
+          advanceBtn.style.display = 'none';
+        } else {
+          advanceBtn.style.display = 'inline-flex';
+          if (pedido.status === 'aguardando') {
+            advanceLabel.innerHTML = 'Salvar & Iniciar Separação ➜';
+          } else if (pedido.status === 'separando') {
+            advanceLabel.innerHTML = 'Salvar & Pronto p/ Coleta 📦';
+          } else if (pedido.status === 'coleta') {
+            advanceLabel.innerHTML = 'Salvar & Despachar (Em Rota) 🚚';
+          } else if (pedido.status === 'enviado') {
+            advanceLabel.innerHTML = 'Salvar & Concluir Entrega ✓';
+          } else {
+            advanceBtn.style.display = 'none';
+          }
+        }
+      }
+
+      // Botão Excluir Ordem (Admin)
+      const deleteModalBtn = document.getElementById('btn-delete-order-modal');
+      if (deleteModalBtn) {
+        if (isAdmin()) {
+          deleteModalBtn.style.display = 'inline-flex';
+          deleteModalBtn.onclick = () => deletePedidoEnvio(pedido.id);
+        } else {
+          deleteModalBtn.style.display = 'none';
+        }
+      }
+
+      document.getElementById('btn-whatsapp-action').onclick = () => sendToWhatsApp(pedido.id);
+
+      // Linhas da tabela de itens
+      let itemsRowsHtml = currentDetailItems.map((it, idx) => {
+        const isDivergent = it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal;
+        let diffBadge = '';
+        if (it.qtd === 0) {
+          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-ban"></i> Zerado (Sem Estoque)</span>`;
+        } else if (!isDivergent) {
+          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check"></i> 100% Atendido</span>`;
+        } else if (it.qtd < it.qtdOriginal) {
+          const faltam = it.qtdOriginal - it.qtd;
+          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-lg" title="Estoque insuficiente na matriz"><i class="fa-solid fa-triangle-exclamation"></i> Parcial (-${faltam} un)</span>`;
+        } else {
+          const extra = it.qtd - it.qtdOriginal;
+          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-300 bg-cyan-500/20 border border-cyan-500/40 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-plus"></i> Adicional (+${extra} un)</span>`;
+        }
+
+        const rowBg = it.checked ? 'bg-emerald-950/20 border-emerald-500/20' : 'hover:bg-slate-900/50 border-white/5';
+
+        return `
+          <tr id="check-row-${idx}" class="checklist-row border-b transition-all duration-150 ${rowBg}">
+            <td class="py-2.5 px-3 text-slate-500 font-mono text-center text-xs">${idx + 1}</td>
+            <td class="py-2.5 px-3">
+              <div class="font-bold text-white text-xs ${it.checked ? 'text-emerald-300' : ''} flex items-center gap-1.5">
+                ${it.checked ? '<i class="fa-solid fa-check text-emerald-400 text-xs"></i>' : ''}
+                <span>${it.nome}</span>
+              </div>
+              <div class="text-[10px] text-slate-500 uppercase font-semibold">${it.categoria || 'MATERIAL'}</div>
+            </td>
+            <td class="py-2.5 px-3 text-center">
+              ${it.qtdOriginal > 0 
+                ? `<span class="font-mono font-bold text-slate-300 text-xs">${it.qtdOriginal} un</span>` 
+                : `<span class="text-[9px] font-bold text-purple-400 bg-purple-500/10 px-1.5 py-0.5 rounded border border-purple-500/20">+ Extra</span>`}
+            </td>
+            <td class="py-2.5 px-3">
+              <div class="flex items-center justify-center gap-1">
+                <button type="button" onclick="adjustDetailItemQtd(${idx}, -1)" title="Diminuir 1 un" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center font-bold text-xs border border-white/10 transition cursor-pointer active:scale-95">-</button>
+                <input type="number" min="0" value="${it.qtd}" onchange="setDetailItemQtd(${idx}, this.value)" class="w-14 bg-slate-950 border ${isDivergent ? 'border-amber-500/50 text-amber-300 font-black' : 'border-white/20 text-white font-bold'} focus:border-orange-500 rounded-lg px-1.5 py-1 text-center font-mono text-xs focus:outline-none">
+                <button type="button" onclick="adjustDetailItemQtd(${idx}, 1)" title="Aumentar 1 un" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white flex items-center justify-center font-bold text-xs border border-white/10 transition cursor-pointer active:scale-95">+</button>
+                <span class="text-[10px] text-slate-400 font-mono ml-0.5">un</span>
+              </div>
+            </td>
+            <td class="py-2.5 px-3 text-center">
+              ${diffBadge}
+            </td>
+            <td class="py-2.5 px-3 text-center">
+              <label class="inline-flex items-center justify-center cursor-pointer p-1">
+                <input type="checkbox" ${it.checked ? 'checked' : ''} onchange="toggleDetailItemChecked(${idx})" 
+                       class="w-4 h-4 rounded bg-slate-900 border-white/30 text-emerald-500 focus:ring-0 cursor-pointer">
+              </label>
+            </td>
+            <td class="py-2.5 px-3 text-center">
+              <button type="button" onclick="removeDetailItem(${idx})" title="Remover item da carga" class="text-slate-500 hover:text-rose-400 p-1 rounded hover:bg-rose-500/10 transition cursor-pointer">
+                <i class="fa-solid fa-trash-can text-xs"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Opções de catálogo para inclusão inline
+      const allCatalogItems = [];
+      CATALOGO_MATERIAIS.forEach(c => {
+        c.itens.forEach(item => {
+          if (!allCatalogItems.includes(item)) allCatalogItems.push(item);
+        });
+      });
+      allCatalogItems.sort();
+      const catalogOptionsHtml = allCatalogItems.map(item => `<option value="${item}">${item}</option>`).join('');
 
       document.getElementById('detail-body-print').innerHTML = `
+        <!-- Métricas Rápidas do Cabeçalho -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 glass-surface p-3.5 rounded-2xl border border-white/5">
           <div>
             <span class="text-slate-400 text-[10px] uppercase font-bold block">Filial Destino</span>
@@ -2567,106 +2774,382 @@
             <span class="font-bold text-xs">${getUrgenciaBadge(pedido.urgencia)}</span>
           </div>
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Volume Total</span>
-            <span class="font-mono font-bold text-emerald-400 text-xs">${totalUnidades} peças</span>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Volume da Carga</span>
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono font-bold text-emerald-400 text-xs">${totalSeparado} peças</span>
+              ${hasDivergence ? `<span class="text-[10px] text-slate-400 font-mono">(pediram ${totalSolicitado})</span>` : ''}
+            </div>
           </div>
         </div>
 
-        ${pedido.obs ? `
-          <div class="glass-surface p-3 rounded-2xl border border-white/5">
-            <span class="text-[10px] text-slate-400 font-bold block uppercase">Observação / Destino:</span>
-            <p class="text-slate-300 text-xs mt-0.5">${pedido.obs}</p>
+        ${hasDivergence ? `
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <div>
+                <h4 class="font-extrabold text-amber-300 text-xs">Ajuste de Quantidades na Remessa</h4>
+                <p class="text-[11px] text-amber-200/80">
+                  O envio atual possui <strong>${totalSeparado} peças</strong> no total (${diffTotal < 0 ? Math.abs(diffTotal) + ' a menos' : diffTotal + ' a mais'} do que o solicitado inicialmente).
+                </p>
+              </div>
+            </div>
+            <span class="font-mono text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-lg border border-amber-500/30">
+              ${diffTotal < 0 ? 'Falta de Estoque / Parcial' : 'Acréscimo Autorizado'}
+            </span>
           </div>
         ` : ''}
 
+        <!-- Observação & Justificativa Almoxarifado -->
+        <div class="glass-surface p-3.5 rounded-2xl border border-white/5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-regular fa-clipboard text-orange-400"></i> Observação & Justificativa de Separação:
+            </span>
+            <span class="text-[10px] text-slate-500">Editável pelo Almoxarifado</span>
+          </div>
+          <input type="text" id="modal-detail-obs-input" value="${pedido.obs || ''}" onchange="updateObsConference(this.value)" placeholder="Ex: Faltavam 10 câmeras em estoque, restante será enviado na próxima terça..." 
+                 class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500 placeholder-slate-600 transition">
+        </div>
+
+        <!-- Tabela de Conferência Física -->
         <div class="border border-white/10 rounded-2xl overflow-hidden bg-slate-950/80 shadow-lg">
-          <div class="bg-slate-900/90 px-4 py-3 text-xs font-bold text-slate-200 border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
+          <div class="bg-slate-900/90 px-4 py-3 text-xs font-bold text-slate-200 border-b border-white/10 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-2">
               <i class="fa-solid fa-list-check text-orange-400"></i>
-              <span>Conferência de Separação Física (Almoxarifado)</span>
+              <span>Conferência de Separação Física (Almoxarifado Matriz)</span>
             </div>
-            <div class="text-[11px] font-mono font-bold text-slate-400">
-              Conferidos: <span id="checklist-progress-text" class="text-emerald-400">0 / ${pedido.itens.length}</span>
+            <div class="flex items-center gap-3">
+              <button type="button" onclick="toggleAllDetailItemsChecked()" class="text-[11px] font-bold text-orange-400 hover:text-orange-300 bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 px-2.5 py-1 rounded-lg transition cursor-pointer">
+                <i class="fa-solid fa-check-double mr-1"></i> ${conferidosCount === totalItensCount && totalItensCount > 0 ? 'Desmarcar Todos' : 'Marcar Todos'}
+              </button>
+              <div class="text-[11px] font-mono font-bold text-slate-400">
+                Conferidos: <span class="${conferidosCount === totalItensCount && totalItensCount > 0 ? 'text-emerald-400 font-black' : 'text-orange-300'}">${conferidosCount} / ${totalItensCount} (${pctConferido}%)</span>
+              </div>
             </div>
           </div>
-          <table class="w-full text-left text-xs">
-            <thead>
-              <tr class="bg-slate-900/40 text-slate-400 border-b border-white/5 text-[10px] uppercase tracking-wider font-semibold">
-                <th class="py-2 px-3 w-10 text-center">#</th>
-                <th class="py-2 px-3">Descrição do Material</th>
-                <th class="py-2 px-3 text-right">Qtd</th>
-                <th class="py-2 px-3 text-center w-24">Bipado</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsRows}
-            </tbody>
-          </table>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs min-w-[620px]">
+              <thead>
+                <tr class="bg-slate-900/60 text-slate-400 border-b border-white/5 text-[10px] uppercase tracking-wider font-semibold">
+                  <th class="py-2.5 px-3 w-10 text-center">#</th>
+                  <th class="py-2.5 px-3">Descrição do Material</th>
+                  <th class="py-2.5 px-3 text-center w-24">Solicitado</th>
+                  <th class="py-2.5 px-3 text-center w-36">A Enviar (Separado)</th>
+                  <th class="py-2.5 px-3 text-center w-36">Status</th>
+                  <th class="py-2.5 px-3 text-center w-16">Bipado</th>
+                  <th class="py-2.5 px-3 text-center w-12">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemsRowsHtml.length > 0 ? itemsRowsHtml : `
+                  <tr>
+                    <td colspan="7" class="text-center py-8 text-slate-500 italic">
+                      Nenhum material na lista de conferência.
+                    </td>
+                  </tr>
+                `}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Bottom Table Actions & Add Item Button -->
+          <div class="bg-slate-900/40 p-3 border-t border-white/5 flex flex-wrap items-center justify-between gap-2">
+            <button type="button" onclick="toggleInlineAddMaterial()" class="text-xs font-bold text-orange-400 hover:text-white flex items-center gap-1.5 bg-orange-500/10 hover:bg-orange-500/25 px-3 py-1.5 rounded-xl border border-orange-500/30 transition cursor-pointer">
+              <i class="fa-solid fa-plus text-xs"></i>
+              <span>Adicionar Outro Material à Carga</span>
+            </button>
+            <div class="text-[11px] text-slate-400 flex items-center gap-2">
+              <i class="fa-solid fa-circle-info text-slate-500"></i>
+              <span>Ajuste os valores com [+] e [-] ou digite a quantidade real que irá na van.</span>
+            </div>
+          </div>
+
+          <!-- Inline Add Material Form -->
+          <div id="inline-add-material-box" style="display: ${showInlineAddMaterial ? 'block' : 'none'};" class="bg-slate-900/80 p-3.5 border-t border-orange-500/20 space-y-2">
+            <span class="text-[10px] font-bold uppercase text-orange-400 block tracking-wider">Incluir Novo Item Não Solicitado Originalmente:</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <select id="select-add-custom-material" class="flex-1 min-w-[200px] bg-slate-950 border border-white/20 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500">
+                <option value="">Selecione o material do catálogo...</option>
+                ${catalogOptionsHtml}
+              </select>
+              <div class="flex items-center gap-1">
+                <input type="number" id="input-add-custom-qtd" min="1" value="1" placeholder="Qtd" class="w-16 bg-slate-950 border border-white/20 rounded-xl px-2 py-2 text-xs text-center font-mono font-bold text-white focus:outline-none focus:border-orange-500">
+                <span class="text-xs text-slate-400 font-mono">un</span>
+              </div>
+              <button type="button" onclick="addCustomMaterialToDetail()" class="bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition cursor-pointer shadow-md shadow-orange-600/30">
+                Incluir na Remessa
+              </button>
+            </div>
+          </div>
         </div>
       `;
-
-      document.getElementById('btn-whatsapp-action').onclick = () => sendToWhatsApp(pedido.id);
-      
-      const deleteModalBtn = document.getElementById('btn-delete-order-modal');
-      if (deleteModalBtn) {
-        if (isAdmin()) {
-          deleteModalBtn.style.display = 'inline-flex';
-          deleteModalBtn.onclick = () => deletePedidoEnvio(pedido.id);
-        } else {
-          deleteModalBtn.style.display = 'none';
-        }
-      }
-
-      const el = document.getElementById('modal-card-details');
-      el.style.display = 'flex';
     }
 
-    function toggleCheckItem(checkbox, rowId, totalCount) {
-      const row = document.getElementById(rowId);
-      if (checkbox.checked) {
-        row.classList.add('checked-item');
+    function adjustDetailItemQtd(idx, delta) {
+      if (!currentDetailItems[idx]) return;
+      let val = (currentDetailItems[idx].qtd || 0) + delta;
+      if (val < 0) val = 0;
+      currentDetailItems[idx].qtd = val;
+      renderCardDetailsModal();
+    }
+
+    function setDetailItemQtd(idx, val) {
+      if (!currentDetailItems[idx]) return;
+      let parsed = parseInt(val, 10);
+      if (isNaN(parsed) || parsed < 0) parsed = 0;
+      currentDetailItems[idx].qtd = parsed;
+      renderCardDetailsModal();
+    }
+
+    function toggleDetailItemChecked(idx) {
+      if (!currentDetailItems[idx]) return;
+      currentDetailItems[idx].checked = !currentDetailItems[idx].checked;
+      renderCardDetailsModal();
+    }
+
+    function toggleAllDetailItemsChecked() {
+      const allChecked = currentDetailItems.every(it => it.checked);
+      currentDetailItems.forEach(it => it.checked = !allChecked);
+      renderCardDetailsModal();
+    }
+
+    function removeDetailItem(idx) {
+      if (!currentDetailItems[idx]) return;
+      const it = currentDetailItems[idx];
+      if (confirm(`Remover "${it.nome}" desta remessa?`)) {
+        currentDetailItems.splice(idx, 1);
+        renderCardDetailsModal();
+      }
+    }
+
+    function toggleInlineAddMaterial() {
+      showInlineAddMaterial = !showInlineAddMaterial;
+      const box = document.getElementById('inline-add-material-box');
+      if (box) box.style.display = showInlineAddMaterial ? 'block' : 'none';
+    }
+
+    function addCustomMaterialToDetail() {
+      const sel = document.getElementById('select-add-custom-material');
+      const inputQtd = document.getElementById('input-add-custom-qtd');
+      if (!sel || !sel.value) {
+        showToast('Selecione um material para adicionar.', 'warning');
+        return;
+      }
+      const nome = sel.value;
+      const qtd = parseInt(inputQtd ? inputQtd.value : 1, 10) || 1;
+
+      const existing = currentDetailItems.find(it => it.nome.toLowerCase() === nome.toLowerCase());
+      if (existing) {
+        existing.qtd += qtd;
+        showToast(`Quantidade de "${nome}" atualizada para ${existing.qtd} un.`, 'info');
       } else {
-        row.classList.remove('checked-item');
+        let catNome = "OUTROS";
+        for (const c of CATALOGO_MATERIAIS) {
+          if (c.itens.includes(nome)) {
+            catNome = c.categoria;
+            break;
+          }
+        }
+        currentDetailItems.push({
+          id: null,
+          productId: nome.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 30),
+          categoria: catNome,
+          nome: nome,
+          qtd: qtd,
+          qtdOriginal: 0,
+          checked: false
+        });
+        showToast(`"${nome}" (${qtd} un) adicionado à remessa!`, 'success');
       }
 
-      const checkedCount = document.querySelectorAll('#modal-card-details input[type="checkbox"]:checked').length;
-      const progressText = document.getElementById('checklist-progress-text');
-      if (progressText) {
-        progressText.innerText = `${checkedCount} / ${totalCount}`;
-        if (checkedCount === totalCount) {
-          progressText.innerHTML = `<span class="text-emerald-400 font-black"><i class="fa-solid fa-check-double mr-1"></i> 100% CONFERIDO</span>`;
+      showInlineAddMaterial = false;
+      renderCardDetailsModal();
+    }
+
+    function updateObsConference(val) {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
+      if (pedido) {
+        pedido.obs = val;
+      }
+    }
+
+    async function saveCurrentConference(advanceToStatus = null) {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
+      if (!pedido) return;
+
+      const saveBtn = document.getElementById('btn-save-conference');
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+      }
+
+      try {
+        // Atualiza a observação a partir do input se ele existir
+        const obsInput = document.getElementById('modal-detail-obs-input');
+        if (obsInput) {
+          pedido.obs = obsInput.value.trim();
+        }
+
+        // Atualiza pedido.itens
+        pedido.itens = currentDetailItems.map(it => ({
+          id: it.id || null,
+          productId: it.productId || null,
+          categoria: it.categoria || 'OUTROS',
+          nome: it.nome,
+          qtd: it.qtd,
+          qtdOriginal: it.qtdOriginal !== undefined ? it.qtdOriginal : (pedido.originalMap[it.nome] || it.qtd),
+          checked: it.checked || false
+        }));
+
+        // Atualiza originalMap
+        if (!pedido.originalMap) pedido.originalMap = {};
+        pedido.itens.forEach(it => {
+          if (pedido.originalMap[it.nome] === undefined) {
+            pedido.originalMap[it.nome] = it.qtdOriginal;
+          }
+        });
+
+        // Formata anotações para persistência com tags estruturadas
+        const changedItems = pedido.itens.filter(it => it.qtd !== it.qtdOriginal);
+        let baseNotes = (pedido.obs || "").trim();
+        let newNotes = baseNotes;
+        if (pedido.urgencia && pedido.urgencia !== 'Normal') {
+          newNotes = `[${pedido.urgencia.toUpperCase()}] ${newNotes}`.trim();
+        }
+        newNotes += ` [ORIG:${JSON.stringify(pedido.originalMap)}]`;
+        if (changedItems.length > 0) {
+          const adjDesc = changedItems.map(it => `${it.nome}: ${it.qtdOriginal}➔${it.qtd}`).join(' | ');
+          newNotes += ` [AJUSTE: ${adjDesc}]`;
+        }
+
+        // Supabase DB Sync
+        if (pedido.rawId && supabase) {
+          // Filtra itens com quantidade > 0 (respeitando a check constraint quantity > 0)
+          const activeItems = pedido.itens.filter(it => it.qtd > 0);
+          const itemsPayload = activeItems.map(it => {
+            let catNome = it.categoria || "OUTROS";
+            if (!it.categoria) {
+              for (const c of CATALOGO_MATERIAIS) {
+                if (c.itens.includes(it.nome)) {
+                  catNome = c.categoria;
+                  break;
+                }
+              }
+            }
+            return {
+              shipment_id: pedido.rawId,
+              product_id: it.productId || it.nome.toLowerCase().replace(/[^a-z0-9]/g, '-').slice(0, 30),
+              product_name: it.nome,
+              product_category: catNome,
+              quantity: parseInt(it.qtd, 10) || 1
+            };
+          });
+
+          await supabase.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
+          if (itemsPayload.length > 0) {
+            const { error: insErr } = await supabase.from('shipment_items').insert(itemsPayload);
+            if (insErr) throw insErr;
+          }
+
+          // Atualiza shipments: notes e opcionalmente status
+          const shipmentUpdates = { notes: newNotes };
+          if (advanceToStatus) {
+            shipmentUpdates.status = advanceToStatus === 'chegou' ? 'recebido' : advanceToStatus;
+            pedido.status = advanceToStatus;
+          }
+          const { error: shipErr } = await supabase.from('shipments').update(shipmentUpdates).eq('id', pedido.rawId);
+          if (shipErr) throw shipErr;
+        }
+
+        pedido.rawNotes = newNotes;
+        saveState();
+        renderAll();
+
+        showToast(advanceToStatus 
+          ? `Ordem atualizada e avançada com sucesso!` 
+          : 'Quantidades e conferência salvas com sucesso no banco!', 'success');
+
+        if (advanceToStatus) {
+          closeCardDetailsModal();
+        } else {
+          renderCardDetailsModal();
+        }
+      } catch (err) {
+        console.error('Erro ao salvar conferência:', err);
+        showToast('Erro ao salvar dados no banco.', 'error');
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> <span>Salvar Ajustes</span>';
         }
       }
+    }
+
+    async function saveAndAdvanceCurrentConference() {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
+      if (!pedido) return;
+
+      let nextStatus = null;
+      if (pedido.status === 'aguardando') nextStatus = 'separando';
+      else if (pedido.status === 'separando') nextStatus = 'coleta';
+      else if (pedido.status === 'coleta') nextStatus = 'enviado';
+      else if (pedido.status === 'enviado') nextStatus = 'chegou';
+
+      if (!nextStatus) {
+        saveCurrentConference();
+        return;
+      }
+
+      await saveCurrentConference(nextStatus);
     }
 
     function closeCardDetailsModal() {
       const el = document.getElementById('modal-card-details');
       el.style.display = 'none';
+      currentDetailPedidoId = null;
     }
 
-    // Mensagem WhatsApp
+    // Mensagem WhatsApp Formatada
     function sendToWhatsApp(id) {
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (!pedido) return;
 
       const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
 
-      let msg = `📦 *VIGI SUPRIMENTOS - SOLICITAÇÃO ${pedido.id}*\n`;
-      msg += `📍 *Filial:* ${pedido.filial}\n`;
+      let msg = `📦 *VIGI SUPRIMENTOS - ROMANEIO ${pedido.id}*\n`;
+      msg += `📍 *Filial Destino:* ${pedido.filial}\n`;
       msg += `👤 *Solicitante:* ${pedido.solicitante}\n`;
       msg += `🚨 *Status:* ${statusObj.nome.toUpperCase()}\n`;
       msg += `⚡ *Prioridade:* ${pedido.urgencia}\n`;
-      if (pedido.obs) msg += `📝 *Obs:* ${pedido.obs}\n`;
-      msg += `\n📋 *LISTA DE MATERIAIS:*\n`;
+      if (pedido.obs) msg += `📝 *Obs Almoxarifado:* ${pedido.obs}\n`;
+      msg += `\n📋 *MATERIAIS NA REMESSA:*\n`;
 
-      pedido.itens.forEach((it, i) => {
-        msg += `▪️ ${it.qtd}x - ${it.nome}\n`;
+      let hasDivergence = false;
+      pedido.itens.forEach((it) => {
+        if (it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal) {
+          hasDivergence = true;
+          if (it.qtd === 0) {
+            msg += `❌ ~${it.nome}~ _(zerado - sem estoque matriz)_\n`;
+          } else {
+            msg += `▪️ *${it.qtd}x* ${it.nome} _(solicitado: ${it.qtdOriginal}x)_\n`;
+          }
+        } else {
+          msg += `▪️ *${it.qtd}x* ${it.nome}\n`;
+        }
       });
 
-      msg += `\n⏱ _Atualizado em ${pedido.data}_`;
+      const totalPcs = pedido.itens.reduce((acc, cur) => acc + (cur.qtd || 0), 0);
+      msg += `\n📦 *Volume Total da Carga:* ${totalPcs} peças`;
+      if (hasDivergence) {
+        msg += `\n⚠️ _Nota: As quantidades foram conferidas e ajustadas pelo Almoxarifado Matriz conforme disponibilidade real de estoque._\n`;
+      }
+      msg += `\n⏱ _Conferido e emitido em ${pedido.data}_`;
 
       navigator.clipboard.writeText(msg).then(() => {
-        showToast(`Mensagem copiada! Cole no grupo da filial ${pedido.filial}.`, 'whatsapp');
+        showToast(`Romaneio copiado! Cole no grupo da filial ${pedido.filial}.`, 'whatsapp');
       }).catch(err => {
         prompt('Copie o texto abaixo para enviar no grupo de WhatsApp:', msg);
       });
@@ -2674,10 +3157,28 @@
 
     // Impressão Romaneio Formal
     function printSeparacao() {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
+      if (!pedido) return;
+
       const printDiv = document.getElementById('print-area');
-      const modalContent = document.getElementById('detail-body-print').innerHTML;
       const title = document.getElementById('detail-title').innerText;
       const subtitle = document.getElementById('detail-subtitle').innerText;
+
+      let itemsRowsPrint = pedido.itens.map((it, idx) => `
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 6px 8px; text-align: center; font-family: monospace;">${idx + 1}</td>
+          <td style="padding: 6px 8px; font-weight: bold;">${it.nome}</td>
+          <td style="padding: 6px 8px; text-align: center; color: #666;">${it.categoria || 'OUTROS'}</td>
+          <td style="padding: 6px 8px; text-align: center; font-family: monospace;">${it.qtdOriginal || it.qtd} un</td>
+          <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-weight: bold; color: #fd5f00;">${it.qtd} un</td>
+          <td style="padding: 6px 8px; text-align: center; font-size: 11px;">
+            ${it.qtd === it.qtdOriginal ? '100% Atendido' : (it.qtd === 0 ? 'Zerado (Sem Estoque)' : (it.qtd < it.qtdOriginal ? `Parcial (-${it.qtdOriginal - it.qtd})` : `Adicional (+${it.qtd - it.qtdOriginal})`))}
+          </td>
+          <td style="padding: 6px 8px; text-align: center;">[  ]</td>
+        </tr>
+      `).join('');
+
+      const totalPcs = pedido.itens.reduce((acc, cur) => acc + (cur.qtd || 0), 0);
 
       printDiv.innerHTML = `
         <div style="font-family: sans-serif; padding: 25px; color: #111;">
@@ -2686,7 +3187,7 @@
               <img src="vigi-logo.png" style="height: 48px; object-fit: contain;" alt="VIGI Câmeras" />
               <div>
                 <h1 style="font-size: 18px; font-weight: 800; color: #00204A; margin: 0; text-transform: uppercase;">
-                  ROMANEIO DE CONFERÊNCIA E SEPARAÇÃO DE CARGA
+                  ROMANEIO OFICIAL DE CONFERÊNCIA & SEPARAÇÃO DE CARGA
                 </h1>
                 <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">VIGI Câmeras • Gestão Central de Suprimentos & Filiais PR</p>
               </div>
@@ -2695,14 +3196,39 @@
               <span style="display: inline-block; padding: 4px 10px; background: #fff3eb; border: 1px solid #fd5f00; border-radius: 6px; color: #fd5f00; font-weight: 800; font-family: monospace;">ALMOXARIFADO MATRIZ</span>
             </div>
           </div>
-          <p style="font-size: 13px; margin-bottom: 20px;"><strong>${title}</strong> | ${subtitle}</p>
-          ${modalContent}
+          <p style="font-size: 13px; margin-bottom: 12px;"><strong>${title}</strong> | ${subtitle}</p>
+          ${pedido.obs ? `<div style="background: #f4f4f4; padding: 8px 12px; border-radius: 6px; margin-bottom: 15px; font-size: 12px;"><strong>Observação:</strong> ${pedido.obs}</div>` : ''}
+
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px;">
+            <thead>
+              <tr style="background: #00204A; color: white;">
+                <th style="padding: 6px 8px; text-align: center;">#</th>
+                <th style="padding: 6px 8px; text-align: left;">Descrição do Material</th>
+                <th style="padding: 6px 8px; text-align: center;">Categoria</th>
+                <th style="padding: 6px 8px; text-align: center;">Solicitado</th>
+                <th style="padding: 6px 8px; text-align: center;">A Enviar (Separado)</th>
+                <th style="padding: 6px 8px; text-align: center;">Status Atendimento</th>
+                <th style="padding: 6px 8px; text-align: center;">Conferido Filial</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemsRowsPrint}
+            </tbody>
+            <tfoot>
+              <tr style="background: #f0f0f0; font-weight: bold;">
+                <td colspan="4" style="padding: 8px; text-align: right;">Total de Peças na Carga:</td>
+                <td style="padding: 8px; text-align: center; color: #fd5f00;">${totalPcs} un</td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
+
           <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 12px;">
             <div style="border-top: 1px solid #000; width: 42%; text-align: center; padding-top: 6px;">
-              Assinatura do Almoxarife (Separação)
+              Assinatura do Almoxarife (Separação Matriz)
             </div>
             <div style="border-top: 1px solid #000; width: 42%; text-align: center; padding-top: 6px;">
-              Assinatura do Recebedor (Filial)
+              Assinatura do Recebedor (Conferência Filial)
             </div>
           </div>
         </div>
