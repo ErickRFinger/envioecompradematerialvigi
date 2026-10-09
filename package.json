@@ -1,0 +1,8 @@
+{
+  "name": "vigi-gestao-materiais",
+  "version": "1.0.0",
+  "description": "Sistema de Gestão de Materiais e Logística VIGI",
+  "scripts": {
+    "deploy": "vercel --prod --yes"
+  }
+}

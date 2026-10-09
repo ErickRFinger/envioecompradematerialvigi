@@ -191,65 +191,113 @@
       <div class="glass-surface-card rounded-3xl p-6 space-y-4 border-white/10">
         
         <!-- Selector Tabs: Administradores vs Filiais -->
-        <div class="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/10 text-xs font-bold">
-          <button type="button" onclick="switchLoginTab('admins')" id="login-tab-admins" class="flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5 cursor-pointer">
+        <div class="flex items-center bg-slate-950 p-1.5 rounded-2xl border border-white/10 text-xs font-bold gap-1">
+          <button type="button" onclick="switchLoginTab('admins')" id="login-tab-admins" class="flex-1 py-2.5 rounded-xl transition-all duration-200 bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 font-bold flex items-center justify-center gap-2 cursor-pointer border border-orange-500/40">
             <i class="fa-solid fa-shield-halved text-[11px]"></i>
             <span>Administradores</span>
           </button>
-          <button type="button" onclick="switchLoginTab('filiais')" id="login-tab-filiais" class="flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer">
+          <button type="button" onclick="switchLoginTab('filiais')" id="login-tab-filiais" class="flex-1 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 font-semibold flex items-center justify-center gap-2 cursor-pointer border border-transparent">
             <i class="fa-solid fa-location-dot text-[11px]"></i>
             <span>Filiais (PR)</span>
           </button>
         </div>
 
         <!-- Seção Admins -->
-        <div id="login-sec-admins" class="space-y-2">
+        <div id="login-sec-admins" class="space-y-2.5">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            <span>Toque para selecionar administrador</span>
+            <span>Toque para selecionar atendente / admin</span>
             <span class="text-orange-400 font-mono text-[10px]">Acesso Total</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="setQuickLoginDesktop('erick')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span>Erick Finger</span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            <button type="button" onclick="selectQuickUserDesktop('erick')" id="quick-card-erick" data-user="erick" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">EF</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Erick Finger</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('daniel')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span>Daniel L.</span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            <button type="button" onclick="selectQuickUserDesktop('daniel')" id="quick-card-daniel" data-user="daniel" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">DL</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Daniel L.</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('thiago')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span>Thiago G.</span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            <button type="button" onclick="selectQuickUserDesktop('thiago')" id="quick-card-thiago" data-user="thiago" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">TG</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Thiago G.</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('klaus')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span>Cleverson K.</span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            <button type="button" onclick="selectQuickUserDesktop('klaus')" id="quick-card-klaus" data-user="klaus" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">CK</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Cleverson K.</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
             </button>
           </div>
         </div>
 
         <!-- Seção Filiais -->
-        <div id="login-sec-filiais" class="space-y-2 hidden" style="display: none;">
+        <div id="login-sec-filiais" class="space-y-2.5" style="display: none;">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
-            <span>Toque para selecionar filial</span>
+            <span>Toque para selecionar atendente / filial</span>
             <span class="text-amber-400 font-mono text-[10px]">Acesso Restrito</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="setQuickLoginDesktop('beltrao1')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition text-left cursor-pointer">
-              <span>Beltrão 1</span>
-              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            <button type="button" onclick="selectQuickUserDesktop('beltrao1')" id="quick-card-beltrao1" data-user="beltrao1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-amber-500/30">FB</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Beltrão 1</span>
+                  <span class="text-[10px] text-amber-400 font-semibold block">F. Beltrão</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-amber-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-amber-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('beltrao2')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition text-left cursor-pointer">
-              <span>Beltrão 2</span>
-              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            <button type="button" onclick="selectQuickUserDesktop('beltrao2')" id="quick-card-beltrao2" data-user="beltrao2" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-amber-500/30">FB</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Beltrão 2</span>
+                  <span class="text-[10px] text-amber-400 font-semibold block">F. Beltrão</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-amber-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-amber-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('palotina1')" class="p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold text-xs hover:bg-cyan-500/20 active:scale-95 transition text-left cursor-pointer">
-              <span>Palotina 1</span>
-              <span class="block text-[10px] text-slate-400 font-normal">Palotina</span>
+            <button type="button" onclick="selectQuickUserDesktop('palotina1')" id="quick-card-palotina1" data-user="palotina1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-cyan-500/20 text-cyan-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-cyan-500/30">PL</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Palotina 1</span>
+                  <span class="text-[10px] text-cyan-400 font-semibold block">Palotina</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-cyan-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-cyan-400"></i></span>
             </button>
-            <button type="button" onclick="setQuickLoginDesktop('barracao1')" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold text-xs hover:bg-emerald-500/20 active:scale-95 transition text-left cursor-pointer">
-              <span>Barracão 1</span>
-              <span class="block text-[10px] text-slate-400 font-normal">Barracão</span>
+            <button type="button" onclick="selectQuickUserDesktop('barracao1')" id="quick-card-barracao1" data-user="barracao1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-emerald-500/30">BC</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Barracão 1</span>
+                  <span class="text-[10px] text-emerald-400 font-semibold block">Barracão</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-emerald-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-emerald-400"></i></span>
             </button>
           </div>
         </div>
@@ -720,20 +768,32 @@
             <span>🛡️ Administradores (Acesso Total & Excluir Ordens)</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="switchCurrentUser('erick')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
-              <span>Erick Finger</span>
+            <button onclick="switchCurrentUser('erick')" id="switch-btn-erick" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Erick Finger</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
-            <button onclick="switchCurrentUser('daniel')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
-              <span>Daniel L.</span>
+            <button onclick="switchCurrentUser('daniel')" id="switch-btn-daniel" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Daniel L.</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
-            <button onclick="switchCurrentUser('thiago')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
-              <span>Thiago G.</span>
+            <button onclick="switchCurrentUser('thiago')" id="switch-btn-thiago" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Thiago G.</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
-            <button onclick="switchCurrentUser('klaus')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
-              <span>Cleverson K.</span>
+            <button onclick="switchCurrentUser('klaus')" id="switch-btn-klaus" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Cleverson K.</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
           </div>
@@ -745,21 +805,33 @@
             <span>📍 Filiais (Apenas Solicitar & Ver Própria Filial)</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="switchCurrentUser('beltrao1')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left cursor-pointer">
-              Beltrão 1
-              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            <button onclick="switchCurrentUser('beltrao1')" id="switch-btn-beltrao1" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left cursor-pointer flex items-center justify-between">
+              <div>
+                <span>Beltrão 1</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+              </div>
+              <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('beltrao2')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left cursor-pointer">
-              Beltrão 2
-              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            <button onclick="switchCurrentUser('beltrao2')" id="switch-btn-beltrao2" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left cursor-pointer flex items-center justify-between">
+              <div>
+                <span>Beltrão 2</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+              </div>
+              <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('palotina1')" class="p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold hover:bg-cyan-500/20 transition text-left cursor-pointer">
-              Palotina 1
-              <span class="block text-[10px] text-slate-400 font-normal">Palotina</span>
+            <button onclick="switchCurrentUser('palotina1')" id="switch-btn-palotina1" class="p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold hover:bg-cyan-500/20 transition text-left cursor-pointer flex items-center justify-between">
+              <div>
+                <span>Palotina 1</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Palotina</span>
+              </div>
+              <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('barracao1')" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold hover:bg-emerald-500/20 transition text-left cursor-pointer">
-              Barracão 1
-              <span class="block text-[10px] text-slate-400 font-normal">Barracão</span>
+            <button onclick="switchCurrentUser('barracao1')" id="switch-btn-barracao1" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold hover:bg-emerald-500/20 transition text-left cursor-pointer flex items-center justify-between">
+              <div>
+                <span>Barracão 1</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Barracão</span>
+              </div>
+              <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
           </div>
         </div>
@@ -1252,22 +1324,58 @@
       const secFiliais = document.getElementById('login-sec-filiais');
 
       if (tab === 'admins') {
-        btnAdmins.className = "flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5 cursor-pointer";
-        btnFiliais.className = "flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer";
+        btnAdmins.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow-lg shadow-orange-600/30 font-bold flex items-center justify-center gap-2 cursor-pointer border border-orange-500/40";
+        btnFiliais.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 font-semibold flex items-center justify-center gap-2 cursor-pointer border border-transparent";
         secAdmins.style.display = 'block';
         secFiliais.style.display = 'none';
       } else {
-        btnFiliais.className = "flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5 cursor-pointer";
-        btnAdmins.className = "flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5 cursor-pointer";
-        secFiliais.style.display = 'block';
+        btnFiliais.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 bg-gradient-to-r from-amber-600 to-yellow-600 text-white shadow-lg shadow-amber-600/30 font-bold flex items-center justify-center gap-2 cursor-pointer border border-amber-500/40";
+        btnAdmins.className = "flex-1 py-2.5 rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5 font-semibold flex items-center justify-center gap-2 cursor-pointer border border-transparent";
         secAdmins.style.display = 'none';
+        secFiliais.style.display = 'block';
       }
     }
 
-    function setQuickLoginDesktop(username) {
+    function selectQuickUserDesktop(username) {
+      const u = APP_USERS[username];
+      if (!u) return;
+
       document.getElementById('desktop-login-username').value = username;
       document.getElementById('desktop-login-password').value = "Clic@3369";
+
+      // Reset visual de todos os botões de atendente
+      document.querySelectorAll('.quick-user-card').forEach(c => {
+        c.className = "quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group";
+        const icon = c.querySelector('.quick-status-icon');
+        const uname = c.getAttribute('data-user');
+        if (icon && uname) {
+          const isAdm = APP_USERS[uname] && APP_USERS[uname].role === 'admin';
+          icon.innerHTML = isAdm ? '<i class="fa-solid fa-crown text-[10px] text-orange-400"></i>' : '<i class="fa-solid fa-location-dot text-[10px] text-amber-400"></i>';
+        }
+      });
+
+      // Aplica destaque ativo no card selecionado
+      const card = document.getElementById(`quick-card-${username}`);
+      if (card) {
+        const isAdm = u.role === 'admin';
+        const activeStyles = isAdm 
+          ? 'border-orange-500 bg-orange-500/25 ring-2 ring-orange-500/50 shadow-lg shadow-orange-500/25 text-white scale-[1.02]' 
+          : 'border-amber-500 bg-amber-500/25 ring-2 ring-amber-500/50 shadow-lg shadow-amber-500/25 text-white scale-[1.02]';
+        card.className = `quick-user-card p-3 rounded-2xl border ${activeStyles} font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group`;
+        const icon = card.querySelector('.quick-status-icon');
+        if (icon) {
+          icon.innerHTML = '<span class="flex items-center gap-1 text-[11px] text-emerald-400 font-black"><i class="fa-solid fa-circle-check"></i></span>';
+        }
+      }
+
+      // Atualiza o botão de envio
+      const submitBtn = document.getElementById('btn-desktop-login-submit');
+      if (submitBtn) {
+        submitBtn.innerHTML = `<span>Acessar Painel como ${u.name}</span> <i class="fa-solid fa-arrow-right"></i>`;
+      }
     }
+
+    const setQuickLoginDesktop = selectQuickUserDesktop;
 
     function toggleDesktopPasswordVisibility() {
       const input = document.getElementById('desktop-login-password');
@@ -1362,6 +1470,21 @@
     function openUserSwitchModal() {
       const el = document.getElementById('modal-user-switch');
       el.style.display = 'flex';
+
+      Object.keys(APP_USERS).forEach(uname => {
+        const btn = document.getElementById(`switch-btn-${uname}`);
+        if (btn) {
+          if (uname === currentUser) {
+            btn.classList.add('ring-2', 'ring-emerald-400', 'border-emerald-500', 'bg-emerald-500/20');
+            const badge = btn.querySelector('.active-user-badge');
+            if (badge) badge.classList.remove('hidden');
+          } else {
+            btn.classList.remove('ring-2', 'ring-emerald-400', 'border-emerald-500', 'bg-emerald-500/20');
+            const badge = btn.querySelector('.active-user-badge');
+            if (badge) badge.classList.add('hidden');
+          }
+        }
+      });
     }
 
     function closeUserSwitchModal() {
