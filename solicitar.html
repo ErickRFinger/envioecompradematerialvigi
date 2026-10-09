@@ -180,16 +180,16 @@
             <button type="button" onclick="setQuickLogin('beltrao1')" id="mobile-quick-beltrao1" data-user="beltrao1" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                <span class="truncate">Beltrão 1</span>
+                <span class="truncate">Cleverson</span>
               </span>
-              <span class="text-[10px] text-amber-400/70 font-mono">FB</span>
+              <span class="text-[10px] text-amber-400/70 font-mono">BEL</span>
             </button>
             <button type="button" onclick="setQuickLogin('beltrao2')" id="mobile-quick-beltrao2" data-user="beltrao2" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
-                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                <span class="truncate">Beltrão 2</span>
+                <span class="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
+                <span class="truncate">Iury</span>
               </span>
-              <span class="text-[10px] text-amber-400/70 font-mono">FB</span>
+              <span class="text-[10px] text-yellow-400/70 font-mono">BEL</span>
             </button>
             <button type="button" onclick="setQuickLogin('palotina1')" id="mobile-quick-palotina1" data-user="palotina1" class="mobile-quick-card p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold text-xs hover:bg-cyan-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
@@ -379,7 +379,8 @@
       <!-- Admin Branch Filter Ribbon (Visível APENAS para Admins no celular) -->
       <div id="mobile-admin-branch-filter" class="hidden flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-white/10 overflow-x-auto no-scrollbar text-xs">
         <button onclick="setMobileAdminFilter('todas')" id="m-filter-todas" class="px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0">Todas</button>
-        <button onclick="setMobileAdminFilter('Francisco Beltrão')" id="m-filter-beltrao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão</button>
+        <button onclick="setMobileAdminFilter('Beltrão (Cleverson)')" id="m-filter-beltrao-cleverson" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Cleverson)</button>
+        <button onclick="setMobileAdminFilter('Beltrão (Iury)')" id="m-filter-beltrao-iury" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Iury)</button>
         <button onclick="setMobileAdminFilter('Palotina')" id="m-filter-palotina" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Palotina</button>
         <button onclick="setMobileAdminFilter('Barracão')" id="m-filter-barracao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Barracão</button>
       </div>
@@ -498,7 +499,8 @@
           <div id="checkout-branch-selector-container">
             <label class="block font-semibold text-slate-300 mb-1">Filial de Destino</label>
             <select id="checkout-branch-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 disabled:opacity-75 disabled:cursor-not-allowed">
-              <option value="FRANCISCO BELTRAO PR">Francisco Beltrão (PR)</option>
+              <option value="BELTRAO_CLEVERSON">Beltrão (Cleverson)</option>
+              <option value="BELTRAO_IURY">Beltrão (Iury)</option>
               <option value="PALOTINA PR">Palotina (PR)</option>
               <option value="BARRACAO PR">Barracão (PR)</option>
             </select>
@@ -653,21 +655,21 @@
       // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
       "beltrao1": {
         username: "beltrao1",
-        name: "Técnico Beltrão 01",
+        name: "Cleverson (Beltrão)",
         role: "filial",
-        filial: "Francisco Beltrão",
+        filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
-        email: "beltrao1@vigi.com.br",
-        avatar: "B1"
+        email: "cleverson.beltrao@vigi.com.br",
+        avatar: "CL"
       },
       "beltrao2": {
         username: "beltrao2",
-        name: "Técnico Beltrão 02",
+        name: "Iury (Beltrão)",
         role: "filial",
-        filial: "Francisco Beltrão",
+        filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
-        email: "beltrao2@vigi.com.br",
-        avatar: "B2"
+        email: "iury.beltrao@vigi.com.br",
+        avatar: "IU"
       },
       "palotina1": {
         username: "palotina1",
@@ -952,7 +954,13 @@
         document.getElementById('checkout-branch-subtitle').innerText = `Destino: ${u.filial}`;
         
         // Trava seleção de filial na filial do usuário
-        checkoutSelect.value = u.dbBranch;
+        if (u.filial.includes('Cleverson')) {
+          checkoutSelect.value = 'BELTRAO_CLEVERSON';
+        } else if (u.filial.includes('Iury')) {
+          checkoutSelect.value = 'BELTRAO_IURY';
+        } else {
+          checkoutSelect.value = u.dbBranch;
+        }
         checkoutSelect.disabled = true;
         lockNotice.classList.remove('hidden');
         adminFilter.classList.add('hidden');
@@ -1246,9 +1254,25 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Transmitindo para Matriz...';
 
-      // Define branch: se for admin, usa a escolhida; se for filial, força a filial dele
-      const targetDbBranch = userConfig.role === 'admin' ? branchSelected : userConfig.dbBranch;
-      const fullNotes = `[${urgencia.toUpperCase()}] ${obs ? obs : 'Solicitação operacional de filial'}`;
+      // Define branch e destinatário
+      let targetDbBranch = "FRANCISCO BELTRAO PR";
+      let recipientTag = '';
+
+      const effectiveChoice = userConfig.role === 'admin' ? branchSelected : (userConfig.filial.includes('Cleverson') ? 'BELTRAO_CLEVERSON' : userConfig.filial.includes('Iury') ? 'BELTRAO_IURY' : userConfig.dbBranch);
+
+      if (effectiveChoice === 'BELTRAO_CLEVERSON') {
+        targetDbBranch = 'FRANCISCO BELTRAO PR';
+        recipientTag = '[CLEVERSON] ';
+      } else if (effectiveChoice === 'BELTRAO_IURY') {
+        targetDbBranch = 'FRANCISCO BELTRAO PR';
+        recipientTag = '[IURY] ';
+      } else if (effectiveChoice.includes('PALOTINA')) {
+        targetDbBranch = 'PALOTINA PR';
+      } else if (effectiveChoice.includes('BARRACAO')) {
+        targetDbBranch = 'BARRACAO PR';
+      }
+
+      const fullNotes = `[${urgencia.toUpperCase()}] ${recipientTag}${obs ? obs : 'Solicitação operacional de filial'}`;
 
       try {
         // 1. Inserir em shipments
@@ -1367,13 +1391,14 @@
     // 12. ADMIN BRANCH FILTER NO MOBILE
     function setMobileAdminFilter(filial) {
       adminFilterBranch = filial;
-      ['todas', 'beltrao', 'palotina', 'barracao'].forEach(f => {
+      ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao'].forEach(f => {
         const btn = document.getElementById(`m-filter-${f}`);
         if (btn) btn.className = "px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0";
       });
 
       let targetBtn = document.getElementById('m-filter-todas');
-      if (filial === 'Francisco Beltrão') targetBtn = document.getElementById('m-filter-beltrao');
+      if (filial === 'Beltrão (Cleverson)') targetBtn = document.getElementById('m-filter-beltrao-cleverson');
+      if (filial === 'Beltrão (Iury)') targetBtn = document.getElementById('m-filter-beltrao-iury');
       if (filial === 'Palotina') targetBtn = document.getElementById('m-filter-palotina');
       if (filial === 'Barracão') targetBtn = document.getElementById('m-filter-barracao');
 
@@ -1422,14 +1447,31 @@
       trackingList.innerHTML = '';
       historyList.innerHTML = '';
 
-      // Filtro local adicional se for admin e tiver selecionado filtro
+      // Filtro local adicional se for admin ou filial
       let filtered = myShipments;
       if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
         filtered = myShipments.filter(s => {
           const b = (s.branch_name || "").toUpperCase();
-          if (adminFilterBranch === 'Francisco Beltrão') return b.includes('BELTRAO');
+          const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
+          if (adminFilterBranch === 'Beltrão (Cleverson)') {
+            return b.includes('BELTRAO') && !txt.includes('iury') && !txt.includes('iuri');
+          }
+          if (adminFilterBranch === 'Beltrão (Iury)') {
+            return b.includes('BELTRAO') && (txt.includes('iury') || txt.includes('iuri'));
+          }
           if (adminFilterBranch === 'Palotina') return b.includes('PALOTINA');
           if (adminFilterBranch === 'Barracão') return b.includes('BARRACAO');
+          return true;
+        });
+      } else if (userConfig && userConfig.role === 'filial') {
+        filtered = myShipments.filter(s => {
+          const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
+          if (userConfig.filial.includes('Cleverson')) {
+            return !txt.includes('iury') && !txt.includes('iuri');
+          }
+          if (userConfig.filial.includes('Iury')) {
+            return txt.includes('iury') || txt.includes('iuri');
+          }
           return true;
         });
       }
@@ -1491,6 +1533,15 @@
       } else if (bUpper.includes("BARRACAO")) {
         branchLabel = "Barracão";
         branchColor = "text-emerald-400 border-emerald-500/30 bg-emerald-500/10";
+      } else {
+        const txt = `${order.notes || ''} ${order.sender_name || ''}`.toLowerCase();
+        if (txt.includes('iury') || txt.includes('iuri') || txt.includes('beltrao 02') || txt.includes('beltrao2')) {
+          branchLabel = "Beltrão • Iury";
+          branchColor = "text-yellow-400 border-yellow-500/30 bg-yellow-500/10";
+        } else {
+          branchLabel = "Beltrão • Cleverson";
+          branchColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
+        }
       }
 
       // Status Pipeline Index
