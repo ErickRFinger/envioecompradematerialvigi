@@ -317,7 +317,7 @@
             <label class="block text-xs font-semibold text-slate-300 mb-1">Senha de Acesso</label>
             <div class="relative">
               <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-              <input type="password" id="desktop-login-password" required value="Clic@3369" placeholder="Senha" 
+              <input type="password" id="desktop-login-password" required value="" placeholder="Digite sua senha" 
                      class="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 font-mono">
               <button type="button" onclick="toggleDesktopPasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs p-1 cursor-pointer">
                 <i class="fa-regular fa-eye" id="desktop-password-toggle-icon"></i>
@@ -689,8 +689,8 @@
     </div>
 
     <!-- VIEW 2: COMPRAS & ESTOQUE CENTRAL DA MATRIZ -->
-    <div id="view-compras" class="space-y-4 hidden" style="display: none;">
-      <div class="flex items-center justify-between pb-1">
+    <div id="view-compras" class="space-y-4" style="display: none;">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div>
           <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
             <span>Suprimentos & Aquisições para Reposição de Estoque</span>
@@ -702,6 +702,10 @@
             Controle de itens em falta ou com estoque baixo para compras junto aos fornecedores e distribuidoras.
           </p>
         </div>
+        <button onclick="openNewCompraModal()" class="self-start sm:self-auto flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all transform active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-plus-circle text-sm"></i>
+          <span>Nova Solicitação de Compra</span>
+        </button>
       </div>
 
       <!-- KANBAN DE COMPRAS (3 COLUNAS) -->
@@ -1222,12 +1226,16 @@
     // 4. ESTADO DA SESSÃO & DADOS
     let currentUser = null; // NÃO ENTRA LOGADO DIRETO!
     let pedidosEnvio = JSON.parse(localStorage.getItem('vigi_pedidos_envio_v2')) || [];
-    let pedidosCompra = JSON.parse(localStorage.getItem('vigi_pedidos_compra_v2')) || [
+    let storedCompras = null;
+    try {
+      storedCompras = JSON.parse(localStorage.getItem('vigi_pedidos_compra_v2'));
+    } catch (e) {}
+    let pedidosCompra = (Array.isArray(storedCompras) && storedCompras.length > 0) ? storedCompras : [
       {
         id: "COM-201",
-        item: "Conector RJ45 Blindado",
+        item: "Conector RJ45 Blindado Cat6",
         qtd: 500,
-        solicitante: "Roberto (Estoque Matriz)",
+        solicitante: "Roberto (Almoxarifado Matriz)",
         urgencia: "Alta",
         data: "08/10/2026 08:30",
         obs: "Consumo elevado em Beltrão e Palotina. Restam poucas unidades na matriz.",
@@ -1235,9 +1243,9 @@
       },
       {
         id: "COM-202",
-        item: "Câmera Bullet Hikvision ColorVu",
+        item: "Câmera Bullet Hikvision ColorVu IP",
         qtd: 25,
-        solicitante: "Roberto (Estoque Matriz)",
+        solicitante: "Roberto (Almoxarifado Matriz)",
         urgencia: "Normal",
         data: "07/10/2026 14:00",
         obs: "Pedido faturado na distribuidora parceira.",
@@ -1245,13 +1253,23 @@
       },
       {
         id: "COM-203",
-        item: "Bobina de Cabo de Fibra",
+        item: "Bobina de Cabo de Fibra Drop 1KM",
         qtd: 10,
         solicitante: "Diretoria Suprimentos",
         urgencia: "Normal",
         data: "05/10/2026 11:20",
         obs: "Concluído e armazenado no galpão.",
         status: "emestoque"
+      },
+      {
+        id: "COM-204",
+        item: "Fonte Chaveada 12V 5A",
+        qtd: 80,
+        solicitante: "Thiago Graxaim",
+        urgencia: "Alta",
+        data: "09/10/2026 10:15",
+        obs: "Reposição emergencial para kits de CFTV.",
+        status: "solicitado"
       }
     ];
 
@@ -1341,7 +1359,11 @@
       if (!u) return;
 
       document.getElementById('desktop-login-username').value = username;
-      document.getElementById('desktop-login-password').value = "Clic@3369";
+      const pwdInput = document.getElementById('desktop-login-password');
+      if (pwdInput) {
+        pwdInput.value = "";
+        pwdInput.focus();
+      }
 
       // Reset visual de todos os botões de atendente
       document.querySelectorAll('.quick-user-card').forEach(c => {
@@ -1419,7 +1441,13 @@
         sessionStorage.removeItem('vigi_active_session');
         localStorage.removeItem('vigi_auth_session');
         currentUser = null;
-        document.getElementById('view-login').style.display = 'flex';
+        const pwdInput = document.getElementById('desktop-login-password');
+        if (pwdInput) pwdInput.value = '';
+        const viewLogin = document.getElementById('view-login');
+        if (viewLogin) {
+          viewLogin.style.display = 'flex';
+          viewLogin.classList.remove('hidden');
+        }
       }
     }
 
@@ -1578,12 +1606,16 @@
         btnEnvios.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-600/30 cursor-pointer";
         btnCompras.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60 cursor-pointer";
         viewEnvios.style.display = 'block';
+        viewEnvios.classList.remove('hidden');
         viewCompras.style.display = 'none';
+        viewCompras.classList.add('hidden');
       } else {
         btnCompras.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30 cursor-pointer";
         btnEnvios.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60 cursor-pointer";
         viewCompras.style.display = 'block';
+        viewCompras.classList.remove('hidden');
         viewEnvios.style.display = 'none';
+        viewEnvios.classList.add('hidden');
       }
       renderAll();
     }
@@ -1956,8 +1988,19 @@
 
       const counts = { solicitado: 0, comprado: 0, emestoque: 0 };
       const adminPerm = isAdmin();
+      const searchTerm = (document.getElementById('filter-search')?.value || '').toLowerCase().trim();
 
-      pedidosCompra.forEach(compra => {
+      const filteredCompras = pedidosCompra.filter(compra => {
+        if (!searchTerm) return true;
+        return (
+          compra.id.toLowerCase().includes(searchTerm) ||
+          compra.item.toLowerCase().includes(searchTerm) ||
+          compra.solicitante.toLowerCase().includes(searchTerm) ||
+          (compra.obs && compra.obs.toLowerCase().includes(searchTerm))
+        );
+      });
+
+      filteredCompras.forEach(compra => {
         if (counts[compra.status] !== undefined) counts[compra.status]++;
 
         const colContainer = document.getElementById(`cards-compra-${compra.status}`);
@@ -1968,7 +2011,7 @@
         const nextCol = colIndex < COMPRAS_COLUNAS.length - 1 ? COMPRAS_COLUNAS[colIndex + 1] : null;
 
         const card = document.createElement('div');
-        card.className = "glass-surface-card rounded-2xl p-4 space-y-3";
+        card.className = "glass-surface-card rounded-2xl p-4 space-y-3 hover:border-emerald-500/40 transition";
         card.innerHTML = `
           <div class="flex items-start justify-between">
             <span class="font-mono text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">${compra.id}</span>
@@ -1977,40 +2020,60 @@
 
           <div>
             <h4 class="font-extrabold text-white text-sm leading-snug">${compra.item}</h4>
-            <div class="text-xs text-orange-300 font-semibold mt-1">
-              Qtd Necessária: <span class="font-mono text-base font-black text-white">${compra.qtd}</span> un
+            <div class="text-xs text-orange-300 font-semibold mt-1 flex items-center gap-1.5">
+              <span>Qtd Necessária:</span>
+              <span class="font-mono text-base font-black text-white bg-slate-900 px-2 py-0.5 rounded-lg border border-white/5">${compra.qtd} un</span>
             </div>
           </div>
 
           <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 text-[11px] text-slate-300 space-y-1">
-            <p class="text-slate-400 leading-relaxed"><i class="fa-solid fa-quote-left text-slate-600 mr-1"></i>${compra.obs || 'Reposição de estoque da matriz'}</p>
-            <div class="pt-1.5 border-t border-white/5 flex justify-between text-slate-500 text-[10px]">
-              <span><i class="fa-regular fa-user mr-1"></i>${compra.solicitante}</span>
-              <span class="font-mono">${compra.data}</span>
+            <p class="text-slate-300 leading-relaxed"><i class="fa-solid fa-quote-left text-emerald-500/50 mr-1.5"></i>${compra.obs || 'Reposição de estoque para matriz e filiais'}</p>
+            <div class="pt-1.5 border-t border-white/5 flex justify-between text-slate-400 text-[10px]">
+              <span class="flex items-center gap-1"><i class="fa-regular fa-user text-slate-500"></i> ${compra.solicitante}</span>
+              <span class="font-mono text-slate-500">${compra.data}</span>
             </div>
           </div>
 
           <div class="flex items-center justify-between pt-1">
             ${adminPerm ? `
-              <button onclick="deleteCompra('${compra.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition cursor-pointer">
+              <button onclick="deleteCompra('${compra.id}')" title="Excluir requisição de compra" class="text-slate-500 hover:text-rose-400 text-xs p-1 transition cursor-pointer">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
-            ` : '<span></span>'}
-            <div class="flex items-center gap-1.5 ml-auto">
-              ${adminPerm && prevCol ? `
-                <button onclick="movePedidoCompra('${compra.id}', '${prevCol.id}')" class="px-3 py-1 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer">
-                  Voltar
-                </button>
-              ` : ''}
-              ${adminPerm && nextCol ? `
-                <button onclick="movePedidoCompra('${compra.id}', '${nextCol.id}')" class="px-3.5 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition cursor-pointer">
-                  Avançar <i class="fa-solid fa-chevron-right ml-1"></i>
-                </button>
-              ` : '<span class="text-emerald-400 text-xs font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Disponível</span>'}
-            </div>
+              <div class="flex items-center gap-1.5 ml-auto">
+                ${prevCol ? `
+                  <button onclick="movePedidoCompra('${compra.id}', '${prevCol.id}')" title="Voltar para ${prevCol.nome}" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Voltar
+                  </button>
+                ` : ''}
+                ${nextCol ? `
+                  <button onclick="movePedidoCompra('${compra.id}', '${nextCol.id}')" title="Avançar para ${nextCol.nome}" class="px-3.5 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition cursor-pointer flex items-center gap-1">
+                    Avançar <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                  </button>
+                ` : '<span class="text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-circle-check mr-1"></i> No Estoque</span>'}
+              </div>
+            ` : `
+              <div class="ml-auto">
+                ${compra.status === 'emestoque' ? '<span class="text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-circle-check mr-1"></i> No Estoque</span>' : 
+                  compra.status === 'comprado' ? '<span class="text-blue-400 text-xs font-semibold bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-truck mr-1"></i> Em Trânsito</span>' :
+                  '<span class="text-amber-400 text-xs font-semibold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-clock mr-1"></i> Solicitado à Matriz</span>'}
+              </div>
+            `}
           </div>
         `;
         colContainer.appendChild(card);
+      });
+
+      // Renderiza estado vazio para colunas sem itens
+      COMPRAS_COLUNAS.forEach(col => {
+        const colContainer = document.getElementById(`cards-compra-${col.id}`);
+        if (colContainer && colContainer.children.length === 0) {
+          colContainer.innerHTML = `
+            <div class="h-44 flex flex-col items-center justify-center text-slate-500 border border-dashed border-white/10 rounded-2xl p-4 text-center">
+              <i class="fa-solid fa-box-open text-2xl mb-2 opacity-30 text-slate-400"></i>
+              <span class="text-xs font-medium">Nenhum item nesta etapa</span>
+            </div>
+          `;
+        }
       });
 
       document.getElementById('col-count-solicitado').innerText = counts.solicitado;
@@ -2362,16 +2425,36 @@
     // Modal Compras
     function openNewCompraModal() {
       const el = document.getElementById('modal-new-compra');
+      if (!el) return;
       el.style.display = 'flex';
+      el.classList.remove('hidden');
+
+      const solicitanteInput = document.getElementById('compra-solicitante');
+      if (solicitanteInput) {
+        if (currentUser && APP_USERS[currentUser]) {
+          const u = APP_USERS[currentUser];
+          solicitanteInput.value = `${u.name} (${u.filial})`;
+        } else {
+          solicitanteInput.value = 'Roberto (Almoxarifado Matriz)';
+        }
+      }
+
+      setTimeout(() => {
+        const itemInput = document.getElementById('compra-item');
+        if (itemInput) itemInput.focus();
+      }, 50);
     }
 
     function closeNewCompraModal() {
       const el = document.getElementById('modal-new-compra');
+      if (!el) return;
       el.style.display = 'none';
+      el.classList.add('hidden');
     }
 
     function submitNewCompra() {
-      const item = document.getElementById('compra-item').value.trim();
+      const itemInput = document.getElementById('compra-item');
+      const item = itemInput ? itemInput.value.trim() : '';
       const qtd = parseInt(document.getElementById('compra-qtd').value) || 1;
       const urgencia = document.getElementById('compra-urgencia').value;
       const solicitante = document.getElementById('compra-solicitante').value.trim();
@@ -2379,6 +2462,7 @@
 
       if (!item) {
         alert('Por favor, informe a descrição do material necessário.');
+        if (itemInput) itemInput.focus();
         return;
       }
 
@@ -2387,7 +2471,7 @@
         id: newId,
         item: item,
         qtd: qtd,
-        solicitante: solicitante || 'Estoque Matriz',
+        solicitante: solicitante || (currentUser ? APP_USERS[currentUser]?.name : 'Almoxarifado Matriz'),
         urgencia: urgencia,
         data: new Date().toLocaleString('pt-BR'),
         obs: obs,
@@ -2398,7 +2482,15 @@
       saveState();
       switchMainTab('compras');
       closeNewCompraModal();
-      showToast(`Requisição de Compra ${newId} aberta!`, 'success');
+
+      // Limpar campos
+      if (itemInput) itemInput.value = '';
+      const obsInput = document.getElementById('compra-obs');
+      if (obsInput) obsInput.value = '';
+      const qtdInput = document.getElementById('compra-qtd');
+      if (qtdInput) qtdInput.value = '10';
+
+      showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
     }
 
     // 18. ROMANEIO, CONFERÊNCIA FÍSICA & IMPRESSÃO

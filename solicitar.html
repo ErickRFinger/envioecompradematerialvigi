@@ -267,7 +267,7 @@
             <label class="block text-xs font-semibold text-slate-300 mb-1">Senha de Acesso</label>
             <div class="relative">
               <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-              <input type="password" id="login-password" required value="Clic@3369" placeholder="Senha" 
+              <input type="password" id="login-password" required value="" placeholder="Digite sua senha" 
                      class="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 font-mono">
               <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs p-1">
                 <i class="fa-regular fa-eye" id="password-toggle-icon"></i>
@@ -833,7 +833,11 @@
       if (!u) return;
 
       document.getElementById('login-username').value = username;
-      document.getElementById('login-password').value = "Clic@3369";
+      const pwdInput = document.getElementById('login-password');
+      if (pwdInput) {
+        pwdInput.value = "";
+        pwdInput.focus();
+      }
 
       // Reset visual de todos os botões de filial / admin
       document.querySelectorAll('.mobile-quick-card').forEach(c => {
@@ -902,6 +906,8 @@
         localStorage.removeItem('vigi_auth_session');
         localStorage.removeItem('vigi_mobile_user');
         currentUser = null;
+        const pwdInput = document.getElementById('login-password');
+        if (pwdInput) pwdInput.value = '';
         const viewLogin = document.getElementById('view-login');
         if (viewLogin) {
           viewLogin.style.display = 'flex';
