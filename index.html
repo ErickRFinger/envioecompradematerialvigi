@@ -3,17 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIGI Logística & Suprimentos - Gestão Inteligente de Filiais</title>
+  <title>VIGI Logística & Suprimentos • Almoxarifado Central & Filiais</title>
   
+  <!-- Favicon & Touch Icons VIGI -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#001127">
+
   <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 6 Pro/Free Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     tailwind.config = {
@@ -21,33 +31,55 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
           },
           colors: {
-            brand: {
-              50: '#eef2ff',
-              100: '#e0e7ff',
-              400: '#818cf8',
-              500: '#6366f1',
-              600: '#4f46e5',
-              700: '#4338ca',
+            vigi: {
+              DEFAULT: '#FD5F00',
+              orange: '#FD5F00',
+              orangeHover: '#e65500',
+              navy: '#00204A',
+              navyDark: '#000c1e',
+              navyPanel: '#001738',
+              navyLight: '#082f66',
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#fd5f00',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
+              900: '#7c2d12',
+              accent: '#FD5F00'
             },
-            dark: {
-              950: '#070a12',
-              900: '#0c1222',
-              850: '#11192e',
-              800: '#16203b',
-              750: '#1d2a4d',
-              700: '#263763'
+            beltrao: {
+              DEFAULT: '#f59e0b',
+              glow: 'rgba(245, 158, 11, 0.25)',
+              border: 'rgba(245, 158, 11, 0.4)'
+            },
+            palotina: {
+              DEFAULT: '#06b6d4',
+              glow: 'rgba(6, 182, 212, 0.25)',
+              border: 'rgba(6, 182, 212, 0.4)'
+            },
+            barracao: {
+              DEFAULT: '#10b981',
+              glow: 'rgba(16, 185, 129, 0.25)',
+              border: 'rgba(16, 185, 129, 0.4)'
             }
           },
           boxShadow: {
-            'glow-indigo': '0 0 25px -5px rgba(99, 102, 241, 0.35)',
-            'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.35)',
-            'glow-amber': '0 0 25px -5px rgba(245, 158, 11, 0.35)',
-            'glow-rose': '0 0 25px -5px rgba(244, 63, 94, 0.35)',
-            'card-glass': '0 8px 32px 0 rgba(0, 0, 0, 0.37)'
+            'glow-vigi': '0 0 35px -5px rgba(253, 95, 0, 0.45)',
+            'glow-navy': '0 0 35px -5px rgba(0, 32, 74, 0.8)',
+            'glow-emerald': '0 0 30px -5px rgba(16, 185, 129, 0.4)',
+            'glow-amber': '0 0 30px -5px rgba(245, 158, 11, 0.4)',
+            'glow-purple': '0 0 30px -5px rgba(168, 85, 247, 0.4)',
+            'glow-cyan': '0 0 30px -5px rgba(6, 182, 212, 0.4)',
+            'glow-rose': '0 0 30px -5px rgba(244, 63, 94, 0.45)',
+            'card-glass': '0 12px 36px 0 rgba(0, 0, 0, 0.45)'
           }
         }
       }
@@ -55,80 +87,88 @@
   </script>
 
   <style>
-    /* Smooth Scrollbar */
+    /* Smooth Scrollbar Premium */
     ::-webkit-scrollbar {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #080c16;
+      background: #000c1e;
     }
     ::-webkit-scrollbar-thumb {
-      background: #1e293b;
+      background: #0a264e;
       border-radius: 9999px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #334155;
+      background: #fd5f00;
     }
 
-    /* Glassmorphism Styles */
-    .glass-panel {
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+    /* Ambient VIGI Deep Navy & Electric Orange Canvas */
+    .bg-mesh-modern {
+      background-color: #000c1e;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 32, 74, 0.95) 0px, transparent 60%),
+        radial-gradient(at 100% 0%, rgba(253, 95, 0, 0.16) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(0, 20, 46, 0.8) 0px, transparent 80%),
+        radial-gradient(at 85% 90%, rgba(0, 32, 74, 0.75) 0px, transparent 55%),
+        radial-gradient(at 15% 85%, rgba(253, 95, 0, 0.1) 0px, transparent 45%);
+      background-attachment: fixed;
     }
 
-    .glass-card {
-      background: rgba(17, 24, 39, 0.85);
-      backdrop-filter: blur(12px);
+    /* Glass Panels with Navy Tint */
+    .glass-surface {
+      background: rgba(2, 18, 42, 0.82);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-surface-card {
+      background: rgba(2, 21, 48, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.06);
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .glass-card:hover {
+    .glass-surface-card:hover {
       transform: translateY(-2px);
-      border-color: rgba(99, 102, 241, 0.4);
-      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.6), 0 0 20px -5px rgba(99, 102, 241, 0.15);
+      border-color: rgba(253, 95, 0, 0.45);
+      box-shadow: 0 18px 40px -12px rgba(0, 0, 0, 0.75), 0 0 25px -5px rgba(253, 95, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12);
     }
 
-    .glass-header {
-      background: rgba(8, 12, 22, 0.82);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    .glass-header-nav {
+      background: rgba(0, 14, 34, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    /* Ambient Background Mesh */
-    .bg-mesh {
-      background-color: #070a13;
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.12) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 50% 50%, rgba(15, 23, 42, 0.5) 0px, transparent 100%),
-        radial-gradient(at 80% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
-    }
-
-    /* Dragging Visual Effects */
+    /* Dragging & Dropzone Animations */
     .kanban-dropzone.dragover {
-      border: 2px dashed #6366f1 !important;
-      background: rgba(99, 102, 241, 0.08) !important;
+      border: 2px dashed #fd5f00 !important;
+      background: rgba(253, 95, 0, 0.14) !important;
+      border-radius: 1rem;
     }
     .card-dragging {
-      opacity: 0.45;
-      transform: scale(0.96) rotate(1deg);
+      opacity: 0.35;
+      transform: scale(0.97) rotate(1.5deg);
+      cursor: grabbing !important;
     }
 
-    /* Custom Pulse Ring */
-    @keyframes pulseGlow {
-      0%, 100% { opacity: 0.6; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.08); }
+    /* Checked Item in Checklist */
+    .checklist-row.checked-item {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.35);
     }
-    .pulse-glow {
-      animation: pulseGlow 2.5s infinite ease-in-out;
+    .checklist-row.checked-item .item-label {
+      text-decoration: line-through;
+      color: #94a3b8;
     }
 
-    /* Print Formatting */
+    /* Print Styles */
     @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
@@ -139,7 +179,7 @@
     }
   </style>
 </head>
-<body class="bg-mesh text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
+<body class="bg-mesh-modern text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-orange-600 selection:text-white">
 
   <!-- ======================================================== -->
   <!-- TOAST NOTIFICATION CONTAINER -->
@@ -147,64 +187,94 @@
   <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
 
   <!-- ======================================================== -->
-  <!-- TOPBAR / MODERN HEADER -->
+  <!-- TOPBAR / HIGH-END NAV -->
   <!-- ======================================================== -->
-  <header class="glass-header sticky top-0 z-40">
-    <div class="max-w-[1920px] mx-auto px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+  <header class="glass-header-nav sticky top-0 z-40">
+    <div class="max-w-[1920px] mx-auto px-5 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
       
-      <!-- Logo & Brand Badge -->
-      <div class="flex items-center gap-3.5">
-        <div class="relative group">
-          <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 rounded-2xl blur-md opacity-70 group-hover:opacity-100 transition duration-300"></div>
-          <div class="relative w-11 h-11 rounded-xl bg-slate-900 border border-white/20 flex items-center justify-center font-black text-2xl text-transparent bg-clip-text bg-gradient-to-tr from-blue-400 via-indigo-300 to-white shadow-xl">
-            V
+      <!-- Brand & Network Status -->
+      <div class="flex items-center gap-4">
+        <!-- Official VIGI Brand Logo -->
+        <div class="relative group cursor-pointer flex items-center" onclick="switchMainTab('envios')">
+          <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-500/30 to-[#00204A]/60 rounded-2xl blur-md opacity-60 group-hover:opacity-100 transition duration-300"></div>
+          <div class="relative h-12 px-3 py-1.5 rounded-xl bg-[#001738]/95 border border-white/10 hover:border-orange-500/40 flex items-center justify-center shadow-xl transition">
+            <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-8 max-w-[155px] object-contain drop-shadow" />
           </div>
         </div>
+        
         <div>
           <div class="flex items-center gap-2.5">
-            <h1 class="font-black text-xl tracking-tight text-white flex items-center gap-2">
-              VIGI <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">SUPRIMENTOS & LOGÍSTICA</span>
+            <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2">
+              VIGI <span class="text-[10px] font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-blue-500/20 text-orange-400 border border-orange-500/30">SUPRIMENTOS & EXPEDIÇÃO</span>
             </h1>
-            <span class="inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Online
+            <span id="supabase-status-badge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Supabase Nuvem
             </span>
           </div>
-          <p class="text-xs text-slate-400 mt-0.5 flex items-center gap-2">
-            <span>Rede Paraná:</span>
-            <span class="text-amber-400/90 font-medium hover:underline cursor-pointer">Francisco Beltrão</span> • 
-            <span class="text-purple-400/90 font-medium hover:underline cursor-pointer">Palotina</span> • 
-            <span class="text-cyan-400/90 font-medium hover:underline cursor-pointer">Barracão</span>
-          </p>
+          <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
+            <span class="text-slate-500 font-medium"><i class="fa-solid fa-network-wired text-orange-500 mr-1"></i>Rede Paraná:</span>
+            <span onclick="setBranchFilter('Francisco Beltrão')" class="hover:text-amber-400 transition cursor-pointer font-semibold text-slate-300">Beltrão</span>
+            <span class="text-slate-600">•</span>
+            <span onclick="setBranchFilter('Palotina')" class="hover:text-cyan-400 transition cursor-pointer font-semibold text-slate-300">Palotina</span>
+            <span class="text-slate-600">•</span>
+            <span onclick="setBranchFilter('Barracão')" class="hover:text-emerald-400 transition cursor-pointer font-semibold text-slate-300">Barracão</span>
+          </div>
         </div>
       </div>
 
-      <!-- Segmented Tab Switcher (iOS/Linear Style) -->
-      <div class="relative bg-slate-900/90 p-1.5 rounded-2xl border border-white/10 shadow-2xl flex items-center">
-        <button id="tab-btn-envios" onclick="switchMainTab('envios')" class="relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-600/30">
+      <!-- Segmented Main Tab Switcher -->
+      <div class="relative bg-slate-950/80 p-1.5 rounded-2xl border border-white/10 shadow-2xl flex items-center">
+        <button id="tab-btn-envios" onclick="switchMainTab('envios')" class="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-600/30">
           <i class="fa-solid fa-truck-ramp-box text-sm"></i>
-          <span>Envios para Filiais</span>
+          <span>Expedição & Filiais</span>
           <span id="badge-count-envios" class="bg-white/20 text-white font-mono text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
-        <button id="tab-btn-compras" onclick="switchMainTab('compras')" class="relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60">
+        <button id="tab-btn-compras" onclick="switchMainTab('compras')" class="relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60">
           <i class="fa-solid fa-cart-shopping text-sm"></i>
-          <span>Compras & Almoxarifado</span>
+          <span>Suprimentos Matriz</span>
           <span id="badge-count-compras" class="bg-slate-800 text-slate-300 font-mono text-[10px] px-2 py-0.5 rounded-full font-black">0</span>
         </button>
       </div>
 
-      <!-- Quick Action Buttons -->
+      <!-- User Profile, Fast Switcher & Actions -->
       <div class="flex items-center gap-3">
-        <button onclick="openNewEnvioModal()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none">
-          <span class="absolute inset-0 bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 group-hover:opacity-100 transition duration-300"></span>
-          <span class="relative flex items-center gap-2.5 px-5 py-2.5 rounded-[11px] bg-slate-900/90 text-white font-bold text-xs tracking-wide group-hover:bg-opacity-70 transition duration-200">
-            <i class="fa-solid fa-plus-circle text-indigo-400 text-sm group-hover:rotate-90 transition duration-300"></i>
-            <span>Nova Solicitação de Filial</span>
+        
+        <!-- User Badge & Profile Switcher -->
+        <div onclick="openUserSwitchModal()" class="cursor-pointer group flex items-center gap-2.5 bg-slate-950/90 hover:bg-slate-900 border border-white/10 hover:border-orange-500/40 p-1.5 pr-3 rounded-2xl transition shadow-md">
+          <div id="desktop-user-avatar" class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center font-black text-xs">
+            EF
+          </div>
+          <div class="text-left">
+            <div class="flex items-center gap-1.5">
+              <span id="desktop-user-name" class="font-bold text-xs text-white leading-tight">Erick Finger</span>
+              <i class="fa-solid fa-caret-down text-[10px] text-slate-400 group-hover:text-orange-400 transition"></i>
+            </div>
+            <div id="desktop-user-role-badge" class="text-[10px] font-semibold text-orange-400 flex items-center gap-1">
+              <i class="fa-solid fa-shield-halved text-[9px]"></i> Administrador
+            </div>
+          </div>
+        </div>
+
+        <!-- LINK PARA O APP MOBILE -->
+        <a href="solicitar.html" title="Abrir Aplicativo Mobile de Solicitação para Técnicos" 
+           class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-orange-400 hover:text-white border border-orange-500/30 px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-md transition transform active:scale-95">
+          <i class="fa-solid fa-mobile-screen-button text-orange-400"></i>
+          <span class="hidden xl:inline">Portal Mobile</span>
+        </a>
+
+        <!-- Botão Nova Solicitação -->
+        <button onclick="openNewEnvioModal()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none transition transform active:scale-95 shadow-lg shadow-orange-600/20">
+          <span class="absolute inset-0 bg-gradient-to-r from-orange-500 via-[#FD5F00] to-amber-500 group-hover:opacity-100 transition duration-300"></span>
+          <span class="relative flex items-center gap-2 px-4 py-2.5 rounded-[11px] bg-slate-950 text-white font-bold text-xs tracking-wide group-hover:bg-opacity-80 transition duration-200">
+            <i class="fa-solid fa-plus-circle text-orange-400 text-sm group-hover:rotate-90 transition duration-300"></i>
+            <span>Nova Solicitação</span>
           </span>
         </button>
 
-        <button onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/20 transition-all transform active:scale-95">
+        <!-- Botão Pedir Compra -->
+        <button onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/25 transition-all transform active:scale-95">
           <i class="fa-solid fa-bag-shopping text-sm"></i>
-          <span>Pedir Compra</span>
+          <span class="hidden sm:inline">Repor Estoque</span>
         </button>
       </div>
 
@@ -212,67 +282,121 @@
   </header>
 
   <!-- ======================================================== -->
-  <!-- STATS & FILTERS SUB-HEADER (CARDS COM GLOW) -->
+  <!-- HIGH-END KPI ANALYTICS RIBBON (5 CARDS DE MÉTRICAS) -->
   <!-- ======================================================== -->
-  <section class="border-b border-white/5 bg-slate-950/60 backdrop-blur-md px-5 py-3">
-    <div class="max-w-[1920px] mx-auto flex flex-wrap items-center justify-between gap-4">
+  <section class="border-b border-white/5 bg-slate-950/40 backdrop-blur-md px-5 lg:px-8 py-3.5">
+    <div class="max-w-[1920px] mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
       
-      <!-- KPI Metric Badges -->
-      <div class="flex items-center gap-3 flex-wrap">
+      <!-- 5 Metric Cards with Semantic Glow -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 flex-1 max-w-5xl">
         
-        <!-- Aguardando -->
-        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20">
-          <div class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse shadow-glow-amber"></div>
-          <span class="text-xs text-amber-200/80 font-medium">Aguardando:</span>
-          <span id="stat-aguardando" class="font-mono font-black text-amber-400 text-sm">0</span>
+        <!-- 1. Aguardando -->
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-amber-500/20 hover:border-amber-500/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black shadow-glow-amber">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-amber-300/80">Aguardando</p>
+              <p class="text-[10px] text-slate-400">Fila da Matriz</p>
+            </div>
+          </div>
+          <span id="stat-aguardando" class="font-mono font-black text-amber-400 text-lg">0</span>
         </div>
 
-        <!-- Separando -->
-        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20">
-          <div class="w-2.5 h-2.5 rounded-full bg-blue-400"></div>
-          <span class="text-xs text-blue-200/80 font-medium">Separando:</span>
-          <span id="stat-separando" class="font-mono font-black text-blue-400 text-sm">0</span>
+        <!-- 2. Separando -->
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-blue-500/20 hover:border-blue-500/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xs font-black">
+              <i class="fa-solid fa-dolly"></i>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-blue-300/80">Separando</p>
+              <p class="text-[10px] text-slate-400">Almoxarifado</p>
+            </div>
+          </div>
+          <span id="stat-separando" class="font-mono font-black text-blue-400 text-lg">0</span>
         </div>
 
-        <!-- Coleta -->
-        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-purple-500/10 border border-purple-500/20">
-          <div class="w-2.5 h-2.5 rounded-full bg-purple-400"></div>
-          <span class="text-xs text-purple-200/80 font-medium">Pronto p/ Coleta:</span>
-          <span id="stat-coleta" class="font-mono font-black text-purple-400 text-sm">0</span>
+        <!-- 3. Pronto / Coleta -->
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-purple-500/20 hover:border-purple-500/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-black shadow-glow-purple">
+              <i class="fa-solid fa-boxes-packing"></i>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-purple-300/80">Pronto p/ Coleta</p>
+              <p class="text-[10px] text-slate-400">Embalado e selado</p>
+            </div>
+          </div>
+          <span id="stat-coleta" class="font-mono font-black text-purple-400 text-lg">0</span>
         </div>
 
-        <!-- Enviado -->
-        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20">
-          <div class="w-2.5 h-2.5 rounded-full bg-cyan-400"></div>
-          <span class="text-xs text-cyan-200/80 font-medium">Em Rota:</span>
-          <span id="stat-enviado" class="font-mono font-black text-cyan-400 text-sm">0</span>
+        <!-- 4. Em Rota -->
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-cyan-500/20 hover:border-cyan-500/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xs font-black shadow-glow-cyan">
+              <i class="fa-solid fa-van-shuttle"></i>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-cyan-300/80">Em Rota</p>
+              <p class="text-[10px] text-slate-400">Na rodovia / van</p>
+            </div>
+          </div>
+          <span id="stat-enviado" class="font-mono font-black text-cyan-400 text-lg">0</span>
         </div>
 
-        <!-- Entregue -->
-        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-          <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-glow-emerald"></div>
-          <span class="text-xs text-emerald-200/80 font-medium">Entregues:</span>
-          <span id="stat-chegou" class="font-mono font-black text-emerald-400 text-sm">0</span>
+        <!-- 5. Entregues -->
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-emerald-500/20 hover:border-emerald-500/40 transition">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs font-black shadow-glow-emerald">
+              <i class="fa-solid fa-check-double"></i>
+            </div>
+            <div>
+              <p class="text-[10px] uppercase font-bold tracking-wider text-emerald-300/80">Entregues</p>
+              <p class="text-[10px] text-slate-400">Concluídos</p>
+            </div>
+          </div>
+          <span id="stat-chegou" class="font-mono font-black text-emerald-400 text-lg">0</span>
         </div>
 
       </div>
 
-      <!-- Quick Filter Bar -->
-      <div class="flex items-center gap-3">
+      <!-- Quick Controls: Filters & Search -->
+      <div class="flex items-center gap-3 flex-wrap justify-between lg:justify-end">
         
-        <!-- Branch Pills Filter -->
-        <div class="flex items-center bg-slate-900/90 p-1 rounded-xl border border-white/10 text-xs">
-          <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1 rounded-lg font-bold transition-all bg-indigo-600 text-white">Todas</button>
-          <button onclick="setBranchFilter('Francisco Beltrão')" id="filter-btn-beltrao" class="px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white">Beltrão</button>
-          <button onclick="setBranchFilter('Palotina')" id="filter-btn-palotina" class="px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white">Palotina</button>
-          <button onclick="setBranchFilter('Barracão')" id="filter-btn-barracao" class="px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white">Barracão</button>
+        <!-- Branch Pills Filter with Distinct Branch Accent -->
+        <div id="desktop-branch-filters-container" class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
+          <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30">
+            Todas
+          </button>
+          <button onclick="setBranchFilter('Francisco Beltrão')" id="filter-btn-beltrao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-amber-400 transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Beltrão
+          </button>
+          <button onclick="setBranchFilter('Palotina')" id="filter-btn-palotina" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-cyan-400 transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Palotina
+          </button>
+          <button onclick="setBranchFilter('Barracão')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão
+          </button>
         </div>
 
-        <!-- Search Bar -->
+        <!-- View Switcher (Kanban vs Table) -->
+        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
+          <button id="view-mode-kanban-btn" onclick="setViewMode('kanban')" title="Visualização Kanban em Colunas" class="px-2.5 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40">
+            <i class="fa-solid fa-table-columns mr-1"></i> Kanban
+          </button>
+          <button id="view-mode-table-btn" onclick="setViewMode('table')" title="Visualização em Lista / Tabela de Expedição" class="px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-list-check mr-1"></i> Tabela
+          </button>
+        </div>
+
+        <!-- Search Bar with Shortcut -->
         <div class="relative">
           <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
           <input type="text" id="filter-search" oninput="renderAll()" placeholder="Filtrar pedidos ou materiais..." 
-                 class="bg-slate-900/90 border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 w-56 transition-all">
+                 class="bg-slate-950/80 border border-white/10 rounded-xl pl-8 pr-12 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 w-52 sm:w-64 transition-all">
+          <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500 bg-slate-900 border border-white/10 px-1.5 py-0.5 rounded">/</span>
         </div>
 
       </div>
@@ -280,171 +404,173 @@
   </section>
 
   <!-- ======================================================== -->
-  <!-- MAIN WORKSPACE / KANBAN BOARDS -->
+  <!-- MAIN WORKSPACE -->
   <!-- ======================================================== -->
-  <main class="flex-1 max-w-[1920px] w-full mx-auto p-5 overflow-x-auto">
+  <main class="flex-1 max-w-[1920px] w-full mx-auto p-4 lg:p-6 overflow-x-auto">
 
     <!-- VIEW 1: ENVIOS DE MATERIAIS PARA FILIAIS -->
     <div id="view-envios" class="space-y-4">
       
-      <!-- Section Header with Drag tip -->
+      <!-- Section Header with Operational Helper -->
       <div class="flex items-center justify-between pb-1">
-        <div class="flex items-center gap-3">
-          <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-            Pipeline de Distribuição & Despacho
+        <div>
+          <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
+            <span>Pipeline Operacional de Expedição</span>
+            <span id="role-view-indicator" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30">
+              🛡️ Modo Administrador • Acesso Total
+            </span>
           </h2>
-          <span class="text-xs text-slate-400 bg-slate-900/60 px-3 py-1 rounded-lg border border-white/5">
-            <i class="fa-solid fa-hand-pointer text-indigo-400 mr-1.5"></i> Dica: Você pode <strong>arrastar e soltar (drag & drop)</strong> os cards entre as colunas!
-          </span>
+          <p class="text-xs text-slate-400 mt-0.5" id="pipeline-description-text">
+            Arraste os cards entre as colunas para atualizar a fase de separação, romaneio e transporte.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="loadSupabaseShipments()" class="text-xs font-bold text-orange-400 hover:text-white bg-slate-950 border border-white/10 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> <span>Sincronizar Banco</span>
+          </button>
         </div>
       </div>
 
-      <!-- 5-Column Ultra Modern Kanban Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-start">
+      <!-- KANBAN BOARD CONTAINER (5 COLUNAS) -->
+      <div id="kanban-view-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 items-start">
         
-        <!-- 1. AGUARDANDO SEPARAÇÃO -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col min-h-[75vh] border-amber-500/20 shadow-lg"
-             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'aguardando')">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black">1</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-200">Aguardando</h3>
-                <p class="text-[10px] text-slate-500">Fila de separação</p>
-              </div>
+        <!-- COL 1: AGUARDANDO SEPARAÇÃO -->
+        <div class="glass-surface rounded-3xl p-3.5 space-y-3 border-amber-500/20" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'aguardando')">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-300">1. Aguardando</h3>
             </div>
-            <span id="col-count-aguardando" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+            <span id="col-count-aguardando" class="font-mono text-xs font-black bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/30">0</span>
           </div>
-          <div id="cards-aguardando" class="kanban-dropzone flex-1 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <p class="text-[11px] text-slate-400">Novos pedidos recebidos das filiais</p>
+          <div id="cards-aguardando" class="kanban-dropzone space-y-3 min-h-[500px]"></div>
         </div>
 
-        <!-- 2. EM SEPARAÇÃO -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col min-h-[75vh] border-blue-500/20 shadow-lg"
-             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'separando')">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xs font-black">2</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-blue-200">Separando</h3>
-                <p class="text-[10px] text-slate-500">Almoxarifado em ação</p>
-              </div>
+        <!-- COL 2: EM SEPARAÇÃO -->
+        <div class="glass-surface rounded-3xl p-3.5 space-y-3 border-blue-500/20" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'separando')">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-blue-300">2. Separando</h3>
             </div>
-            <span id="col-count-separando" class="bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+            <span id="col-count-separando" class="font-mono text-xs font-black bg-blue-500/20 text-blue-400 px-2.5 py-0.5 rounded-full border border-blue-500/30">0</span>
           </div>
-          <div id="cards-separando" class="kanban-dropzone flex-1 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <p class="text-[11px] text-slate-400">Almoxarifado bipando e separando itens</p>
+          <div id="cards-separando" class="kanban-dropzone space-y-3 min-h-[500px]"></div>
         </div>
 
-        <!-- 3. AGUARDANDO COLETA -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col min-h-[75vh] border-purple-500/20 shadow-lg"
-             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'coleta')">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-black">3</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-purple-200">Pronto / Coleta</h3>
-                <p class="text-[10px] text-slate-500">Embalado e etiquetado</p>
-              </div>
+        <!-- COL 3: PRONTO P/ COLETA -->
+        <div class="glass-surface rounded-3xl p-3.5 space-y-3 border-purple-500/20" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'coleta')">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-purple-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-purple-300">3. Pronto Coleta</h3>
             </div>
-            <span id="col-count-coleta" class="bg-purple-500/10 text-purple-400 border border-purple-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+            <span id="col-count-coleta" class="font-mono text-xs font-black bg-purple-500/20 text-purple-400 px-2.5 py-0.5 rounded-full border border-purple-500/30">0</span>
           </div>
-          <div id="cards-coleta" class="kanban-dropzone flex-1 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <p class="text-[11px] text-slate-400">Embalado, etiquetado e aguardando van</p>
+          <div id="cards-coleta" class="kanban-dropzone space-y-3 min-h-[500px]"></div>
         </div>
 
-        <!-- 4. ENVIADO / EM TRÂNSITO -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col min-h-[75vh] border-cyan-500/20 shadow-lg"
-             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'enviado')">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xs font-black">4</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-cyan-200">Em Rota</h3>
-                <p class="text-[10px] text-slate-500">Na van ou transportadora</p>
-              </div>
+        <!-- COL 4: EM ROTA -->
+        <div class="glass-surface rounded-3xl p-3.5 space-y-3 border-cyan-500/20" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'enviado')">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-cyan-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-cyan-300">4. Em Rota</h3>
             </div>
-            <span id="col-count-enviado" class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+            <span id="col-count-enviado" class="font-mono text-xs font-black bg-cyan-500/20 text-cyan-400 px-2.5 py-0.5 rounded-full border border-cyan-500/30">0</span>
           </div>
-          <div id="cards-enviado" class="kanban-dropzone flex-1 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <p class="text-[11px] text-slate-400">Carga em trânsito com motorista</p>
+          <div id="cards-enviado" class="kanban-dropzone space-y-3 min-h-[500px]"></div>
         </div>
 
-        <!-- 5. CHEGOU / ENTREGUE -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col min-h-[75vh] border-emerald-500/20 shadow-lg"
-             ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'chegou')">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs font-black">5</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-200">Entregue</h3>
-                <p class="text-[10px] text-slate-500">Concluído e conferido</p>
-              </div>
+        <!-- COL 5: ENTREGUE -->
+        <div class="glass-surface rounded-3xl p-3.5 space-y-3 border-emerald-500/20" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, 'chegou')">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-300">5. Entregues</h3>
             </div>
-            <span id="col-count-chegou" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+            <span id="col-count-chegou" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/30">0</span>
           </div>
-          <div id="cards-chegou" class="kanban-dropzone flex-1 space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <p class="text-[11px] text-slate-400">Mercadoria recebida e atestada pela filial</p>
+          <div id="cards-chegou" class="kanban-dropzone space-y-3 min-h-[500px]"></div>
         </div>
 
       </div>
+
+      <!-- TABLE VIEW CONTAINER (ALTERNATIVA EM LISTA) -->
+      <div id="table-view-container" class="glass-surface rounded-3xl p-5 hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b border-white/10 text-slate-400 uppercase tracking-wider text-[10px] font-bold">
+                <th class="py-3 px-4">Código</th>
+                <th class="py-3 px-4">Filial Destino</th>
+                <th class="py-3 px-4">Técnico Solicitante</th>
+                <th class="py-3 px-4">Urgência</th>
+                <th class="py-3 px-4">Materiais</th>
+                <th class="py-3 px-4">Fase Atual</th>
+                <th class="py-3 px-4">Data/Hora</th>
+                <th class="py-3 px-4 text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="table-view-tbody" class="divide-y divide-white/5">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
 
-    <!-- VIEW 2: COMPRA DE MATERIAIS (ESTOQUE & SUPRIMENTOS) -->
+    <!-- VIEW 2: COMPRAS & ESTOQUE CENTRAL DA MATRIZ -->
     <div id="view-compras" class="space-y-4 hidden">
-      
       <div class="flex items-center justify-between pb-1">
-        <h2 class="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          Pipeline de Compras & Suprimentos da Matriz
-        </h2>
-        <button onclick="openNewCompraModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-lg shadow-emerald-600/30">
-          <i class="fa-solid fa-plus"></i> Nova Requisição de Compra
-        </button>
+        <div>
+          <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
+            <span>Suprimentos & Aquisições para Reposição de Estoque</span>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+              Almoxarifado Central
+            </span>
+          </h2>
+          <p class="text-xs text-slate-400 mt-0.5">
+            Controle de itens em falta ou com estoque baixo para compras junto aos fornecedores e distribuidoras.
+          </p>
+        </div>
       </div>
 
-      <!-- 3 Colunas de Compras -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
+      <!-- KANBAN DE COMPRAS (3 COLUNAS) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         
-        <!-- Solicitado -->
-        <div class="glass-panel rounded-2xl p-4 flex flex-col min-h-[75vh] border-amber-500/20 shadow-lg">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black">1</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-200">Solicitação Aberta</h3>
-                <p class="text-[10px] text-slate-500">Necessidade do estoque central</p>
-              </div>
-            </div>
-            <span id="col-count-solicitado" class="bg-amber-500/10 text-amber-400 border border-amber-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+        <!-- COL 1: SOLICITADO -->
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-amber-500/20">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-300">1. Aberto / Necessário</h3>
+            <span id="col-count-solicitado" class="font-mono text-xs font-black bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full">0</span>
           </div>
-          <div id="cards-compra-solicitado" class="space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <div id="cards-compra-solicitado" class="space-y-3 min-h-[450px]"></div>
         </div>
 
-        <!-- Comprado / A caminho -->
-        <div class="glass-panel rounded-2xl p-4 flex flex-col min-h-[75vh] border-indigo-500/20 shadow-lg">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center text-xs font-black">2</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-indigo-200">Comprado (Aguardando Chegada)</h3>
-                <p class="text-[10px] text-slate-500">Pedido com fornecedor / NF emitida</p>
-              </div>
-            </div>
-            <span id="col-count-comprado" class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+        <!-- COL 2: COMPRADO -->
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-blue-500/20">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-blue-300">2. Comprado / Em Trânsito</h3>
+            <span id="col-count-comprado" class="font-mono text-xs font-black bg-blue-500/20 text-blue-400 px-2.5 py-0.5 rounded-full">0</span>
           </div>
-          <div id="cards-compra-comprado" class="space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <div id="cards-compra-comprado" class="space-y-3 min-h-[450px]"></div>
         </div>
 
-        <!-- Em Estoque -->
-        <div class="glass-panel rounded-2xl p-4 flex flex-col min-h-[75vh] border-emerald-500/20 shadow-lg">
-          <div class="flex items-center justify-between pb-3 mb-3 border-b border-white/5">
-            <div class="flex items-center gap-2.5">
-              <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs font-black">3</span>
-              <div>
-                <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-200">Em Estoque / Disponível</h3>
-                <p class="text-[10px] text-slate-500">Conferido e pronto para abastecer filiais</p>
-              </div>
-            </div>
-            <span id="col-count-emestoque" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono text-xs font-black px-2.5 py-0.5 rounded-full">0</span>
+        <!-- COL 3: EM ESTOQUE -->
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-emerald-500/20">
+          <div class="flex items-center justify-between pb-2 border-b border-white/5">
+            <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-300">3. Recebido / Em Estoque</h3>
+            <span id="col-count-emestoque" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full">0</span>
           </div>
-          <div id="cards-compra-emestoque" class="space-y-3 overflow-y-auto max-h-[72vh] pr-1"></div>
+          <div id="cards-compra-emestoque" class="space-y-3 min-h-[450px]"></div>
         </div>
 
       </div>
@@ -453,215 +579,187 @@
   </main>
 
   <!-- ======================================================== -->
-  <!-- MODAL: NOVA SOLICITAÇÃO (CATÁLOGO MODERNO HIGH-END) -->
+  <!-- MODAL: TROCAR USUÁRIO / AUTENTICAÇÃO (RBAC) -->
   <!-- ======================================================== -->
-  <div id="modal-new-envio" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-5">
-    <div class="glass-panel w-full max-w-7xl max-h-[94vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden border border-white/10 animate-in fade-in zoom-in-95 duration-200">
+  <div id="modal-user-switch" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-white/10 animate-in zoom-in-95 duration-200">
       
-      <!-- Modal Header -->
-      <div class="px-6 py-4.5 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-400 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-boxes-stacked"></i>
+      <div class="px-6 py-4 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center text-sm font-bold">
+            <i class="fa-solid fa-users-gear"></i>
           </div>
           <div>
-            <h2 class="text-base font-extrabold text-white flex items-center gap-2">
-              Nova Solicitação de Materiais para Filial
-            </h2>
-            <p class="text-xs text-slate-400">Monte a lista selecionando as quantidades. O pedido será despachado para a equipe de separação.</p>
+            <h2 class="text-sm font-extrabold text-white">Alternar Perfil Operacional</h2>
+            <p class="text-[11px] text-slate-400">Controle de acessos e permissões do sistema</p>
           </div>
         </div>
-        <button onclick="closeNewEnvioModal()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 flex items-center justify-center transition">
-          <i class="fa-solid fa-xmark text-sm"></i>
-        </button>
-      </div>
-
-      <!-- Modal Body (Two Panes: 1. Form & Order Summary | 2. Visual Catalog) -->
-      <div class="flex-1 overflow-hidden grid grid-cols-1 lg:grid-cols-12 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
-        
-        <!-- Left Panel: Dados do Pedido + Carrinho (4 Colunas) -->
-        <div class="lg:col-span-4 p-5 space-y-4 overflow-y-auto bg-slate-950/40">
-          
-          <div class="glass-card rounded-2xl p-4 space-y-3.5">
-            <h3 class="text-xs font-black uppercase tracking-wider text-indigo-400 flex items-center gap-2">
-              <i class="fa-solid fa-building-circle-arrow-right"></i> Destino da Remessa
-            </h3>
-
-            <!-- Filial Selector -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Filial Solicitante *</label>
-              <div class="grid grid-cols-3 gap-2">
-                <button type="button" onclick="selectModalFilial('Francisco Beltrão')" id="btn-filial-beltrao"
-                        class="p-2 rounded-xl text-xs font-bold border transition text-center bg-indigo-600 text-white border-indigo-500">
-                  Beltrão
-                </button>
-                <button type="button" onclick="selectModalFilial('Palotina')" id="btn-filial-palotina"
-                        class="p-2 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-indigo-500/40">
-                  Palotina
-                </button>
-                <button type="button" onclick="selectModalFilial('Barracão')" id="btn-filial-barracao"
-                        class="p-2 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-indigo-500/40">
-                  Barracão
-                </button>
-              </div>
-              <input type="hidden" id="req-filial" value="Francisco Beltrão">
-            </div>
-
-            <!-- Solicitante -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Solicitante / Técnico Líder *</label>
-              <div class="relative">
-                <i class="fa-regular fa-user absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                <input type="text" id="req-solicitante" placeholder="Ex: Jean (Técnico Beltrão)" 
-                       class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500">
-              </div>
-            </div>
-
-            <!-- Prioridade -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Urgência do Pedido</label>
-              <select id="req-urgencia" class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500">
-                <option value="Normal">🟢 Normal (Reposição semanal padrão)</option>
-                <option value="Alta">🟡 Alta (Demanda imediata)</option>
-                <option value="Urgente">🔴 Crítica / Obra Parada (Despachar hoje)</option>
-              </select>
-            </div>
-
-            <!-- Observações -->
-            <div>
-              <label class="block text-xs font-semibold text-slate-300 mb-1">Observações / Destino</label>
-              <textarea id="req-obs" rows="2" placeholder="Ex: Material para instalação de câmeras na cooperativa..." 
-                        class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none"></textarea>
-            </div>
-          </div>
-
-          <!-- Carrinho em Tempo Real -->
-          <div class="glass-card rounded-2xl p-4 flex flex-col h-64">
-            <div class="flex items-center justify-between pb-2.5 border-b border-white/10">
-              <div class="flex items-center gap-2">
-                <i class="fa-solid fa-clipboard-check text-emerald-400 text-sm"></i>
-                <h4 class="text-xs font-extrabold uppercase tracking-wider text-white">Lista Selecionada</h4>
-              </div>
-              <span id="cart-total-badge" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">0 un</span>
-            </div>
-
-            <div id="cart-list" class="flex-1 overflow-y-auto space-y-2 py-2 pr-1 text-xs">
-              <div class="text-center text-slate-500 py-12 italic text-xs">
-                Nenhum item selecionado ainda.<br>Use os botões (+) no catálogo ao lado.
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-white/10 flex items-center justify-between text-xs">
-              <button onclick="clearCart()" class="text-slate-500 hover:text-rose-400 text-[11px] font-semibold transition">
-                <i class="fa-solid fa-trash-can mr-1"></i> Limpar Lista
-              </button>
-              <span id="cart-unique-count" class="font-bold text-slate-300">0 tipos de materiais</span>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Right Panel: Catálogo Completo (8 Colunas) -->
-        <div class="lg:col-span-8 p-5 flex flex-col space-y-3.5 overflow-hidden">
-          
-          <!-- Category Quick Chips & Search Bar -->
-          <div class="space-y-2.5">
-            <div class="relative">
-              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-              <input type="text" id="catalog-search" oninput="filterCatalogItems()" placeholder="Buscar em todo o catálogo (ex: Câmera, RJ45, Fibra, Parafuso, Nobreak)..." 
-                     class="w-full bg-slate-900/90 border border-white/10 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all">
-            </div>
-
-            <!-- Category Pills Carousel -->
-            <div id="category-chips-bar" class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs no-scrollbar">
-              <!-- Injected by JS -->
-            </div>
-          </div>
-
-          <!-- Catalog Cards List -->
-          <div id="catalog-container" class="flex-1 overflow-y-auto max-h-[58vh] space-y-4 pr-1.5">
-            <!-- Dynamic Category Cards -->
-          </div>
-
-        </div>
-
-      </div>
-
-      <!-- Modal Footer -->
-      <div class="px-6 py-3.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between">
-        <button onclick="closeNewEnvioModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800 transition">
-          Cancelar
-        </button>
-        <button onclick="submitNewEnvio()" class="flex items-center gap-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-500 hover:from-blue-500 hover:to-indigo-400 text-white px-7 py-2.5 rounded-xl text-xs font-extrabold shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95">
-          <i class="fa-solid fa-paper-plane text-sm"></i>
-          <span>Confirmar e Enviar para Separação</span>
-        </button>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- ======================================================== -->
-  <!-- MODAL: NOVA SOLICITAÇÃO DE COMPRA -->
-  <!-- ======================================================== -->
-  <div id="modal-new-compra" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden border border-white/10 animate-in fade-in zoom-in-95 duration-200">
-      
-      <div class="px-6 py-4 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center text-lg">
-            <i class="fa-solid fa-cart-flatbed"></i>
-          </div>
-          <div>
-            <h2 class="text-sm font-extrabold text-white">Requisição de Compra / Reposição</h2>
-            <p class="text-xs text-slate-400">Notifique o setor de Compras para repor o estoque central.</p>
-          </div>
-        </div>
-        <button onclick="closeNewCompraModal()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+        <button onclick="closeUserSwitchModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
 
       <div class="p-6 space-y-4 text-xs">
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Material Necessário *</label>
-          <input type="text" id="compra-item" list="catalog-datalist" placeholder="Digite ou selecione do catálogo..." 
-                 class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-          <datalist id="catalog-datalist"></datalist>
+        
+        <!-- Admins Group -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-orange-400">
+            <span>🛡️ Administradores (Acesso Total & Excluir Ordens)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="switchCurrentUser('erick')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between">
+              <span>Erick Finger</span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
+            <button onclick="switchCurrentUser('daniel')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between">
+              <span>Daniel L.</span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
+            <button onclick="switchCurrentUser('thiago')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between">
+              <span>Thiago G.</span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
+            <button onclick="switchCurrentUser('klaus')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between">
+              <span>Cleverson K.</span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Quantidade Sugerida *</label>
-            <input type="number" id="compra-qtd" min="1" value="20" class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-white font-mono font-bold focus:outline-none focus:border-emerald-500">
+        <!-- Filiais Group -->
+        <div class="space-y-2 pt-2 border-t border-white/10">
+          <div class="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-amber-400">
+            <span>📍 Filiais (Apenas Solicitar & Ver Própria Filial)</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="switchCurrentUser('beltrao1')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left">
+              Beltrão 1
+              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            </button>
+            <button onclick="switchCurrentUser('beltrao2')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition text-left">
+              Beltrão 2
+              <span class="block text-[10px] text-slate-400 font-normal">Francisco Beltrão</span>
+            </button>
+            <button onclick="switchCurrentUser('palotina1')" class="p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold hover:bg-cyan-500/20 transition text-left">
+              Palotina 1
+              <span class="block text-[10px] text-slate-400 font-normal">Palotina</span>
+            </button>
+            <button onclick="switchCurrentUser('barracao1')" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold hover:bg-emerald-500/20 transition text-left">
+              Barracão 1
+              <span class="block text-[10px] text-slate-400 font-normal">Barracão</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
+        <span class="text-[11px] text-slate-500">Senha padrão: Clic@3369</span>
+        <button onclick="closeUserSwitchModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white">Fechar</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: NOVA SOLICITAÇÃO DE ENVIO -->
+  <!-- ======================================================== -->
+  <div id="modal-new-envio" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-surface w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10 animate-in zoom-in-95 duration-200">
+      
+      <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-2xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center text-base font-bold shadow-glow-vigi">
+            <i class="fa-solid fa-truck-ramp-box"></i>
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Prioridade</label>
-            <select id="compra-urgencia" class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
-              <option value="Normal">Normal (Reposição)</option>
-              <option value="Alta">Alta (Estoque crítico)</option>
-              <option value="Urgente">Urgente (Sem estoque)</option>
+            <h2 class="text-base font-extrabold text-white">Nova Solicitação de Materiais</h2>
+            <p class="text-xs text-slate-400">Envio para filiais da rede VIGI Paraná</p>
+          </div>
+        </div>
+        <button onclick="closeNewEnvioModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-4 overflow-y-auto flex-1 text-xs">
+        
+        <!-- Destino da Filial & Dados -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="space-y-1">
+            <label class="font-bold text-slate-300">Filial de Destino *</label>
+            <div id="modal-filial-selector-pills" class="grid grid-cols-3 gap-1.5 pt-1">
+              <button type="button" onclick="selectModalFilial('Francisco Beltrão')" id="btn-filial-beltrao" class="p-2.5 rounded-xl text-xs font-bold border transition text-center bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-glow-amber">
+                Beltrão
+              </button>
+              <button type="button" onclick="selectModalFilial('Palotina')" id="btn-filial-palotina" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-cyan-500/40">
+                Palotina
+              </button>
+              <button type="button" onclick="selectModalFilial('Barracão')" id="btn-filial-barracao" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-emerald-500/40">
+                Barracão
+              </button>
+            </div>
+            <input type="hidden" id="req-filial" value="Francisco Beltrão">
+            <p id="modal-filial-locked-msg" class="text-[10px] text-slate-500 italic mt-1 hidden">
+              <i class="fa-solid fa-lock text-[9px]"></i> Bloqueado na sua filial vinculada.
+            </p>
+          </div>
+
+          <div class="space-y-1">
+            <label class="font-bold text-slate-300">Técnico Solicitante *</label>
+            <input type="text" id="req-solicitante" placeholder="Ex: Jean Carlos" 
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
+          </div>
+
+          <div class="space-y-1">
+            <label class="font-bold text-slate-300">Urgência</label>
+            <select id="req-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-orange-500">
+              <option value="Normal">🟢 Normal (Próxima rota padrão)</option>
+              <option value="Alta">🟡 Alta (Envio prioritário)</option>
+              <option value="Urgente">🔴 Urgente (Cliente crítico sem monitoramento)</option>
             </select>
           </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Responsável / Solicitante *</label>
-          <input type="text" id="compra-solicitante" placeholder="Ex: Roberto - Estoque Matriz" 
-                 class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        <!-- Seletor de Materiais com Busca e Categorias -->
+        <div class="space-y-2 pt-2 border-t border-white/10">
+          <div class="flex items-center justify-between">
+            <label class="font-bold text-slate-300 uppercase tracking-wider text-[11px]">Selecionar Materiais do Catálogo</label>
+            <span id="modal-cart-counter-text" class="text-orange-400 font-mono font-bold text-[11px]">0 itens adicionados</span>
+          </div>
+
+          <!-- Filtro de Busca de Materiais -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="modal-material-search" oninput="renderModalCatalogItems()" placeholder="Buscar câmeras, dvr, cabos, fontes, ferramentas..." 
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
+          </div>
+
+          <!-- Chips de Categorias -->
+          <div id="category-chips-bar" class="flex items-center gap-1.5 overflow-x-auto py-1">
+            <!-- Injected by JS -->
+          </div>
+
+          <!-- Grid de Materiais Disponíveis -->
+          <div id="modal-catalog-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-1 bg-slate-950/60 rounded-2xl border border-white/5">
+            <!-- Injected by JS -->
+          </div>
         </div>
 
+        <!-- Observações -->
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Justificativa / Fornecedor Sugerido</label>
-          <textarea id="compra-obs" rows="3" placeholder="Ex: Demanda alta de câmeras em Beltrão e Palotina..." 
-                    class="w-full bg-slate-900/90 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+          <label class="block font-bold text-slate-300 mb-1">Observações da Carga (Opcional)</label>
+          <textarea id="req-obs" rows="2" placeholder="Ex: Separar na van da terça-feira para atendimento cliente Fazenda Esperança..." 
+                    class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 resize-none"></textarea>
         </div>
+
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between">
-        <button onclick="closeNewCompraModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white">Cancelar</button>
-        <button onclick="submitNewCompra()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2 rounded-xl font-bold shadow-lg shadow-emerald-600/30">
-          Lançar no Kanban de Compras
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
+        <button onclick="closeNewEnvioModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white">Cancelar</button>
+        <button onclick="submitNewEnvio()" id="btn-submit-desktop-envio" class="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:from-orange-500 text-white px-5 py-2.5 rounded-xl font-extrabold shadow-lg shadow-orange-600/30 flex items-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Registrar Solicitação</span>
         </button>
       </div>
 
@@ -669,20 +767,88 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- MODAL: FICHA DETALHADA / ROMANEIO DE SEPARAÇÃO -->
+  <!-- MODAL: NOVA SOLICITAÇÃO DE COMPRA / MATRIZ -->
   <!-- ======================================================== -->
-  <div id="modal-card-details" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-    <div class="glass-panel w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10">
+  <div id="modal-new-compra" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-white/10 animate-in zoom-in-95 duration-200">
       
-      <div class="px-6 py-4.5 bg-slate-900/90 border-b border-white/10 flex items-center justify-between">
+      <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <span id="detail-code-badge" class="font-mono text-xs font-black bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 px-3 py-1 rounded-xl">#ENV-000</span>
+          <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base font-bold shadow-glow-emerald">
+            <i class="fa-solid fa-cart-shopping"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-extrabold text-white">Solicitar Compra para Matriz</h2>
+            <p class="text-xs text-slate-400">Reposição de itens no Almoxarifado Central</p>
+          </div>
+        </div>
+        <button onclick="closeNewCompraModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-6 space-y-3.5 text-xs">
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Item / Descrição do Material *</label>
+          <input type="text" id="compra-item" placeholder="Ex: Conector RJ45 blindado, Câmera UNV Color Hunter..." 
+                 class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Quantidade Necessária *</label>
+            <input type="number" id="compra-qtd" min="1" value="10" 
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-mono">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Urgência</label>
+            <select id="compra-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+              <option value="Normal">🟢 Normal (Estoque de segurança)</option>
+              <option value="Alta">🟡 Alta (Ruptura em menos de 5 dias)</option>
+              <option value="Urgente">🔴 Urgente (Estoque zerado)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Solicitante</label>
+          <input type="text" id="compra-solicitante" value="Roberto (Estoque Matriz)" 
+                 class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block font-semibold text-slate-300 mb-1">Justificativa / Fornecedor Sugerido</label>
+          <textarea id="compra-obs" rows="3" placeholder="Ex: Demanda alta de câmeras em Beltrão e Palotina..." 
+                    class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+        </div>
+      </div>
+
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
+        <button onclick="closeNewCompraModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white">Cancelar</button>
+        <button onclick="submitNewCompra()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-emerald-600/30">
+          Lançar Requisição
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: FICHA DETALHADA / ROMANEIO DE SEPARAÇÃO & CHECKLIST -->
+  <!-- ======================================================== -->
+  <div id="modal-card-details" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-surface w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-white/10">
+      
+      <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="vigi-logo.png" alt="VIGI" class="h-7 object-contain" />
+          <span id="detail-code-badge" class="font-mono text-xs font-black bg-orange-500/20 text-orange-400 border border-orange-500/40 px-3 py-1 rounded-xl">#ENV-000</span>
           <div>
             <h2 id="detail-title" class="text-base font-extrabold text-white">Ficha de Separação de Materiais</h2>
             <p id="detail-subtitle" class="text-xs text-slate-400">Filial</p>
           </div>
         </div>
-        <button onclick="closeCardDetailsModal()" class="w-8 h-8 rounded-xl bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center">
+        <button onclick="closeCardDetailsModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
@@ -691,15 +857,21 @@
         <!-- Injected by JS -->
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between">
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
         <div class="flex items-center gap-2">
           <button id="btn-whatsapp-action" class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-3.5 py-2 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/20 transition">
             <i class="fa-brands fa-whatsapp text-sm"></i>
-            <span>Copiar p/ WhatsApp da Filial</span>
+            <span>Copiar p/ WhatsApp</span>
           </button>
           <button onclick="printSeparacao()" class="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl font-bold text-xs border border-white/10 transition">
             <i class="fa-solid fa-print"></i>
             <span>Imprimir Romaneio</span>
+          </button>
+          
+          <!-- Botão Excluir Pedido (PROTEGIDO POR RBAC - VISÍVEL APENAS PARA ADMINS) -->
+          <button id="btn-delete-order-modal" title="Excluir este pedido do sistema (Ação de Administrador)" class="flex items-center gap-1.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 px-3 py-2 rounded-xl font-bold text-xs transition">
+            <i class="fa-solid fa-trash-can"></i>
+            <span>Excluir Ordem</span>
           </button>
         </div>
         <button onclick="closeCardDetailsModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white">Fechar</button>
@@ -712,25 +884,114 @@
   <div id="print-area" class="hidden p-8 text-black bg-white"></div>
 
   <!-- ======================================================== -->
-  <!-- JAVASCRIPT APPLICATION CORE -->
+  <!-- JAVASCRIPT APPLICATION CORE & SUPABASE SYNC -->
   <!-- ======================================================== -->
   <script>
-    // 1. BANCO DE MATERIAIS EXTRAÍDO DAS FOTOS
+    // 1. SUPABASE CLIENT CONFIGURATION
+    const SUPABASE_URL = "https://hnfhrjgzeivzrcpumkyk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI";
+
+    const supabase = (window.supabase && window.supabase.createClient) 
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    // 2. DICIONÁRIO OFICIAL DE USUÁRIOS & RBAC
+    const APP_USERS = {
+      // --- ADMINISTRADORES GERAIS (Acesso Total & Exclusão de Ordens) ---
+      "erick": {
+        username: "erick",
+        name: "Erick Finger",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "EF"
+      },
+      "daniel": {
+        username: "daniel",
+        name: "Daniel Lazzarotto",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "DL"
+      },
+      "thiago": {
+        username: "thiago",
+        name: "Thiago Graxaim",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "TG"
+      },
+      "klaus": {
+        username: "klaus",
+        name: "Cleverson Klaus",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "CK"
+      },
+
+      // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
+      "beltrao1": {
+        username: "beltrao1",
+        name: "Técnico Beltrão 01",
+        role: "filial",
+        filial: "Francisco Beltrão",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        avatar: "B1"
+      },
+      "beltrao2": {
+        username: "beltrao2",
+        name: "Técnico Beltrão 02",
+        role: "filial",
+        filial: "Francisco Beltrão",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        avatar: "B2"
+      },
+      "palotina1": {
+        username: "palotina1",
+        name: "Técnico Palotina 01",
+        role: "filial",
+        filial: "Palotina",
+        dbBranch: "PALOTINA PR",
+        avatar: "P1"
+      },
+      "barracao1": {
+        username: "barracao1",
+        name: "Técnico Barracão 01",
+        role: "filial",
+        filial: "Barracão",
+        dbBranch: "BARRACAO PR",
+        avatar: "BR"
+      }
+    };
+
+    // 3. BANCO DE MATERIAIS EXTRAÍDO DAS FOTOS
     const CATALOGO_MATERIAIS = [
       {
-        categoria: "MARKETING E OUTROS",
-        icon: "fa-bullhorn",
-        itens: ["Adesivo de Monitoramento", "Camisa VIGI", "Copo", "Plaquinha VIGI", "Sacola para Copos", "Ticket Sem Parar"]
+        categoria: "CÂMERAS",
+        icon: "fa-video",
+        itens: ["Câmera Bullet Hikvision", "Câmera Bullet Hikvision ColorVu", "Câmera Bullet Positivo", "Câmera Bullet UNV", "Câmera Bullet UNV ColorVu", "Câmera Bullet UNV Dual Light", "Câmera Dome UNV", "Câmera Dome UNV ColorVu", "Câmera Dome UNV Dual Light", "Câmera Hik com Sirene", "Câmera Hik Robotizada Sirene", "Câmera IP Bullet Hikvision", "Câmera IP Bullet UNV", "Câmera IP Dome UNV", "Câmera IP EZVIZ", "Câmera TWO", "Câmera UNV Color Hunter com Áudio", "Câmera Varifocal"]
       },
       {
-        categoria: "EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)",
-        icon: "fa-wrench",
-        itens: ["Alicate de Bico", "Alicate de Corte", "Alicate de Crimpar", "Aplicador de Silicone", "Aspirador de Pó Vertical", "Broca de Aço", "Broca de Concreto", "Broca de Madeira", "Broca Escalonada", "Caixa de Ferramentas", "Escada", "Furadeira de Impacto", "Martelo", "Multímetro", "Parafusadeira", "Ponteira Philips", "Serrinha", "Testador de Cabo de Rede"]
+        categoria: "GRAVADORES (DVRs)",
+        icon: "fa-server",
+        itens: ["DVR Hikvision 16CH", "DVR Hikvision 2CH", "DVR Hikvision 4CH", "DVR Hikvision 8CH", "DVR INTELBRAS 16CH", "DVR INTELBRAS 2CH", "DVR INTELBRAS 4CH", "DVR INTELBRAS 8CH", "DVR UNV 16CH", "DVR UNV 2CH", "DVR UNV 4CH", "DVR UNV 8CH"]
       },
       {
         categoria: "CABOS E FIOS",
         icon: "fa-network-wired",
         itens: ["Arame de Espinar", "Bobina de Cabo Blindado", "Bobina de Cabo Coaxial", "Bobina de Cabo de Fibra", "Caixa de Cabo de Rede", "Lubrificante Passa Fio", "Rolo de Cabo de Alarme", "Rolo de Cabo de Energia"]
+      },
+      {
+        categoria: "CONECTORES E VÍDEO",
+        icon: "fa-plug",
+        itens: ["Conector BNC", "Conector de Energia", "Conector de Fibra", "Conector P4", "Conector RJ45", "Conector Wago", "Emenda de Energia", "Emenda de Vídeo", "Par de Balun", "Par de Injetor POE", "Par de Media Converter"]
+      },
+      {
+        categoria: "ALARMES E SENSORES",
+        icon: "fa-shield-halved",
+        itens: ["Central de Alarme", "Sensor de Presença Com Fio", "Sensor de Presença Sem Fio", "Sensor Magnético de Abertura", "Sirene", "Suporte de Alarme"]
       },
       {
         categoria: "ELÉTRICA E PROTEÇÃO",
@@ -743,9 +1004,9 @@
         itens: ["Bucha 6", "Caixa Metálica", "Caixa Organizadora para DVR", "Caixinha de Passagem Branca", "Caixinha de Passagem Vedada", "Canaleta", "Cinta Metálica", "Cola para Canaleta", "Emenda de Canaleta", "Fita Dupla Face", "Fita Isolante Branca", "Fita Isolante Preta", "Miguelão de Concreto", "Miguelão de Madeira", "Parafuso 4x16", "Parafuso 4x20", "Parafuso 4x40", "Parafuso Brocante", "Prego para Concreto", "Presilha de Nylon 20cm", "Presilha de Nylon 40cm", "Super Bonder", "Tubo de Silicone"]
       },
       {
-        categoria: "CÂMERAS",
-        icon: "fa-video",
-        itens: ["Câmera Bullet Hikvision", "Câmera Bullet Hikvision ColorVu", "Câmera Bullet Positivo", "Câmera Bullet UNV", "Câmera Bullet UNV ColorVu", "Câmera Bullet UNV Dual Light", "Câmera Dome UNV", "Câmera Dome UNV ColorVu", "Câmera Dome UNV Dual Light", "Câmera Hik com Sirene", "Câmera Hik Robotizada Sirene", "Câmera IP Bullet Hikvision", "Câmera IP Bullet UNV", "Câmera IP Dome UNV", "Câmera IP EZVIZ", "Câmera TWO", "Câmera UNV Color Hunter com Áudio", "Câmera Varifocal"]
+        categoria: "EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)",
+        icon: "fa-wrench",
+        itens: ["Alicate de Bico", "Alicate de Corte", "Alicate de Crimpar", "Aplicador de Silicone", "Aspirador de Pó Vertical", "Broca de Aço", "Broca de Concreto", "Broca de Madeira", "Broca Escalonada", "Caixa de Ferramentas", "Escada", "Furadeira de Impacto", "Martelo", "Multímetro", "Parafusadeira", "Ponteira Philips", "Serrinha", "Testador de Cabo de Rede"]
       },
       {
         categoria: "INFORMÁTICA E DIVERSOS",
@@ -753,19 +1014,9 @@
         itens: ["Cartão de Memória", "HD 1TB", "HD 2TB", "Hub Switch 4 Portas", "Hub Switch 8 Portas", "Kit de Fibra", "Monitor", "Repetidor de Internet", "SSD 240GB", "SSD 480GB"]
       },
       {
-        categoria: "ALARMES E SENSORES",
-        icon: "fa-shield-halved",
-        itens: ["Central de Alarme", "Sensor de Presença Com Fio", "Sensor de Presença Sem Fio", "Sensor Magnético de Abertura", "Sirene", "Suporte de Alarme"]
-      },
-      {
-        categoria: "CONECTORES E VÍDEO",
-        icon: "fa-plug",
-        itens: ["Conector BNC", "Conector de Energia", "Conector de Fibra", "Conector P4", "Conector RJ45", "Conector Wago", "Emenda de Energia", "Emenda de Vídeo", "Par de Balun", "Par de Injetor POE", "Par de Media Converter"]
-      },
-      {
-        categoria: "GRAVADORES (DVRs)",
-        icon: "fa-server",
-        itens: ["DVR Hikvision 16CH", "DVR Hikvision 2CH", "DVR Hikvision 4CH", "DVR Hikvision 8CH", "DVR INTELBRAS 16CH", "DVR INTELBRAS 2CH", "DVR INTELBRAS 4CH", "DVR INTELBRAS 8CH", "DVR UNV 16CH", "DVR UNV 2CH", "DVR UNV 4CH", "DVR UNV 8CH"]
+        categoria: "MARKETING E OUTROS",
+        icon: "fa-bullhorn",
+        itens: ["Adesivo de Monitoramento", "Camisa VIGI", "Copo", "Plaquinha VIGI", "Sacola para Copos", "Ticket Sem Parar"]
       }
     ];
 
@@ -785,77 +1036,20 @@
       { id: "emestoque", nome: "Em Estoque", step: 3 }
     ];
 
-    // 2. ESTADO DA APLICAÇÃO COM DADOS DEMO
-    let pedidosEnvio = JSON.parse(localStorage.getItem('vigi_pedidos_envio_v2')) || [
-      {
-        id: "ENV-101",
-        filial: "Francisco Beltrão",
-        solicitante: "Jean Carlos (Líder Beltrão)",
-        urgencia: "Alta",
-        data: "08/10/2026 09:30",
-        obs: "Instalação de novo sistema de monitoramento na cooperativa.",
-        status: "aguardando",
-        itens: [
-          { nome: "Câmera Bullet Hikvision ColorVu", qtd: 4 },
-          { nome: "DVR Hikvision 4CH", qtd: 1 },
-          { nome: "Caixa de Cabo de Rede", qtd: 1 },
-          { nome: "Conector RJ45", qtd: 20 },
-          { nome: "Fonte 12V 3.0A", qtd: 2 }
-        ]
-      },
-      {
-        id: "ENV-102",
-        filial: "Palotina",
-        solicitante: "Eduardo Silveira",
-        urgencia: "Normal",
-        data: "08/10/2026 10:15",
-        obs: "Reposição de alarmes e ferramentas do carro 02.",
-        status: "separando",
-        itens: [
-          { nome: "Central de Alarme", qtd: 2 },
-          { nome: "Sensor de Presença Com Fio", qtd: 6 },
-          { nome: "Alicate de Crimpar", qtd: 1 },
-          { nome: "Fita Isolante Preta", qtd: 5 }
-        ]
-      },
-      {
-        id: "ENV-103",
-        filial: "Barracão",
-        solicitante: "Lucas Menegati",
-        urgencia: "Urgente",
-        data: "08/10/2026 08:00",
-        obs: "Obra parada! Aguardando van da rota das 14h.",
-        status: "coleta",
-        itens: [
-          { nome: "Bobina de Cabo de Fibra", qtd: 2 },
-          { nome: "Nobreak 1200VA", qtd: 1 },
-          { nome: "Kit de Fibra", qtd: 1 }
-        ]
-      },
-      {
-        id: "ENV-104",
-        filial: "Francisco Beltrão",
-        solicitante: "Marcos Vinicius",
-        urgencia: "Normal",
-        data: "07/10/2026 16:40",
-        obs: "Despachado ontem pela transportadora parceira.",
-        status: "enviado",
-        itens: [
-          { nome: "Câmera Dome UNV", qtd: 3 },
-          { nome: "Caixinha de Passagem Branca", qtd: 10 }
-        ]
-      }
-    ];
+    // 4. ESTADO DA SESSÃO & DADOS
+    let currentUser = localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_mobile_user') || 'erick';
+    if (!APP_USERS[currentUser]) currentUser = 'erick';
 
+    let pedidosEnvio = JSON.parse(localStorage.getItem('vigi_pedidos_envio_v2')) || [];
     let pedidosCompra = JSON.parse(localStorage.getItem('vigi_pedidos_compra_v2')) || [
       {
         id: "COM-201",
-        item: "Conector RJ45",
+        item: "Conector RJ45 Blindado",
         qtd: 500,
         solicitante: "Roberto (Estoque Matriz)",
         urgencia: "Alta",
         data: "08/10/2026 08:30",
-        obs: "Consumo alto em Beltrão e Palotina. Restam menos de 60 na matriz.",
+        obs: "Consumo elevado em Beltrão e Palotina. Restam poucas unidades na matriz.",
         status: "solicitado"
       },
       {
@@ -865,7 +1059,7 @@
         solicitante: "Roberto (Estoque Matriz)",
         urgencia: "Normal",
         data: "07/10/2026 14:00",
-        obs: "Faturado pela distribuidora. Previsão de chegada na sexta-feira.",
+        obs: "Pedido faturado na distribuidora parceira.",
         status: "comprado"
       },
       {
@@ -875,7 +1069,7 @@
         solicitante: "Diretoria Suprimentos",
         urgencia: "Normal",
         data: "05/10/2026 11:20",
-        obs: "Entregue e disponibilizado no almoxarifado central.",
+        obs: "Concluído e armazenado no galpão.",
         status: "emestoque"
       }
     ];
@@ -883,29 +1077,38 @@
     let currentCart = {};
     let activeBranchFilter = 'todas';
     let selectedActiveCategory = 'todas';
+    let currentViewMode = 'kanban';
     let draggedOrderId = null;
+
+    function isAdmin() {
+      const u = APP_USERS[currentUser];
+      return u && u.role === 'admin';
+    }
 
     function saveState() {
       localStorage.setItem('vigi_pedidos_envio_v2', JSON.stringify(pedidosEnvio));
       localStorage.setItem('vigi_pedidos_compra_v2', JSON.stringify(pedidosCompra));
     }
 
-    // 3. TOAST SYSTEM
+    // 5. SISTEMA DE TOAST
     function showToast(msg, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       
-      let border = 'border-indigo-500/30';
-      let icon = '<i class="fa-solid fa-circle-check text-indigo-400"></i>';
+      let border = 'border-orange-500/40 shadow-glow-vigi';
+      let icon = '<i class="fa-solid fa-circle-check text-orange-400"></i>';
       if (type === 'success') {
-        border = 'border-emerald-500/40';
+        border = 'border-emerald-500/40 shadow-glow-emerald';
         icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
       } else if (type === 'whatsapp') {
-        border = 'border-emerald-500/50';
+        border = 'border-emerald-500/60 shadow-glow-emerald';
         icon = '<i class="fa-brands fa-whatsapp text-emerald-400 text-base"></i>';
+      } else if (type === 'error') {
+        border = 'border-rose-500/60 shadow-glow-rose';
+        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
       }
 
-      toast.className = `glass-panel pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-2xl shadow-2xl border ${border} text-xs text-white transform transition-all duration-300 translate-y-3 opacity-0`;
+      toast.className = `glass-surface pointer-events-auto flex items-center gap-3 px-4.5 py-3 rounded-2xl shadow-2xl border ${border} text-xs text-white transform transition-all duration-300 translate-y-3 opacity-0`;
       toast.innerHTML = `${icon} <span class="font-medium">${msg}</span>`;
       
       container.appendChild(toast);
@@ -914,12 +1117,139 @@
       }, 20);
 
       setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-y-2');
+        toast.classList.add('opacity-0', 'translate-y-3');
         setTimeout(() => toast.remove(), 300);
-      }, 4000);
+      }, 3500);
     }
 
-    // 4. MAIN TABS
+    // 6. GESTÃO DE USUÁRIO & PERMISSÕES
+    function applyUserRoleSettings() {
+      const u = APP_USERS[currentUser] || APP_USERS['erick'];
+      localStorage.setItem('vigi_auth_session', u.username);
+      localStorage.setItem('vigi_mobile_user', u.username);
+
+      document.getElementById('desktop-user-name').innerText = u.name;
+      document.getElementById('desktop-user-avatar').innerText = u.avatar || u.username.slice(0, 2).toUpperCase();
+
+      const roleBadge = document.getElementById('desktop-user-role-badge');
+      const roleIndicator = document.getElementById('role-view-indicator');
+      const pipelineDesc = document.getElementById('pipeline-description-text');
+      const branchFilters = document.getElementById('desktop-branch-filters-container');
+      const deleteModalBtn = document.getElementById('btn-delete-order-modal');
+      const reqSolicitanteInput = document.getElementById('req-solicitante');
+      const filialLockedMsg = document.getElementById('modal-filial-locked-msg');
+
+      if (u.role === 'admin') {
+        roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-orange-400"></i> Gestão Geral`;
+        roleIndicator.innerText = `🛡️ Administrador (${u.name}) • Acesso Total & Exclusão`;
+        roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30';
+        pipelineDesc.innerText = 'Arraste os cards entre as colunas para atualizar a fase de separação, romaneio e transporte.';
+        branchFilters.classList.remove('hidden');
+        if (deleteModalBtn) deleteModalBtn.classList.remove('hidden');
+        if (filialLockedMsg) filialLockedMsg.classList.add('hidden');
+      } else {
+        roleBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] text-amber-400"></i> ${u.filial}`;
+        roleIndicator.innerText = `📍 Filial (${u.filial}) • Acesso Restrito`;
+        roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30';
+        pipelineDesc.innerText = `Visualização exclusiva dos pedidos requisitados pela filial ${u.filial}.`;
+        
+        // Bloqueia filtro de filial na filial do usuário
+        activeBranchFilter = u.filial;
+        branchFilters.classList.add('hidden');
+        if (deleteModalBtn) deleteModalBtn.classList.add('hidden');
+        if (filialLockedMsg) filialLockedMsg.classList.remove('hidden');
+        selectModalFilial(u.filial);
+      }
+
+      if (reqSolicitanteInput && !reqSolicitanteInput.value) {
+        reqSolicitanteInput.value = u.name;
+      }
+
+      renderAll();
+    }
+
+    function openUserSwitchModal() {
+      document.getElementById('modal-user-switch').classList.remove('hidden');
+    }
+
+    function closeUserSwitchModal() {
+      document.getElementById('modal-user-switch').classList.add('hidden');
+    }
+
+    function switchCurrentUser(username) {
+      if (APP_USERS[username]) {
+        currentUser = username;
+        closeUserSwitchModal();
+        applyUserRoleSettings();
+        loadSupabaseShipments();
+        showToast(`Perfil alterado para: ${APP_USERS[username].name}`, 'success');
+      }
+    }
+
+    // 7. CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
+    async function loadSupabaseShipments() {
+      if (!supabase) return;
+      const userConfig = APP_USERS[currentUser];
+
+      try {
+        let query = supabase
+          .from('shipments')
+          .select('*, shipment_items(*)')
+          .order('created_at', { ascending: false })
+          .limit(80);
+
+        // RBAC: Filial só consulta dados de sua própria base
+        if (userConfig && userConfig.role === 'filial') {
+          query = query.eq('branch_name', userConfig.dbBranch);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        if (data) {
+          pedidosEnvio = data.map(row => {
+            let filial = "Francisco Beltrão";
+            const b = (row.branch_name || "").toUpperCase();
+            if (b.includes("PALOTINA")) filial = "Palotina";
+            else if (b.includes("BARRACAO")) filial = "Barracão";
+
+            let urgencia = "Normal";
+            let cleanObs = row.notes || "";
+            if (cleanObs.includes("[URGENTE]")) { urgencia = "Urgente"; cleanObs = cleanObs.replace("[URGENTE]", "").trim(); }
+            else if (cleanObs.includes("[ALTA]")) { urgencia = "Alta"; cleanObs = cleanObs.replace("[ALTA]", "").trim(); }
+            else if (cleanObs.includes("[NORMAL]")) { cleanObs = cleanObs.replace("[NORMAL]", "").trim(); }
+
+            const dateObj = new Date(row.created_at);
+            const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            let st = row.status || 'aguardando';
+            if (st === 'recebido') st = 'chegou';
+
+            return {
+              id: 'ENV-' + row.id.slice(0, 6).toUpperCase(),
+              rawId: row.id,
+              filial: filial,
+              solicitante: row.sender_name || 'Técnico',
+              urgencia: urgencia,
+              data: dataStr,
+              obs: cleanObs,
+              status: st,
+              itens: (row.shipment_items || []).map(it => ({
+                nome: it.product_name,
+                qtd: it.quantity || 1
+              }))
+            };
+          });
+
+          saveState();
+          renderAll();
+        }
+      } catch (err) {
+        console.warn('Erro ao sincronizar com Supabase:', err);
+      }
+    }
+
+    // 8. TABS PRINCIPAIS & MODOS DE VISUALIZAÇÃO
     function switchMainTab(tab) {
       const btnEnvios = document.getElementById('tab-btn-envios');
       const btnCompras = document.getElementById('tab-btn-compras');
@@ -927,40 +1257,77 @@
       const viewCompras = document.getElementById('view-compras');
 
       if (tab === 'envios') {
-        btnEnvios.className = "relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-lg shadow-indigo-600/30";
-        btnCompras.className = "relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60";
+        btnEnvios.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white shadow-lg shadow-orange-600/30";
+        btnCompras.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60";
         viewEnvios.classList.remove('hidden');
         viewCompras.classList.add('hidden');
       } else {
-        btnCompras.className = "relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30";
-        btnEnvios.className = "relative flex items-center gap-2.5 px-6 py-2 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60";
+        btnCompras.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-600/30";
+        btnEnvios.className = "relative flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 text-slate-400 hover:text-white hover:bg-slate-800/60";
         viewCompras.classList.remove('hidden');
         viewEnvios.classList.add('hidden');
       }
       renderAll();
     }
 
-    // 5. FILTROS DE FILIAL
+    function setViewMode(mode) {
+      currentViewMode = mode;
+      const kanbanContainer = document.getElementById('kanban-view-container');
+      const tableContainer = document.getElementById('table-view-container');
+      const btnKanban = document.getElementById('view-mode-kanban-btn');
+      const btnTable = document.getElementById('view-mode-table-btn');
+
+      if (mode === 'kanban') {
+        kanbanContainer.classList.remove('hidden');
+        tableContainer.classList.add('hidden');
+        btnKanban.className = "px-2.5 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40";
+        btnTable.className = "px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition";
+      } else {
+        kanbanContainer.classList.add('hidden');
+        tableContainer.classList.remove('hidden');
+        btnTable.className = "px-2.5 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40";
+        btnKanban.className = "px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition";
+      }
+      renderAll();
+    }
+
+    // 9. FILTROS DE FILIAL (COM RESTRIÇÃO)
     function setBranchFilter(filial) {
+      if (!isAdmin()) {
+        const u = APP_USERS[currentUser];
+        activeBranchFilter = u.filial;
+        return;
+      }
+
       activeBranchFilter = filial;
       ['todas', 'beltrao', 'palotina', 'barracao'].forEach(f => {
         const btn = document.getElementById(`filter-btn-${f}`);
         if (!btn) return;
-        btn.className = "px-3 py-1 rounded-lg font-semibold text-slate-400 hover:text-white transition";
+        btn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition";
       });
 
       let activeId = 'filter-btn-todas';
-      if (filial === 'Francisco Beltrão') activeId = 'filter-btn-beltrao';
-      if (filial === 'Palotina') activeId = 'filter-btn-palotina';
-      if (filial === 'Barracão') activeId = 'filter-btn-barracao';
+      let activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30";
+      if (filial === 'Francisco Beltrão') {
+        activeId = 'filter-btn-beltrao';
+        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-amber-500/30 text-amber-300 border border-amber-500/50 shadow-glow-amber";
+      } else if (filial === 'Palotina') {
+        activeId = 'filter-btn-palotina';
+        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan";
+      } else if (filial === 'Barracão') {
+        activeId = 'filter-btn-barracao';
+        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-glow-emerald";
+      }
 
-      document.getElementById(activeId).className = "px-3 py-1 rounded-lg font-bold transition-all bg-indigo-600 text-white shadow";
+      const activeEl = document.getElementById(activeId);
+      if (activeEl) activeEl.className = activeClass;
       renderAll();
     }
 
-    // 6. RENDERIZAÇÃO GERAL
+    // 10. RENDERIZAÇÃO GERAL
     function renderAll() {
       renderEnviosKanban();
+      renderEnviosTable();
       renderComprasKanban();
       updateHeaderBadges();
       updateStats();
@@ -973,16 +1340,25 @@
 
     function updateStats() {
       const counts = { aguardando: 0, separando: 0, coleta: 0, enviado: 0, chegou: 0 };
-      pedidosEnvio.forEach(p => {
+      
+      const filteredForStats = pedidosEnvio.filter(item => {
+        if (!isAdmin()) {
+          const u = APP_USERS[currentUser];
+          return item.filial === u.filial;
+        }
+        return activeBranchFilter === 'todas' || item.filial === activeBranchFilter;
+      });
+
+      filteredForStats.forEach(p => {
         if (counts[p.status] !== undefined) counts[p.status]++;
       });
+
       document.getElementById('stat-aguardando').innerText = counts.aguardando;
       document.getElementById('stat-separando').innerText = counts.separando;
       document.getElementById('stat-coleta').innerText = counts.coleta;
       document.getElementById('stat-enviado').innerText = counts.enviado;
       document.getElementById('stat-chegou').innerText = counts.chegou;
 
-      // Col counters
       document.getElementById('col-count-aguardando').innerText = counts.aguardando;
       document.getElementById('col-count-separando').innerText = counts.separando;
       document.getElementById('col-count-coleta').innerText = counts.coleta;
@@ -992,37 +1368,48 @@
 
     function getFilialBadge(filial) {
       if (filial === 'Francisco Beltrão') {
-        return '<span class="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-amber-400"></i> Francisco Beltrão</span>';
+        return '<span class="inline-flex items-center gap-1.5 bg-amber-500/15 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-amber-400"></i> Beltrão</span>';
       } else if (filial === 'Palotina') {
-        return '<span class="inline-flex items-center gap-1.5 bg-purple-500/10 text-purple-300 border border-purple-500/30 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-purple-400"></i> Palotina</span>';
+        return '<span class="inline-flex items-center gap-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-cyan-400"></i> Palotina</span>';
       } else {
-        return '<span class="inline-flex items-center gap-1.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/30 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-cyan-400"></i> Barracão</span>';
+        return '<span class="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-emerald-400"></i> Barracão</span>';
       }
     }
 
     function getUrgenciaBadge(urgencia) {
       if (urgencia === 'Urgente') {
-        return '<span class="bg-rose-500/15 text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-full text-[10px] font-black inline-flex items-center gap-1 shadow-glow-rose"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span> URGENTE</span>';
+        return '<span class="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded-full text-[10px] font-black inline-flex items-center gap-1 shadow-glow-rose"><span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span> URGENTE</span>';
       } else if (urgencia === 'Alta') {
-        return '<span class="bg-amber-500/15 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-black">⚡ ALTA</span>';
+        return '<span class="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-black">⚡ ALTA</span>';
       }
-      return '<span class="bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full text-[10px] font-medium">Rotina</span>';
+      return '<span class="bg-slate-800/80 text-slate-400 border border-white/5 px-2 py-0.5 rounded-full text-[10px] font-medium">Rotina</span>';
     }
 
+    // 11. RENDERIZAÇÃO KANBAN DE ENVIOS
     function renderEnviosKanban() {
       const searchTerm = document.getElementById('filter-search').value.toLowerCase();
+      const adminPerm = isAdmin();
 
       ENVIOS_COLUNAS.forEach(col => {
-        document.getElementById(`cards-${col.id}`).innerHTML = '';
+        const el = document.getElementById(`cards-${col.id}`);
+        if (el) el.innerHTML = '';
       });
 
       const filtered = pedidosEnvio.filter(item => {
-        const matchFilial = activeBranchFilter === 'todas' || item.filial === activeBranchFilter;
+        let matchFilial = true;
+        if (!adminPerm) {
+          const u = APP_USERS[currentUser];
+          matchFilial = item.filial === u.filial;
+        } else {
+          matchFilial = activeBranchFilter === 'todas' || item.filial === activeBranchFilter;
+        }
+
         const matchSearch = searchTerm === '' || 
           item.id.toLowerCase().includes(searchTerm) ||
           item.filial.toLowerCase().includes(searchTerm) ||
           item.solicitante.toLowerCase().includes(searchTerm) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
+
         return matchFilial && matchSearch;
       });
 
@@ -1035,51 +1422,77 @@
         const prevCol = colIndex > 0 ? ENVIOS_COLUNAS[colIndex - 1] : null;
         const nextCol = colIndex < ENVIOS_COLUNAS.length - 1 ? ENVIOS_COLUNAS[colIndex + 1] : null;
 
-        // Visual Pipeline Progress Bar (Step 1 of 5)
-        const progressPercent = ((colIndex + 1) / 5) * 100;
+        // Progress bar
+        let pipelineStepsHtml = '<div class="flex items-center gap-1.5 w-full py-1">';
+        for (let i = 0; i < 5; i++) {
+          const isDone = i <= colIndex;
+          const isCurrent = i === colIndex;
+          pipelineStepsHtml += `
+            <div class="flex-1 h-1.5 rounded-full transition-all duration-300 ${
+              isCurrent 
+                ? 'bg-gradient-to-r from-orange-500 to-amber-400 shadow-glow-vigi' 
+                : isDone ? 'bg-orange-500/80' : 'bg-slate-800'
+            }"></div>
+          `;
+        }
+        pipelineStepsHtml += '</div>';
 
         const previewItens = pedido.itens.slice(0, 3).map(it => 
-          `<li class="truncate flex justify-between text-slate-300 text-[11px] py-0.5">
-            <span class="truncate text-slate-300">${it.nome}</span> 
-            <span class="font-mono font-bold text-indigo-400 ml-1">x${it.qtd}</span>
+          `<li class="truncate flex justify-between text-slate-300 text-[11px] py-1 border-b border-white/[0.04] last:border-none">
+            <span class="truncate text-slate-300 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+              ${it.nome}
+            </span> 
+            <span class="font-mono font-bold text-orange-300 ml-1.5 shrink-0 bg-slate-900/80 px-1.5 py-0.2 rounded border border-white/5">x${it.qtd}</span>
           </li>`
         ).join('');
-        const maisItens = pedido.itens.length > 3 ? `<div class="text-[10px] text-slate-400 font-semibold pt-1">+ ${pedido.itens.length - 3} itens adicionais...</div>` : '';
+        const maisItens = pedido.itens.length > 3 ? `<div class="text-[10px] text-slate-400 font-semibold pt-1 text-center bg-slate-900/40 rounded py-0.5 mt-1 border border-white/5">+ ${pedido.itens.length - 3} itens adicionais...</div>` : '';
+
+        // Botão de Excluir: RENDERIZADO EXCLUSIVAMENTE PARA ADMINS
+        const deleteBtnHtml = adminPerm ? `
+          <button onclick="event.stopPropagation(); deletePedidoEnvio('${pedido.id}')" title="Excluir este pedido (Ação de Administrador)" 
+                  class="w-7 h-7 rounded-xl bg-slate-900 border border-white/10 hover:border-rose-500/40 text-slate-500 hover:text-rose-400 flex items-center justify-center text-[10px] transition">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        ` : '';
 
         const card = document.createElement('div');
-        card.className = "glass-card rounded-2xl p-3.5 space-y-3 cursor-grab active:cursor-grabbing border border-white/5 relative group";
-        card.draggable = true;
-        card.ondragstart = (e) => handleDragStart(e, pedido.id);
-        card.ondragend = (e) => handleDragEnd(e);
+        card.className = "glass-surface-card rounded-2xl p-4 space-y-3 cursor-grab active:cursor-grabbing relative group";
+        card.draggable = adminPerm;
+        if (adminPerm) {
+          card.ondragstart = (e) => handleDragStart(e, pedido.id);
+          card.ondragend = (e) => handleDragEnd(e);
+        }
 
         card.innerHTML = `
           <!-- Card Header & Badges -->
           <div class="flex items-start justify-between gap-1">
             <div class="space-y-1">
-              <span class="font-mono text-xs font-black text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20">${pedido.id}</span>
+              <span class="font-mono text-xs font-black text-orange-400 bg-orange-500/15 px-2.5 py-0.5 rounded-lg border border-orange-500/30">${pedido.id}</span>
               <div>${getFilialBadge(pedido.filial)}</div>
             </div>
             <div>${getUrgenciaBadge(pedido.urgencia)}</div>
           </div>
 
-          <!-- Mini Pipeline Progress -->
-          <div class="w-full bg-slate-800 rounded-full h-1 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-500 to-indigo-500 h-1 transition-all duration-500" style="width: ${progressPercent}%"></div>
-          </div>
+          <!-- Mini Pipeline Stepper -->
+          ${pipelineStepsHtml}
 
           <!-- Solicitante & Data -->
           <div class="text-[11px] text-slate-400 flex items-center justify-between border-b border-white/5 pb-2">
-            <span class="truncate flex items-center gap-1.5"><i class="fa-solid fa-circle-user text-slate-500"></i> ${pedido.solicitante}</span>
-            <span class="font-mono text-[10px] text-slate-500">${pedido.data.split(' ')[0]}</span>
+            <span class="truncate flex items-center gap-1.5 font-medium text-slate-300">
+              <i class="fa-regular fa-user text-orange-400 text-xs"></i> 
+              <span class="truncate">${pedido.solicitante}</span>
+            </span>
+            <span class="font-mono text-[10px] text-slate-500 shrink-0">${pedido.data.split(' ')[0]}</span>
           </div>
 
           <!-- Preview da Lista de Materiais -->
-          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-white/5">
-            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 flex justify-between">
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5">
+            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 flex justify-between items-center">
               <span>Materiais Requisitados</span>
-              <span class="text-indigo-400 font-mono font-bold">${totalItens} un</span>
+              <span class="text-orange-300 font-mono font-bold bg-orange-500/15 px-2 py-0.5 rounded-md text-[10px]">${totalItens} un</span>
             </div>
-            <ul class="divide-y divide-white/5">
+            <ul>
               ${previewItens}
             </ul>
             ${maisItens}
@@ -1088,30 +1501,31 @@
           <!-- Bottom Action Buttons -->
           <div class="flex items-center justify-between pt-1 gap-1">
             <button onclick="event.stopPropagation(); openCardDetails('${pedido.id}')" 
-                    class="text-[11px] font-bold text-indigo-300 hover:text-white flex items-center gap-1.5 bg-indigo-500/15 hover:bg-indigo-500/30 px-2.5 py-1 rounded-lg border border-indigo-500/30 transition">
-              <i class="fa-solid fa-list-check"></i> Ficha
+                    class="text-[11px] font-bold text-orange-400 hover:text-white flex items-center gap-1.5 bg-orange-500/15 hover:bg-orange-500/30 px-3 py-1.5 rounded-xl border border-orange-500/30 transition">
+              <i class="fa-solid fa-list-check"></i> Romaneio
             </button>
 
             <button onclick="event.stopPropagation(); sendToWhatsApp('${pedido.id}')" 
                     title="Copiar aviso para o WhatsApp da filial" 
-                    class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/30 px-2.5 py-1 rounded-lg border border-emerald-500/30 transition">
+                    class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/30 px-3 py-1.5 rounded-xl border border-emerald-500/30 transition">
               <i class="fa-brands fa-whatsapp text-sm"></i> Zap
             </button>
 
-            <!-- Setas Rápidas de Avanço -->
+            <!-- Setas Rápidas de Avanço & Excluir -->
             <div class="flex items-center gap-1 ml-auto">
-              ${prevCol ? `
+              ${adminPerm && prevCol ? `
                 <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', '${prevCol.id}')" title="Voltar para: ${prevCol.nome}" 
-                        class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 flex items-center justify-center text-[10px] transition">
+                        class="w-7 h-7 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-[10px] transition">
                   <i class="fa-solid fa-chevron-left"></i>
                 </button>
               ` : ''}
-              ${nextCol ? `
+              ${adminPerm && nextCol ? `
                 <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', '${nextCol.id}')" title="Avançar para: ${nextCol.nome}" 
-                        class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white flex items-center justify-center text-[10px] font-bold shadow-md shadow-indigo-600/30 transition">
+                        class="w-7 h-7 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-md shadow-orange-600/30 transition">
                   <i class="fa-solid fa-chevron-right"></i>
                 </button>
-              ` : '<span class="text-emerald-400 text-xs px-1"><i class="fa-solid fa-circle-check"></i></span>'}
+              ` : ''}
+              ${deleteBtnHtml}
             </div>
           </div>
         `;
@@ -1119,8 +1533,104 @@
         card.onclick = () => openCardDetails(pedido.id);
         colContainer.appendChild(card);
       });
+
+      // Empty states for columns
+      ENVIOS_COLUNAS.forEach(col => {
+        const colContainer = document.getElementById(`cards-${col.id}`);
+        if (colContainer && colContainer.children.length === 0) {
+          colContainer.innerHTML = `
+            <div class="h-44 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-2xl text-slate-500">
+              <i class="fa-regular fa-folder-open text-xl mb-2 opacity-40"></i>
+              <span class="text-xs font-medium">Nenhum pedido nesta fase</span>
+              <span class="text-[10px] text-slate-600 mt-0.5">${adminPerm ? 'Arraste cards para cá' : 'Aguardando atualização da Matriz'}</span>
+            </div>
+          `;
+        }
+      });
     }
 
+    // 12. MODO TABELA (EXPEDITION TABLE)
+    function renderEnviosTable() {
+      const tbody = document.getElementById('table-view-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const searchTerm = document.getElementById('filter-search').value.toLowerCase();
+      const adminPerm = isAdmin();
+
+      const filtered = pedidosEnvio.filter(item => {
+        let matchFilial = true;
+        if (!adminPerm) {
+          const u = APP_USERS[currentUser];
+          matchFilial = item.filial === u.filial;
+        } else {
+          matchFilial = activeBranchFilter === 'todas' || item.filial === activeBranchFilter;
+        }
+
+        const matchSearch = searchTerm === '' || 
+          item.id.toLowerCase().includes(searchTerm) ||
+          item.filial.toLowerCase().includes(searchTerm) ||
+          item.solicitante.toLowerCase().includes(searchTerm) ||
+          item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
+
+        return matchFilial && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-10 text-slate-500 italic">
+              Nenhum pedido encontrado com os filtros aplicados.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      filtered.forEach(pedido => {
+        const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
+        const totalItens = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-900/60 transition cursor-pointer";
+        tr.onclick = () => openCardDetails(pedido.id);
+
+        const deleteActionHtml = adminPerm ? `
+          <button onclick="deletePedidoEnvio('${pedido.id}')" title="Excluir este pedido" class="px-2 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 border border-rose-500/30 font-bold text-[11px]">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        ` : '';
+
+        tr.innerHTML = `
+          <td class="py-3 px-4 font-mono font-bold text-orange-400">${pedido.id}</td>
+          <td class="py-3 px-4">${getFilialBadge(pedido.filial)}</td>
+          <td class="py-3 px-4 font-medium text-slate-300">${pedido.solicitante}</td>
+          <td class="py-3 px-4">${getUrgenciaBadge(pedido.urgencia)}</td>
+          <td class="py-3 px-4">
+            <span class="font-mono text-orange-300 font-bold bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-lg text-[11px]">${totalItens} un</span>
+            <span class="text-slate-400 text-[10px] ml-1">(${pedido.itens.length} tipos)</span>
+          </td>
+          <td class="py-3 px-4">
+            <span class="bg-orange-500/15 text-orange-300 border border-orange-500/30 px-2.5 py-1 rounded-xl text-[11px] font-bold">
+              ${statusObj.nome}
+            </span>
+          </td>
+          <td class="py-3 px-4 font-mono text-slate-400 text-[11px]">${pedido.data}</td>
+          <td class="py-3 px-4 text-right space-x-1" onclick="event.stopPropagation()">
+            <button onclick="openCardDetails('${pedido.id}')" class="px-2.5 py-1 rounded-lg bg-orange-500/15 hover:bg-orange-500/25 text-orange-400 border border-orange-500/30 font-bold text-[11px]">
+              Romaneio
+            </button>
+            <button onclick="sendToWhatsApp('${pedido.id}')" class="px-2.5 py-1 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-bold text-[11px]">
+              <i class="fa-brands fa-whatsapp"></i> Zap
+            </button>
+            ${deleteActionHtml}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 13. KANBAN DE COMPRAS
     function renderComprasKanban() {
       COMPRAS_COLUNAS.forEach(col => {
         const el = document.getElementById(`cards-compra-${col.id}`);
@@ -1128,6 +1638,7 @@
       });
 
       const counts = { solicitado: 0, comprado: 0, emestoque: 0 };
+      const adminPerm = isAdmin();
 
       pedidosCompra.forEach(compra => {
         if (counts[compra.status] !== undefined) counts[compra.status]++;
@@ -1140,7 +1651,7 @@
         const nextCol = colIndex < COMPRAS_COLUNAS.length - 1 ? COMPRAS_COLUNAS[colIndex + 1] : null;
 
         const card = document.createElement('div');
-        card.className = "glass-card rounded-2xl p-4 space-y-3";
+        card.className = "glass-surface-card rounded-2xl p-4 space-y-3";
         card.innerHTML = `
           <div class="flex items-start justify-between">
             <span class="font-mono text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">${compra.id}</span>
@@ -1149,12 +1660,12 @@
 
           <div>
             <h4 class="font-extrabold text-white text-sm leading-snug">${compra.item}</h4>
-            <div class="text-xs text-indigo-300 font-semibold mt-1">
-              Quantidade Necessária: <span class="font-mono text-base font-black text-white">${compra.qtd}</span> un
+            <div class="text-xs text-orange-300 font-semibold mt-1">
+              Qtd Necessária: <span class="font-mono text-base font-black text-white">${compra.qtd}</span> un
             </div>
           </div>
 
-          <div class="bg-slate-950/70 p-2.5 rounded-xl border border-white/5 text-[11px] text-slate-300 space-y-1">
+          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 text-[11px] text-slate-300 space-y-1">
             <p class="text-slate-400 leading-relaxed"><i class="fa-solid fa-quote-left text-slate-600 mr-1"></i>${compra.obs || 'Reposição de estoque da matriz'}</p>
             <div class="pt-1.5 border-t border-white/5 flex justify-between text-slate-500 text-[10px]">
               <span><i class="fa-regular fa-user mr-1"></i>${compra.solicitante}</span>
@@ -1163,20 +1674,22 @@
           </div>
 
           <div class="flex items-center justify-between pt-1">
-            <button onclick="deleteCompra('${compra.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
+            ${adminPerm ? `
+              <button onclick="deleteCompra('${compra.id}')" class="text-slate-500 hover:text-rose-400 text-xs transition">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            ` : '<span></span>'}
             <div class="flex items-center gap-1.5 ml-auto">
-              ${prevCol ? `
-                <button onclick="movePedidoCompra('${compra.id}', '${prevCol.id}')" class="px-3 py-1 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold transition">
+              ${adminPerm && prevCol ? `
+                <button onclick="movePedidoCompra('${compra.id}', '${prevCol.id}')" class="px-3 py-1 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition">
                   Voltar
                 </button>
               ` : ''}
-              ${nextCol ? `
+              ${adminPerm && nextCol ? `
                 <button onclick="movePedidoCompra('${compra.id}', '${nextCol.id}')" class="px-3.5 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition">
                   Avançar <i class="fa-solid fa-chevron-right ml-1"></i>
                 </button>
-              ` : '<span class="text-emerald-400 text-xs font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Estoque Abastecido</span>'}
+              ` : '<span class="text-emerald-400 text-xs font-bold"><i class="fa-solid fa-circle-check mr-1"></i> Disponível</span>'}
             </div>
           </div>
         `;
@@ -1188,8 +1701,9 @@
       document.getElementById('col-count-emestoque').innerText = counts.emestoque;
     }
 
-    // 7. DRAG AND DROP HANDLERS (TRELLO STYLE)
+    // 14. DRAG AND DROP HANDLERS (ADMIN ONLY)
     function handleDragStart(e, id) {
+      if (!isAdmin()) return;
       draggedOrderId = id;
       e.target.classList.add('card-dragging');
       e.dataTransfer.setData('text/plain', id);
@@ -1201,6 +1715,7 @@
     }
 
     function handleDragOver(e) {
+      if (!isAdmin()) return;
       e.preventDefault();
       const dropzone = e.currentTarget.querySelector('.kanban-dropzone');
       if (dropzone) dropzone.classList.add('dragover');
@@ -1212,6 +1727,7 @@
     }
 
     function handleDrop(e, newStatus) {
+      if (!isAdmin()) return;
       e.preventDefault();
       document.querySelectorAll('.kanban-dropzone').forEach(el => el.classList.remove('dragover'));
       if (draggedOrderId) {
@@ -1220,7 +1736,12 @@
       }
     }
 
-    function movePedidoEnvio(id, newStatus) {
+    async function movePedidoEnvio(id, newStatus) {
+      if (!isAdmin()) {
+        showToast('Apenas administradores podem movimentar fases de ordens.', 'error');
+        return;
+      }
+
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (pedido) {
         pedido.status = newStatus;
@@ -1228,20 +1749,35 @@
         renderAll();
         const statusObj = ENVIOS_COLUNAS.find(c => c.id === newStatus);
         showToast(`Pedido ${id} atualizado para: ${statusObj.nome}`);
+
+        // Sincroniza status no Supabase
+        if (pedido.rawId && supabase) {
+          const dbStatus = newStatus === 'chegou' ? 'recebido' : newStatus;
+          try {
+            await supabase
+              .from('shipments')
+              .update({ status: dbStatus })
+              .eq('id', pedido.rawId);
+          } catch (err) {
+            console.warn('Erro ao atualizar status no Supabase:', err);
+          }
+        }
       }
     }
 
     function movePedidoCompra(id, newStatus) {
+      if (!isAdmin()) return;
       const compra = pedidosCompra.find(c => c.id === id);
       if (compra) {
         compra.status = newStatus;
         saveState();
         renderAll();
-        showToast(`Compra ${id} avançou no fluxo!`, 'success');
+        showToast(`Compra ${id} atualizada!`, 'success');
       }
     }
 
     function deleteCompra(id) {
+      if (!isAdmin()) return;
       if (confirm(`Excluir solicitação de compra ${id}?`)) {
         pedidosCompra = pedidosCompra.filter(c => c.id !== id);
         saveState();
@@ -1250,195 +1786,175 @@
       }
     }
 
-    // 8. CATÁLOGO MODERNO & FILIAIS
+    // 15. EXCLUSÃO PROTEGIDA POR RBAC (ADMINS: ERICK, DANIEL, THIAGO, KLAUS)
+    async function deletePedidoEnvio(id) {
+      if (!isAdmin()) {
+        alert('Permissão Negada: Apenas administradores (Erick, Daniel, Thiago, Klaus) podem excluir solicitações.');
+        return;
+      }
+
+      const pedido = pedidosEnvio.find(p => p.id === id);
+      if (!pedido) return;
+
+      if (!confirm(`CONFIRMAÇÃO DE ADMINISTRADOR:\nDeseja realmente excluir a solicitação ${id} (${pedido.filial})?\nEsta ação apagará permanentemente o pedido e seus itens do sistema e do banco de dados.`)) {
+        return;
+      }
+
+      // Se existir no Supabase, exclui itens e shipment
+      if (pedido.rawId && supabase) {
+        try {
+          await supabase.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
+          const { error } = await supabase.from('shipments').delete().eq('id', pedido.rawId);
+          if (error) throw error;
+        } catch (err) {
+          console.warn('Erro ao excluir no Supabase:', err);
+        }
+      }
+
+      pedidosEnvio = pedidosEnvio.filter(p => p.id !== id);
+      saveState();
+      closeCardDetailsModal();
+      renderAll();
+      showToast(`Pedido ${id} excluído com sucesso!`, 'success');
+    }
+
+    // 16. MODAIS & CATÁLOGO
     function selectModalFilial(filial) {
       document.getElementById('req-filial').value = filial;
       ['beltrao', 'palotina', 'barracao'].forEach(f => {
-        document.getElementById(`btn-filial-${f}`).className = "p-2 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-indigo-500/40";
+        const btn = document.getElementById(`btn-filial-${f}`);
+        if (btn) btn.className = "p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-orange-500/40";
       });
       if (filial === 'Francisco Beltrão') {
-        document.getElementById('btn-filial-beltrao').className = "p-2 rounded-xl text-xs font-bold border transition text-center bg-indigo-600 text-white border-indigo-500 shadow-md";
+        document.getElementById('btn-filial-beltrao').className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-glow-amber";
       } else if (filial === 'Palotina') {
-        document.getElementById('btn-filial-palotina').className = "p-2 rounded-xl text-xs font-bold border transition text-center bg-purple-600 text-white border-purple-500 shadow-md";
+        document.getElementById('btn-filial-palotina').className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-glow-cyan";
       } else {
-        document.getElementById('btn-filial-barracao').className = "p-2 rounded-xl text-xs font-bold border transition text-center bg-cyan-600 text-white border-cyan-500 shadow-md";
+        document.getElementById('btn-filial-barracao').className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-glow-emerald";
       }
     }
 
     function initCatalogUI() {
-      // Category chips
       const chipsBar = document.getElementById('category-chips-bar');
       chipsBar.innerHTML = `
-        <button type="button" onclick="setCategoryFilter('todas')" id="cat-chip-todas" 
-                class="px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow">
-          Todos os Materiais
+        <button type="button" onclick="selectModalCategory('todas')" id="cat-chip-todas" 
+                class="px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30">
+          Todas (${CATALOGO_MATERIAIS.reduce((acc, c) => acc + c.itens.length, 0)})
         </button>
       `;
 
-      // Datalist for compra
-      const datalist = document.getElementById('catalog-datalist');
-      datalist.innerHTML = '';
-
       CATALOGO_MATERIAIS.forEach((cat, idx) => {
-        const safeCatName = `cat-chip-${idx}`;
         chipsBar.innerHTML += `
-          <button type="button" onclick="setCategoryFilter('${cat.categoria}', '${safeCatName}')" id="${safeCatName}" 
-                  class="px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900/80 border border-white/5 transition flex items-center gap-1.5">
-            <i class="fa-solid ${cat.icon} text-indigo-400 text-[10px]"></i>
+          <button type="button" onclick="selectModalCategory('${cat.categoria}')" id="cat-chip-${idx}" 
+                  class="px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5">
+            <i class="fa-solid ${cat.icon} text-orange-400 text-[10px]"></i>
             <span>${cat.categoria}</span>
           </button>
         `;
-
-        cat.itens.forEach(it => {
-          datalist.innerHTML += `<option value="${it}">${cat.categoria}</option>`;
-        });
       });
 
-      renderCatalogItems();
+      renderModalCatalogItems();
     }
 
-    function setCategoryFilter(categoria, chipId = null) {
-      selectedActiveCategory = categoria;
-      // Update chip styles
-      const allChips = document.querySelectorAll('#category-chips-bar button');
-      allChips.forEach(c => {
-        c.className = "px-3 py-1.5 rounded-xl font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900/80 border border-white/5 transition flex items-center gap-1.5";
+    function selectModalCategory(cat) {
+      selectedActiveCategory = cat;
+      const buttons = document.querySelectorAll('#category-chips-bar button');
+      buttons.forEach(b => {
+        b.className = "px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5";
       });
 
-      if (categoria === 'todas') {
-        document.getElementById('cat-chip-todas').className = "px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow";
-      } else if (chipId) {
-        document.getElementById(chipId).className = "px-3.5 py-1.5 rounded-xl font-bold whitespace-nowrap transition bg-indigo-600 text-white shadow flex items-center gap-1.5";
+      if (cat === 'todas') {
+        document.getElementById('cat-chip-todas').className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30";
+      } else {
+        const catIdx = CATALOGO_MATERIAIS.findIndex(c => c.categoria === cat);
+        if (catIdx !== -1) {
+          const btn = document.getElementById(`cat-chip-${catIdx}`);
+          if (btn) btn.className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 flex items-center gap-1.5";
+        }
       }
-      renderCatalogItems();
+
+      renderModalCatalogItems();
     }
 
-    function renderCatalogItems() {
-      const container = document.getElementById('catalog-container');
-      const searchTerm = document.getElementById('catalog-search').value.toLowerCase();
+    function renderModalCatalogItems() {
+      const container = document.getElementById('modal-catalog-list');
+      const searchTerm = document.getElementById('modal-material-search').value.toLowerCase();
       container.innerHTML = '';
 
+      let count = 0;
       CATALOGO_MATERIAIS.forEach(cat => {
         if (selectedActiveCategory !== 'todas' && cat.categoria !== selectedActiveCategory) return;
 
-        const itensFiltrados = cat.itens.filter(item => item.toLowerCase().includes(searchTerm));
-        if (itensFiltrados.length === 0) return;
+        cat.itens.forEach(item => {
+          if (searchTerm && !item.toLowerCase().includes(searchTerm)) return;
+          count++;
 
-        const catBlock = document.createElement('div');
-        catBlock.className = "glass-panel rounded-2xl p-4 border border-white/5 space-y-3";
-        
-        let itemsHtml = `
-          <div class="flex items-center justify-between pb-2 border-b border-white/5">
-            <h4 class="text-xs font-black uppercase tracking-wider text-indigo-300 flex items-center gap-2">
-              <i class="fa-solid ${cat.icon} text-indigo-400"></i> ${cat.categoria}
-            </h4>
-            <span class="text-[10px] text-slate-500 font-mono">${itensFiltrados.length} opções</span>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-        `;
-
-        itensFiltrados.forEach(item => {
           const currentQty = currentCart[item] || 0;
           const isSelected = currentQty > 0;
 
-          itemsHtml += `
-            <div class="rounded-xl p-3 flex flex-col justify-between transition-all duration-200 border ${
-              isSelected ? 'bg-indigo-600/15 border-indigo-500/60 shadow-glow-indigo' : 'bg-slate-950/70 border-white/5 hover:border-white/20'
-            }">
-              <div class="text-xs font-semibold text-slate-200 line-clamp-2 leading-tight mb-2.5">
-                ${item}
-              </div>
-              
-              <!-- Quantity Stepper Styled as in User's screenshot -->
-              <div class="flex items-center justify-between bg-slate-900/90 rounded-xl p-1 border border-white/10">
-                <span class="text-[10px] text-slate-400 font-bold ml-1.5">Qtd:</span>
-                <div class="flex items-center gap-1.5">
-                  <button type="button" onclick="decrementCart('${item.replace(/'/g, "\\'")}')" 
-                          class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-black flex items-center justify-center text-xs transition">
-                    -
-                  </button>
-                  <span class="w-7 text-center font-mono text-xs font-black ${isSelected ? 'text-indigo-400' : 'text-slate-400'}">
-                    ${currentQty}
-                  </span>
-                  <button type="button" onclick="incrementCart('${item.replace(/'/g, "\\'")}')" 
-                          class="w-6 h-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-black flex items-center justify-center text-xs shadow-md shadow-indigo-600/30 transition">
-                    +
-                  </button>
-                </div>
-              </div>
+          const itemCard = document.createElement('div');
+          itemCard.className = `p-2.5 rounded-xl border flex items-center justify-between gap-2 transition ${
+            isSelected 
+              ? 'bg-orange-500/15 border-orange-500/50 shadow-glow-vigi' 
+              : 'bg-slate-900/90 border-white/5 hover:border-white/20'
+          }`;
+
+          itemCard.innerHTML = `
+            <div class="truncate flex-1">
+              <span class="font-bold text-white block truncate text-[11px]">${item}</span>
+              <span class="text-[9px] text-slate-500 block truncate">${cat.categoria}</span>
+            </div>
+            <div class="flex items-center gap-1 shrink-0 bg-slate-950 p-1 rounded-lg border border-white/5">
+              <button type="button" onclick="decrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded bg-slate-800 text-slate-200 hover:bg-slate-700 flex items-center justify-center font-bold text-xs">-</button>
+              <span class="w-6 text-center font-mono font-bold text-xs ${isSelected ? 'text-orange-400' : 'text-slate-500'}">${currentQty}</span>
+              <button type="button" onclick="incrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded bg-orange-600 text-white hover:bg-orange-500 flex items-center justify-center font-bold text-xs shadow-sm">+</button>
             </div>
           `;
+          container.appendChild(itemCard);
         });
-
-        itemsHtml += `</div>`;
-        catBlock.innerHTML = itemsHtml;
-        container.appendChild(catBlock);
       });
+
+      if (count === 0) {
+        container.innerHTML = `
+          <div class="col-span-3 text-center py-8 text-slate-500 text-xs">
+            Nenhum material encontrado com "${searchTerm}".
+          </div>
+        `;
+      }
     }
 
-    function filterCatalogItems() {
-      renderCatalogItems();
-    }
-
-    function incrementCart(item) {
+    function incrementModalCart(item) {
       currentCart[item] = (currentCart[item] || 0) + 1;
-      updateCartDisplay();
+      updateModalCartUI();
     }
 
-    function decrementCart(item) {
+    function decrementModalCart(item) {
       if (currentCart[item] && currentCart[item] > 0) {
         currentCart[item]--;
         if (currentCart[item] === 0) delete currentCart[item];
       }
-      updateCartDisplay();
+      updateModalCartUI();
     }
 
-    function clearCart() {
-      currentCart = {};
-      updateCartDisplay();
-      showToast('Carrinho limpo.');
+    function updateModalCartUI() {
+      const totalUnits = Object.values(currentCart).reduce((a, b) => a + b, 0);
+      const typesCount = Object.keys(currentCart).length;
+      document.getElementById('modal-cart-counter-text').innerText = `${totalUnits} peças (${typesCount} tipos)`;
+      renderModalCatalogItems();
     }
 
-    function updateCartDisplay() {
-      const cartList = document.getElementById('cart-list');
-      const keys = Object.keys(currentCart);
-
-      if (keys.length === 0) {
-        cartList.innerHTML = `
-          <div class="text-center text-slate-500 py-12 italic text-xs">
-            Nenhum item selecionado ainda.<br>Use os botões (+) no catálogo ao lado.
-          </div>
-        `;
-        document.getElementById('cart-total-badge').innerText = '0 un';
-        document.getElementById('cart-unique-count').innerText = '0 tipos de materiais';
-      } else {
-        let html = '';
-        let totalQty = 0;
-        keys.forEach(itemName => {
-          const qty = currentCart[itemName];
-          totalQty += qty;
-          html += `
-            <div class="bg-slate-900/90 p-2 rounded-xl border border-white/5 flex items-center justify-between text-xs">
-              <span class="truncate font-medium text-slate-200 mr-2">${itemName}</span>
-              <div class="flex items-center gap-1.5 shrink-0">
-                <span class="font-mono font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20 text-[11px]">${qty}x</span>
-                <button onclick="decrementCart('${itemName.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-rose-400 p-0.5"><i class="fa-solid fa-minus"></i></button>
-                <button onclick="incrementCart('${itemName.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-emerald-400 p-0.5"><i class="fa-solid fa-plus"></i></button>
-              </div>
-            </div>
-          `;
-        });
-        cartList.innerHTML = html;
-        document.getElementById('cart-total-badge').innerText = `${totalQty} un`;
-        document.getElementById('cart-unique-count').innerText = `${keys.length} tipos de materiais`;
-      }
-      renderCatalogItems();
-    }
-
-    // 9. SUBMISSÃO DE PEDIDOS
     function openNewEnvioModal() {
       currentCart = {};
-      updateCartDisplay();
+      updateModalCartUI();
+      document.getElementById('modal-material-search').value = '';
+      
+      const u = APP_USERS[currentUser];
+      document.getElementById('req-solicitante').value = u ? u.name : 'Erick Finger';
+      
+      if (!isAdmin()) {
+        selectModalFilial(u.filial);
+      }
+      
       document.getElementById('modal-new-envio').classList.remove('hidden');
     }
 
@@ -1446,47 +1962,84 @@
       document.getElementById('modal-new-envio').classList.add('hidden');
     }
 
-    function submitNewEnvio() {
+    async function submitNewEnvio() {
       const filial = document.getElementById('req-filial').value;
       const solicitante = document.getElementById('req-solicitante').value.trim();
       const urgencia = document.getElementById('req-urgencia').value;
       const obs = document.getElementById('req-obs').value.trim();
+      const btn = document.getElementById('btn-submit-desktop-envio');
 
       if (!solicitante) {
-        alert('Por favor, informe o nome do Solicitante / Responsável.');
+        alert('Por favor, informe o técnico solicitante.');
         return;
       }
 
-      const itens = Object.keys(currentCart).map(nome => ({
-        nome: nome,
-        qtd: currentCart[nome]
-      }));
-
-      if (itens.length === 0) {
-        alert('Adicione pelo menos 1 item ao pedido no catálogo.');
+      const cartKeys = Object.keys(currentCart);
+      if (cartKeys.length === 0) {
+        alert('Selecione pelo menos um material do catálogo para a solicitação.');
         return;
       }
 
-      const now = new Date();
-      const dataStr = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const newId = 'ENV-' + Math.floor(1000 + Math.random() * 9000);
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
 
-      const novoPedido = {
-        id: newId,
-        filial: filial,
-        solicitante: solicitante,
-        urgencia: urgencia,
-        data: dataStr,
-        obs: obs,
-        status: 'aguardando',
-        itens: itens
-      };
+      let dbBranch = "FRANCISCO BELTRAO PR";
+      if (filial === 'Palotina') dbBranch = "PALOTINA PR";
+      else if (filial === 'Barracão') dbBranch = "BARRACAO PR";
 
-      pedidosEnvio.unshift(novoPedido);
-      saveState();
-      renderAll();
-      closeNewEnvioModal();
-      showToast(`Pedido ${newId} enviado para a fila de separação!`, 'success');
+      try {
+        const fullNotes = `[${urgencia.toUpperCase()}] ${obs ? obs : 'Solicitação lançada pelo painel'}`;
+
+        // 1. Inserir em shipments
+        const shipmentPayload = {
+          branch_name: dbBranch,
+          sender_name: `${solicitante} (${currentUser})`,
+          driver_name: null,
+          notes: fullNotes,
+          status: 'aguardando'
+        };
+
+        const { data: shipData, error: shipError } = await supabase
+          .from('shipments')
+          .insert([shipmentPayload])
+          .select();
+
+        if (shipError) throw shipError;
+
+        const newShip = shipData[0];
+
+        // 2. Inserir em shipment_items
+        const itemsPayload = cartKeys.map(nome => {
+          let catNome = "OUTROS";
+          for (const c of CATALOGO_MATERIAIS) {
+            if (c.itens.includes(nome)) {
+              catNome = c.categoria;
+              break;
+            }
+          }
+          const slug = nome.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          return {
+            shipment_id: newShip.id,
+            product_id: slug,
+            product_name: nome,
+            product_category: catNome,
+            quantity: currentCart[nome]
+          };
+        });
+
+        await supabase.from('shipment_items').insert(itemsPayload);
+
+        closeNewEnvioModal();
+        showToast(`Solicitação #ENV-${newShip.id.slice(0, 6).toUpperCase()} criada com sucesso!`, 'success');
+        loadSupabaseShipments();
+
+      } catch (err) {
+        console.error('Erro ao registrar no Supabase:', err);
+        alert('Erro ao registrar: ' + (err.message || 'Verifique sua conexão.'));
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Registrar Solicitação</span>';
+      }
     }
 
     // Modal Compras
@@ -1501,30 +2054,23 @@
     function submitNewCompra() {
       const item = document.getElementById('compra-item').value.trim();
       const qtd = parseInt(document.getElementById('compra-qtd').value) || 1;
-      const solicitante = document.getElementById('compra-solicitante').value.trim();
       const urgencia = document.getElementById('compra-urgencia').value;
+      const solicitante = document.getElementById('compra-solicitante').value.trim();
       const obs = document.getElementById('compra-obs').value.trim();
 
       if (!item) {
-        alert('Informe o nome do material a ser comprado.');
-        return;
-      }
-      if (!solicitante) {
-        alert('Informe o solicitante do estoque.');
+        alert('Por favor, informe a descrição do material necessário.');
         return;
       }
 
-      const now = new Date();
-      const dataStr = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const newId = 'COM-' + Math.floor(2000 + Math.random() * 8000);
-
+      const newId = `COM-${Math.floor(200 + Math.random() * 800)}`;
       const novaCompra = {
         id: newId,
         item: item,
         qtd: qtd,
-        solicitante: solicitante,
+        solicitante: solicitante || 'Estoque Matriz',
         urgencia: urgencia,
-        data: dataStr,
+        data: new Date().toLocaleString('pt-BR'),
         obs: obs,
         status: 'solicitado'
       };
@@ -1536,24 +2082,25 @@
       showToast(`Requisição de Compra ${newId} aberta!`, 'success');
     }
 
-    // 10. DETALHES, WHATSAPP & IMPRESSÃO
+    // 17. ROMANEIO, CONFERÊNCIA FÍSICA & IMPRESSÃO
     function openCardDetails(id) {
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (!pedido) return;
 
       document.getElementById('detail-code-badge').innerText = pedido.id;
-      document.getElementById('detail-title').innerText = `Pedido ${pedido.id} - ${pedido.filial}`;
-      document.getElementById('detail-subtitle').innerText = `Solicitado em ${pedido.data} por ${pedido.solicitante}`;
+      document.getElementById('detail-title').innerText = `Romaneio de Separação • ${pedido.id}`;
+      document.getElementById('detail-subtitle').innerText = `Destino: ${pedido.filial} • Solicitado por ${pedido.solicitante} em ${pedido.data}`;
 
-      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status);
+      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
 
       let itemsRows = pedido.itens.map((it, idx) => `
-        <tr class="border-b border-white/5">
-          <td class="py-2.5 px-3 text-slate-500 font-mono">${idx + 1}</td>
-          <td class="py-2.5 px-3 font-semibold text-white">${it.nome}</td>
-          <td class="py-2.5 px-3 text-right font-mono font-black text-indigo-400 text-sm">${it.qtd} un</td>
+        <tr id="check-row-${idx}" class="checklist-row border-b border-white/5 transition duration-150">
+          <td class="py-2.5 px-3 text-slate-500 font-mono text-center">${idx + 1}</td>
+          <td class="py-2.5 px-3 font-semibold text-white item-label">${it.nome}</td>
+          <td class="py-2.5 px-3 text-right font-mono font-black text-orange-300 text-sm">${it.qtd} un</td>
           <td class="py-2.5 px-3 text-center">
-            <input type="checkbox" class="w-4 h-4 rounded-lg bg-slate-900 border-white/20 text-indigo-600 focus:ring-0">
+            <input type="checkbox" onchange="toggleCheckItem(this, 'check-row-${idx}', ${pedido.itens.length})" 
+                   class="w-4 h-4 rounded bg-slate-900 border-white/20 text-orange-600 focus:ring-0 cursor-pointer">
           </td>
         </tr>
       `).join('');
@@ -1561,17 +2108,17 @@
       const totalUnidades = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
 
       document.getElementById('detail-body-print').innerHTML = `
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 glass-panel p-3.5 rounded-2xl border border-white/5">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 glass-surface p-3.5 rounded-2xl border border-white/5">
           <div>
             <span class="text-slate-400 text-[10px] uppercase font-bold block">Filial Destino</span>
             <span class="font-bold text-white text-xs">${pedido.filial}</span>
           </div>
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Fase do Pedido</span>
-            <span class="font-bold text-indigo-300 text-xs">${statusObj.nome}</span>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Fase Operacional</span>
+            <span class="font-bold text-orange-300 text-xs">${statusObj.nome}</span>
           </div>
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Urgência</span>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Prioridade</span>
             <span class="font-bold text-xs">${getUrgenciaBadge(pedido.urgencia)}</span>
           </div>
           <div>
@@ -1581,24 +2128,29 @@
         </div>
 
         ${pedido.obs ? `
-          <div class="glass-panel p-3 rounded-2xl border border-white/5">
+          <div class="glass-surface p-3 rounded-2xl border border-white/5">
             <span class="text-[10px] text-slate-400 font-bold block uppercase">Observação / Destino:</span>
             <p class="text-slate-300 text-xs mt-0.5">${pedido.obs}</p>
           </div>
         ` : ''}
 
-        <div class="border border-white/5 rounded-2xl overflow-hidden bg-slate-950/70">
-          <div class="bg-slate-900/90 px-4 py-2.5 text-xs font-bold text-slate-200 border-b border-white/5 flex justify-between">
-            <span>Checklist de Conferência Física (Almoxarife)</span>
-            <span class="text-slate-400 font-normal">Marque os itens ao bipar / colocar na caixa</span>
+        <div class="border border-white/10 rounded-2xl overflow-hidden bg-slate-950/80 shadow-lg">
+          <div class="bg-slate-900/90 px-4 py-3 text-xs font-bold text-slate-200 border-b border-white/10 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-orange-400"></i>
+              <span>Conferência de Separação Física (Almoxarifado)</span>
+            </div>
+            <div class="text-[11px] font-mono font-bold text-slate-400">
+              Conferidos: <span id="checklist-progress-text" class="text-emerald-400">0 / ${pedido.itens.length}</span>
+            </div>
           </div>
           <table class="w-full text-left text-xs">
             <thead>
-              <tr class="bg-slate-900/40 text-slate-400 border-b border-white/5">
-                <th class="py-2.5 px-3 w-10">#</th>
-                <th class="py-2.5 px-3">Descrição do Material</th>
-                <th class="py-2.5 px-3 text-right">Qtd</th>
-                <th class="py-2.5 px-3 text-center w-24">Bipado</th>
+              <tr class="bg-slate-900/40 text-slate-400 border-b border-white/5 text-[10px] uppercase tracking-wider font-semibold">
+                <th class="py-2 px-3 w-10 text-center">#</th>
+                <th class="py-2 px-3">Descrição do Material</th>
+                <th class="py-2 px-3 text-right">Qtd</th>
+                <th class="py-2 px-3 text-center w-24">Bipado</th>
               </tr>
             </thead>
             <tbody>
@@ -1609,19 +2161,48 @@
       `;
 
       document.getElementById('btn-whatsapp-action').onclick = () => sendToWhatsApp(pedido.id);
+      
+      const deleteModalBtn = document.getElementById('btn-delete-order-modal');
+      if (deleteModalBtn) {
+        if (isAdmin()) {
+          deleteModalBtn.classList.remove('hidden');
+          deleteModalBtn.onclick = () => deletePedidoEnvio(pedido.id);
+        } else {
+          deleteModalBtn.classList.add('hidden');
+        }
+      }
+
       document.getElementById('modal-card-details').classList.remove('hidden');
+    }
+
+    function toggleCheckItem(checkbox, rowId, totalCount) {
+      const row = document.getElementById(rowId);
+      if (checkbox.checked) {
+        row.classList.add('checked-item');
+      } else {
+        row.classList.remove('checked-item');
+      }
+
+      const checkedCount = document.querySelectorAll('#modal-card-details input[type="checkbox"]:checked').length;
+      const progressText = document.getElementById('checklist-progress-text');
+      if (progressText) {
+        progressText.innerText = `${checkedCount} / ${totalCount}`;
+        if (checkedCount === totalCount) {
+          progressText.innerHTML = `<span class="text-emerald-400 font-black"><i class="fa-solid fa-check-double mr-1"></i> 100% CONFERIDO</span>`;
+        }
+      }
     }
 
     function closeCardDetailsModal() {
       document.getElementById('modal-card-details').classList.add('hidden');
     }
 
-    // WhatsApp Message Generator
+    // Mensagem WhatsApp
     function sendToWhatsApp(id) {
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (!pedido) return;
 
-      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status);
+      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
 
       let msg = `📦 *VIGI SUPRIMENTOS - SOLICITAÇÃO ${pedido.id}*\n`;
       msg += `📍 *Filial:* ${pedido.filial}\n`;
@@ -1638,12 +2219,13 @@
       msg += `\n⏱ _Atualizado em ${pedido.data}_`;
 
       navigator.clipboard.writeText(msg).then(() => {
-        showToast(`Mensagem formatada copiada! Cole no grupo da filial ${pedido.filial}.`, 'whatsapp');
+        showToast(`Mensagem copiada! Cole no grupo da filial ${pedido.filial}.`, 'whatsapp');
       }).catch(err => {
         prompt('Copie o texto abaixo para enviar no grupo de WhatsApp:', msg);
       });
     }
 
+    // Impressão Romaneio Formal
     function printSeparacao() {
       const printDiv = document.getElementById('print-area');
       const modalContent = document.getElementById('detail-body-print').innerHTML;
@@ -1651,10 +2233,21 @@
       const subtitle = document.getElementById('detail-subtitle').innerText;
 
       printDiv.innerHTML = `
-        <div style="font-family: sans-serif; padding: 25px;">
-          <h1 style="font-size: 20px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 6px;">
-            VIGI - ROMANEIO DE CONFERÊNCIA E SEPARAÇÃO DE MATERIAIS
-          </h1>
+        <div style="font-family: sans-serif; padding: 25px; color: #111;">
+          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00204A; padding-bottom: 12px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; gap: 15px;">
+              <img src="vigi-logo.png" style="height: 48px; object-fit: contain;" alt="VIGI Câmeras" />
+              <div>
+                <h1 style="font-size: 18px; font-weight: 800; color: #00204A; margin: 0; text-transform: uppercase;">
+                  ROMANEIO DE CONFERÊNCIA E SEPARAÇÃO DE CARGA
+                </h1>
+                <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">VIGI Câmeras • Gestão Central de Suprimentos & Filiais PR</p>
+              </div>
+            </div>
+            <div style="text-align: right; font-size: 11px;">
+              <span style="display: inline-block; padding: 4px 10px; background: #fff3eb; border: 1px solid #fd5f00; border-radius: 6px; color: #fd5f00; font-weight: 800; font-family: monospace;">ALMOXARIFADO MATRIZ</span>
+            </div>
+          </div>
           <p style="font-size: 13px; margin-bottom: 20px;"><strong>${title}</strong> | ${subtitle}</p>
           ${modalContent}
           <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 12px;">
@@ -1662,7 +2255,7 @@
               Assinatura do Almoxarife (Separação)
             </div>
             <div style="border-top: 1px solid #000; width: 42%; text-align: center; padding-top: 6px;">
-              Assinatura da Filial (Recebimento)
+              Assinatura do Recebedor (Filial)
             </div>
           </div>
         </div>
@@ -1672,10 +2265,52 @@
       printDiv.classList.add('hidden');
     }
 
+    // 18. ATALHOS & EVENTOS
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeNewEnvioModal();
+        closeNewCompraModal();
+        closeCardDetailsModal();
+        closeUserSwitchModal();
+      }
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        e.preventDefault();
+        const searchInput = document.getElementById('filter-search');
+        if (searchInput) searchInput.focus();
+      }
+    });
+
+    // Supabase Realtime Listener
+    function initRealtime() {
+      if (!supabase) return;
+      try {
+        supabase
+          .channel('vigi-matriz-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
+            loadSupabaseShipments();
+          })
+          .subscribe();
+      } catch (err) {
+        console.warn('Realtime fallback:', err);
+      }
+    }
+
+    // Polling a cada 20 segundos
+    setInterval(() => {
+      loadSupabaseShipments();
+    }, 20000);
+
+    // Auto-detecção Mobile: se aberto no celular sem parâmetro desktop, vai para o solicitar.html
+    if (window.innerWidth < 768 && !window.location.search.includes('desktop=true') && !sessionStorage.getItem('stay_desktop')) {
+      window.location.href = 'solicitar.html';
+    }
+
     // Inicialização
     window.onload = function() {
+      applyUserRoleSettings();
       initCatalogUI();
-      renderAll();
+      loadSupabaseShipments();
+      initRealtime();
     };
   </script>
 </body>

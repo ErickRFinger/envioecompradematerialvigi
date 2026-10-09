@@ -77,9 +77,25 @@ graph TD
 
 | Arquivo | Descrição |
 | :--- | :--- |
-| `index.html` | Aplicação web principal completa e funcional (Vanilla JS + Tailwind CSS CDN). |
-| `sistema_solicitacao_materiais.html` | Cópia de segurança com o nome descritivo original. |
-| `README.md` | Este documento de arquitetura e instruções para o próximo desenvolvedor. |
+| `index.html` | Dashboard principal Matriz (Kanban & Tabela) conectado ao Supabase em tempo real. |
+| `solicitar.html` | **Aplicativo Web Mobile (PWA)** para técnicos solicitarem materiais pelo celular com rastreio ao vivo. |
+| `sistema_solicitacao_materiais.html` | Cópia de segurança sincronizada do dashboard principal. |
+| `RESUMO_PROJETO.md` | Documento de arquitetura, credenciais de acesso e especificações. |
+| `README.md` | Guia rápido de execução e operação. |
+
+### 👥 Usuários e Permissões (RBAC) Cadastrados no Supabase:
+
+#### 🛡️ Administradores Gerais (Acesso Total, Todas as Filiais & Exclusão de Ordens):
+- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin`
+- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin`
+- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin`
+- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin`
+
+#### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
+- **`beltrao1`** (`beltrao1@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
+- **`beltrao2`** (`beltrao2@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
+- **`palotina1`** (`palotina1@vigi.com.br`) • Palotina • Senha: `Clic@3369` • Role: `filial`
+- **`barracao1`** (`barracao1@vigi.com.br`) • Barracão • Senha: `Clic@3369` • Role: `filial`
 
 ---
 

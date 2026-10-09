@@ -77,9 +77,38 @@ graph TD
 
 | Arquivo | Descrição |
 | :--- | :--- |
-| `index.html` | Aplicação web principal completa e funcional (Vanilla JS + Tailwind CSS CDN). |
-| `sistema_solicitacao_materiais.html` | Cópia de segurança com o nome descritivo original. |
-| `README.md` | Este documento de arquitetura e instruções para o próximo desenvolvedor. |
+| `index.html` | Dashboard principal Matriz (Kanban & Tabela) conectado ao Supabase em tempo real. |
+| `solicitar.html` | **Aplicativo Web Mobile (PWA)** para técnicos solicitarem materiais pelo celular com rastreio ao vivo. |
+| `sistema_solicitacao_materiais.html` | Cópia de segurança sincronizada do dashboard principal. |
+| `vigi1.png` | Arquivo original em alta resolução (4081x2612) da logo oficial VIGI Câmeras. |
+| `vigi-logo.png` | Versão otimizada para web e impressão de romaneios da logo VIGI. |
+| `favicon.ico` | Favicon multi-resolução nativo MS Windows (16x16, 32x32, 48x48, 64x64) para abas de navegadores. |
+| `apple-touch-icon.png` | Ícone de toque em alta resolução (180x180) para Safari no iOS. |
+| `icon-192.png` / `icon-512.png` | Ícones PWA para instalação no celular. |
+| `manifest.json` | Configuração PWA para tela inicial do smartphone. |
+| `vercel.json` | Regras de roteamento e clean URLs para Vercel. |
+| `RESUMO_PROJETO.md` | Documento de arquitetura, credenciais de acesso e especificações. |
+| `README.md` | Guia rápido de execução e operação. |
+
+### 🎨 Identidade Visual & Cores Oficiais da Marca (Extraídas da Logo `vigi1`):
+- **Azul Marinho Corporativo:** `#00204A` (cor base do contorno, texto e superfícies)
+- **Laranja Vibrante VIGI:** `#FD5F00` (cor da casinha e do pingo do 'i' — utilizada para botões de ação primária, botões de avanço, badges ativos, glow tecnológico e carrinho flutuante)
+- **Branco Puro:** `#FFFFFF` (para títulos e tipografia de alto contraste)
+- **Fundo Dark Navy Glassmorphism:** `#000c1e` com gradientes atmosféricos em `#00204A` e toques em `#FD5F00`.
+
+### 👥 Usuários e Permissões (RBAC) Cadastrados no Supabase:
+
+#### 🛡️ Administradores Gerais (Acesso Total, Todas as Filiais & Exclusão de Ordens):
+- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin`
+- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin`
+- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin`
+- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin`
+
+#### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
+- **`beltrao1`** (`beltrao1@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
+- **`beltrao2`** (`beltrao2@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
+- **`palotina1`** (`palotina1@vigi.com.br`) • Palotina • Senha: `Clic@3369` • Role: `filial`
+- **`barracao1`** (`barracao1@vigi.com.br`) • Barracão • Senha: `Clic@3369` • Role: `filial`
 
 ---
 

@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>VIGI Solicitação Mobile • Suprimentos de Filial</title>
+  
+  <!-- Favicon & Touch Icons VIGI -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#001127">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VIGI Filiais">
+
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome 6 Pro/Free Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Supabase JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+          },
+          colors: {
+            vigi: {
+              DEFAULT: '#FD5F00',
+              orange: '#FD5F00',
+              orangeHover: '#e65500',
+              navy: '#00204A',
+              navyDark: '#000c1e',
+              navyPanel: '#001738',
+              navyLight: '#082f66',
+              50: '#fff7ed',
+              100: '#ffedd5',
+              200: '#fed7aa',
+              300: '#fdba74',
+              400: '#fb923c',
+              500: '#fd5f00',
+              600: '#ea580c',
+              700: '#c2410c',
+              800: '#9a3412',
+              900: '#7c2d12',
+              accent: '#FD5F00'
+            }
+          },
+          boxShadow: {
+            'glow-vigi': '0 0 35px -5px rgba(253, 95, 0, 0.45)',
+            'glow-emerald': '0 0 30px -5px rgba(16, 185, 129, 0.4)',
+            'glow-amber': '0 0 30px -5px rgba(245, 158, 11, 0.4)',
+            'glow-purple': '0 0 30px -5px rgba(168, 85, 247, 0.4)',
+            'glow-cyan': '0 0 30px -5px rgba(6, 182, 212, 0.4)',
+            'glow-rose': '0 0 30px -5px rgba(244, 63, 94, 0.45)',
+            'bottom-bar': '0 -10px 30px 0 rgba(0, 0, 0, 0.65)'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .bg-mesh-app {
+      background-color: #000c1e;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(0, 32, 74, 0.95) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(253, 95, 0, 0.16) 0px, transparent 55%),
+        radial-gradient(at 50% 50%, rgba(0, 18, 42, 0.8) 0px, transparent 100%);
+      background-attachment: fixed;
+    }
+
+    .glass-nav {
+      background: rgba(0, 14, 34, 0.94);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-bottom-bar {
+      background: rgba(0, 12, 30, 0.96);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-card {
+      background: rgba(2, 21, 48, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 10px 25px -8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .glass-card:active {
+      transform: scale(0.985);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+<body class="bg-mesh-app text-slate-100 min-h-screen flex flex-col font-sans antialiased pb-24 selection:bg-orange-600 selection:text-white">
+
+  <!-- ======================================================== -->
+  <!-- TOAST NOTIFICATIONS -->
+  <!-- ======================================================== -->
+  <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none w-[90%] max-w-sm"></div>
+
+  <!-- ======================================================== -->
+  <!-- 1. LOGIN SCREEN (ROLE-BASED & ENTERPRISE DESIGN) -->
+  <!-- ======================================================== -->
+  <div id="view-login" class="fixed inset-0 z-50 bg-[#000c1e] flex flex-col justify-center items-center p-4 overflow-y-auto">
+    <div class="w-full max-w-md space-y-5 my-auto py-6">
+      
+      <!-- Brand Header com Logo Oficial VIGI -->
+      <div class="text-center space-y-3">
+        <div class="inline-flex p-3.5 px-6 rounded-2xl bg-[#001738]/95 border border-white/10 shadow-2xl shadow-orange-600/15">
+          <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-12 max-w-[210px] object-contain drop-shadow" />
+        </div>
+        <div>
+          <h1 class="text-xl font-black text-white tracking-tight flex items-center justify-center gap-2">
+            VIGI <span class="text-orange-400 font-mono text-xs uppercase px-2.5 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 font-bold">SUPRIMENTOS</span>
+          </h1>
+          <p class="text-xs text-slate-400 font-medium mt-0.5">Portal Mobile de Filiais • Paraná</p>
+        </div>
+      </div>
+
+      <!-- User Role Selector Card -->
+      <div class="glass-card rounded-3xl p-5 space-y-4 border-white/10">
+        
+        <!-- Toggle Tabs: Filiais vs Admins -->
+        <div class="flex items-center bg-slate-950 p-1 rounded-2xl border border-white/10 text-xs font-bold">
+          <button type="button" onclick="switchLoginRoleTab('filiais')" id="tab-login-filiais" class="flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-location-dot text-[11px]"></i>
+            <span>Filiais (PR)</span>
+          </button>
+          <button type="button" onclick="switchLoginRoleTab('admins')" id="tab-login-admins" class="flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-shield-halved text-[11px]"></i>
+            <span>Administradores</span>
+          </button>
+        </div>
+
+        <!-- Seção 1: Filiais (Apenas Solicitar & Rastrear Própria Filial) -->
+        <div id="section-login-filiais" class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Toque para selecionar sua filial</span>
+            <span class="text-amber-400 font-mono text-[10px]">4 acessos</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setQuickLogin('beltrao1')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                <span class="truncate">Beltrão 1</span>
+              </span>
+              <span class="text-[10px] text-amber-400/70 font-mono">FB</span>
+            </button>
+            <button type="button" onclick="setQuickLogin('beltrao2')" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                <span class="truncate">Beltrão 2</span>
+              </span>
+              <span class="text-[10px] text-amber-400/70 font-mono">FB</span>
+            </button>
+            <button type="button" onclick="setQuickLogin('palotina1')" class="p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold text-xs hover:bg-cyan-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
+                <span class="truncate">Palotina 1</span>
+              </span>
+              <span class="text-[10px] text-cyan-400/70 font-mono">PAL</span>
+            </button>
+            <button type="button" onclick="setQuickLogin('barracao1')" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold text-xs hover:bg-emerald-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span class="truncate">Barracão 1</span>
+              </span>
+              <span class="text-[10px] text-emerald-400/70 font-mono">BAR</span>
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-500 italic text-center pt-1">
+            <i class="fa-solid fa-lock text-[9px] mr-1"></i> Acesso de filial restrito a pedidos e rastreio da própria base
+          </p>
+        </div>
+
+        <!-- Seção 2: Admins (Acesso Geral & Exclusão de Ordens) -->
+        <div id="section-login-admins" class="space-y-2 hidden">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Toque para selecionar administrador</span>
+            <span class="text-orange-400 font-mono text-[10px]">Gestão Matriz</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button type="button" onclick="setQuickLogin('erick')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Erick Finger</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+            <button type="button" onclick="setQuickLogin('daniel')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Daniel L.</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+            <button type="button" onclick="setQuickLogin('thiago')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Thiago G.</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+            <button type="button" onclick="setQuickLogin('klaus')" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Cleverson K.</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+          </div>
+          <p class="text-[10px] text-orange-400/80 italic text-center pt-1">
+            <i class="fa-solid fa-shield-halved text-[9px] mr-1"></i> Acesso admin completo: visualização de todas as filiais e exclusão de ordens
+          </p>
+        </div>
+
+        <!-- Formulário com Inputs -->
+        <form onsubmit="handleLoginSubmit(event)" class="space-y-3.5 pt-2 border-t border-white/10">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Usuário / Credencial</label>
+            <div class="relative">
+              <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input type="text" id="login-username" required placeholder="Ex: beltrao1 ou erick" 
+                     class="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Senha de Acesso</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+              <input type="password" id="login-password" required value="Clic@3369" placeholder="Senha" 
+                     class="w-full bg-slate-950 border border-white/10 rounded-xl pl-9 pr-10 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 font-mono">
+              <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs p-1">
+                <i class="fa-regular fa-eye" id="password-toggle-icon"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-login-submit" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:from-orange-500 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition transform active:scale-95 flex items-center justify-center gap-2">
+            <span>Entrar no Sistema</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </form>
+
+      </div>
+
+      <div class="text-center pt-2">
+        <a href="index.html" class="inline-flex items-center gap-2 text-xs text-slate-400 hover:text-orange-400 font-semibold transition px-3 py-1.5 rounded-xl hover:bg-white/5">
+          <i class="fa-solid fa-desktop"></i>
+          <span>Abrir Painel Matriz Completo (Desktop)</span>
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- APP HEADER (COMPACT MOBILE TOPBAR) -->
+  <!-- ======================================================== -->
+  <header class="glass-nav sticky top-0 z-40 px-4 py-2.5 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="h-9 px-2.5 py-1 rounded-xl bg-[#001738]/95 border border-white/10 flex items-center justify-center shadow-md">
+        <img src="vigi-logo.png" alt="VIGI" class="h-5 max-w-[85px] object-contain" />
+      </div>
+      <div>
+        <div class="flex items-center gap-1.5">
+          <h1 class="text-xs font-black text-white leading-tight">Materiais & Peças</h1>
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+        </div>
+        <div id="user-branch-badge" class="text-[10px] font-bold text-amber-400 flex items-center gap-1">
+          <i class="fa-solid fa-location-dot text-[9px]"></i> Francisco Beltrão
+        </div>
+      </div>
+    </div>
+
+    <!-- User Info & Actions -->
+    <div class="flex items-center gap-1.5">
+      <div id="header-user-badge" class="flex items-center gap-1.5 font-mono text-[11px] font-bold text-slate-300 bg-slate-950/90 border border-white/10 px-2.5 py-1 rounded-xl">
+        <span id="header-user-avatar" class="w-4 h-4 rounded-full bg-orange-500/20 text-orange-400 text-[9px] flex items-center justify-center font-black">U</span>
+        <span id="header-user-name" class="truncate max-w-[90px]">usuario</span>
+      </div>
+      <a href="index.html" title="Abrir Painel Matriz / Desktop" class="w-8 h-8 rounded-xl bg-slate-950 border border-white/10 text-orange-400 hover:text-white flex items-center justify-center text-xs transition active:scale-95">
+        <i class="fa-solid fa-desktop"></i>
+      </a>
+      <button onclick="handleLogout()" title="Sair da Conta" class="w-8 h-8 rounded-xl bg-slate-950 border border-white/10 text-slate-400 hover:text-rose-400 flex items-center justify-center text-xs transition active:scale-95">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- MAIN APP VIEWS CONTAINER -->
+  <!-- ======================================================== -->
+  <main class="flex-1 px-4 py-3 max-w-lg mx-auto w-full space-y-4">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: CATÁLOGO & SOLICITAÇÃO (MOBILE) -->
+    <!-- ========================================== -->
+    <section id="tab-content-catalogo" class="space-y-3.5">
+      
+      <!-- Sticky Search Bar -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+        <input type="text" id="mobile-search" oninput="renderMobileCatalog()" placeholder="Buscar câmeras, cabos, conectores..." 
+               class="w-full bg-slate-950/90 border border-white/10 rounded-2xl pl-10 pr-9 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 shadow-md">
+        <button onclick="clearSearch()" id="btn-clear-search" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white text-xs hidden">
+          <i class="fa-solid fa-circle-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Category Filter Pills (Horizontal Scroll) -->
+      <div id="mobile-category-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Items Grid (Mobile Friendly Cards) -->
+      <div id="mobile-catalog-grid" class="space-y-2.5">
+        <!-- Rendered by JS -->
+      </div>
+
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: MEUS PEDIDOS & RASTREIO AO VIVO -->
+    <!-- ========================================== -->
+    <section id="tab-content-rastreio" class="space-y-3.5 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-sm font-black text-white flex items-center gap-2">
+            <span>Rastreio de Solicitações</span>
+            <span id="tracking-role-indicator" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-400 border border-white/10">Filial</span>
+          </h2>
+          <p class="text-[11px] text-slate-400" id="tracking-subtitle">Acompanhe a separação e o transporte da Matriz</p>
+        </div>
+        <button onclick="loadShipmentsFromSupabase()" class="text-orange-400 hover:text-orange-300 text-xs font-bold flex items-center gap-1.5 p-1 transition">
+          <i class="fa-solid fa-rotate"></i> <span>Atualizar</span>
+        </button>
+      </div>
+
+      <!-- Admin Branch Filter Ribbon (Visível APENAS para Admins no celular) -->
+      <div id="mobile-admin-branch-filter" class="hidden flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-white/10 overflow-x-auto no-scrollbar text-xs">
+        <button onclick="setMobileAdminFilter('todas')" id="m-filter-todas" class="px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0">Todas</button>
+        <button onclick="setMobileAdminFilter('Francisco Beltrão')" id="m-filter-beltrao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão</button>
+        <button onclick="setMobileAdminFilter('Palotina')" id="m-filter-palotina" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Palotina</button>
+        <button onclick="setMobileAdminFilter('Barracão')" id="m-filter-barracao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Barracão</button>
+      </div>
+
+      <!-- Pedidos List -->
+      <div id="tracking-orders-list" class="space-y-3">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: HISTÓRICO ENTREGUE -->
+    <!-- ========================================== -->
+    <section id="tab-content-historico" class="space-y-3.5 hidden">
+      <div>
+        <h2 class="text-sm font-black text-white">Histórico de Concluídos</h2>
+        <p class="text-[11px] text-slate-400">Solicitações finalizadas e entregues na filial</p>
+      </div>
+
+      <div id="history-orders-list" class="space-y-3">
+        <!-- Injected by JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- FLOATING CART STRIP (SURFACE QUANDO ITENS > 0) -->
+  <!-- ======================================================== -->
+  <div id="floating-cart-bar" class="fixed bottom-16 left-4 right-4 z-40 max-w-lg mx-auto hidden animate-in slide-in-from-bottom-4 duration-200">
+    <div onclick="openCheckoutModal()" class="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 rounded-2xl p-3 px-4 shadow-xl shadow-orange-600/40 border border-white/20 flex items-center justify-between cursor-pointer active:scale-95 transition transform">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white text-base font-bold shadow-inner">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+        <div>
+          <div class="text-xs font-black text-white flex items-center gap-2">
+            <span id="floating-cart-count">0 itens</span> selecionados
+          </div>
+          <p class="text-[10px] text-orange-100 font-medium">Toque para revisar e enviar para Matriz</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 bg-white/25 px-3 py-1.5 rounded-xl text-xs font-extrabold text-white shadow-sm">
+        <span>Revisar</span>
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- BOTTOM APP NAVIGATION BAR (TAB BAR) -->
+  <!-- ======================================================== -->
+  <nav class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-40 px-6 py-2">
+    <div class="max-w-lg mx-auto flex items-center justify-around text-center">
+      
+      <button onclick="switchMobileTab('catalogo')" id="nav-btn-catalogo" class="flex flex-col items-center gap-1 text-orange-400 font-bold transition">
+        <i class="fa-solid fa-boxes-stacked text-lg"></i>
+        <span class="text-[10px]">Solicitar</span>
+      </button>
+
+      <button onclick="switchMobileTab('rastreio')" id="nav-btn-rastreio" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition relative">
+        <i class="fa-solid fa-truck-fast text-lg"></i>
+        <span class="text-[10px]">Rastreio</span>
+        <span id="nav-tracking-badge" class="absolute -top-1 right-1 w-2 h-2 rounded-full bg-orange-400 animate-pulse hidden"></span>
+      </button>
+
+      <button onclick="switchMobileTab('historico')" id="nav-btn-historico" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition">
+        <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+        <span class="text-[10px]">Histórico</span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- ======================================================== -->
+  <!-- MODAL / BOTTOM SHEET: REVISÃO & CHECKOUT DO PEDIDO -->
+  <!-- ======================================================== -->
+  <div id="modal-checkout" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[90vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
+      
+      <!-- Header -->
+      <div class="px-5 py-4 bg-slate-950 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 flex items-center justify-center text-sm font-bold shadow-glow-vigi">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-extrabold text-white">Revisar Solicitação</h3>
+            <p id="checkout-branch-subtitle" class="text-[10px] text-orange-400 font-semibold">Destino: Francisco Beltrão</p>
+          </div>
+        </div>
+        <button onclick="closeCheckoutModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Checkout Body -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- Carrinho com Lista de Itens -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            <span>Itens Selecionados</span>
+            <button onclick="clearMobileCart()" class="text-rose-400 hover:underline normal-case font-semibold">Limpar tudo</button>
+          </div>
+          
+          <div id="checkout-items-list" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+
+        <!-- Dados do Solicitante e Destino -->
+        <div class="space-y-3 pt-2 border-t border-white/10">
+          
+          <!-- Seletor de Filial (Apenas Admins podem alterar, Filiais ficam travadas) -->
+          <div id="checkout-branch-selector-container">
+            <label class="block font-semibold text-slate-300 mb-1">Filial de Destino</label>
+            <select id="checkout-branch-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 disabled:opacity-75 disabled:cursor-not-allowed">
+              <option value="FRANCISCO BELTRAO PR">Francisco Beltrão (PR)</option>
+              <option value="PALOTINA PR">Palotina (PR)</option>
+              <option value="BARRACAO PR">Barracão (PR)</option>
+            </select>
+            <p id="checkout-branch-lock-notice" class="text-[10px] text-slate-500 mt-1 italic hidden">
+              <i class="fa-solid fa-lock text-[9px] mr-1"></i> Sua conta está vinculada exclusivamente a esta base.
+            </p>
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Técnico Solicitante *</label>
+            <input type="text" id="checkout-solicitante" placeholder="Ex: Jean Carlos" 
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Nível de Urgência</label>
+            <div class="grid grid-cols-3 gap-2">
+              <button type="button" onclick="setCheckoutUrgencia('Normal')" id="urg-btn-normal" class="p-2 rounded-xl border text-[11px] font-bold border-emerald-500/40 bg-emerald-500/20 text-emerald-300">
+                🟢 Normal
+              </button>
+              <button type="button" onclick="setCheckoutUrgencia('Alta')" id="urg-btn-alta" class="p-2 rounded-xl border text-[11px] font-semibold border-white/10 bg-slate-900 text-slate-400">
+                🟡 Alta
+              </button>
+              <button type="button" onclick="setCheckoutUrgencia('Urgente')" id="urg-btn-urgente" class="p-2 rounded-xl border text-[11px] font-semibold border-white/10 bg-slate-900 text-slate-400">
+                🔴 Crítica
+              </button>
+            </div>
+            <input type="hidden" id="checkout-urgencia" value="Normal">
+          </div>
+
+          <div>
+            <label class="block font-semibold text-slate-300 mb-1">Observações Operacionais (Opcional)</label>
+            <textarea id="checkout-obs" rows="2" placeholder="Ex: Material para manutenção cliente X, van das 14h..." 
+                      class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 resize-none"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Checkout Footer -->
+      <div class="p-4 bg-slate-950 border-t border-white/10 flex items-center justify-between gap-3">
+        <button onclick="closeCheckoutModal()" class="px-4 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white text-xs">
+          Voltar
+        </button>
+        <button onclick="submitOrderToSupabase()" id="btn-submit-order" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:from-orange-500 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition transform active:scale-95 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Enviar para Separação</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL DE SUCESSO & WHATSAPP EM 1 TOQUE -->
+  <!-- ======================================================== -->
+  <div id="modal-success" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-3xl p-6 w-full max-w-sm text-center space-y-4 border border-emerald-500/40 shadow-glow-emerald animate-in zoom-in-95 duration-200">
+      
+      <div class="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center text-2xl shadow-glow-emerald">
+        <i class="fa-solid fa-check"></i>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-base font-black text-white">Solicitação Transmitida!</h3>
+        <p class="text-xs text-slate-400" id="success-modal-desc">
+          O pedido foi registrado no banco da Matriz e entrou na esteira de separação.
+        </p>
+      </div>
+
+      <div class="p-3.5 bg-slate-900 rounded-2xl border border-white/5 text-left text-xs font-mono text-slate-300 space-y-1.5">
+        <div class="flex justify-between text-slate-400 text-[10px]">
+          <span>CÓDIGO:</span>
+          <span id="success-code" class="text-orange-400 font-bold">#ENV-0000</span>
+        </div>
+        <div class="flex justify-between text-slate-400 text-[10px]">
+          <span>FILIAL:</span>
+          <span id="success-branch" class="text-white font-bold">Beltrão</span>
+        </div>
+        <div class="flex justify-between text-slate-400 text-[10px]">
+          <span>VOLUME:</span>
+          <span id="success-items-count" class="text-emerald-400 font-bold">0 un</span>
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="copyAndSendWhatsAppSuccess()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
+          <i class="fa-brands fa-whatsapp text-base"></i>
+          <span>Copiar Mensagem p/ WhatsApp</span>
+        </button>
+
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-white/10 text-slate-300 font-semibold text-xs hover:bg-slate-800 transition">
+          Ver Fila de Pedidos
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- JAVASCRIPT ENGINE & SUPABASE SYNC -->
+  <!-- ======================================================== -->
+  <script>
+    // 1. SUPABASE CONFIGURATION
+    const SUPABASE_URL = "https://hnfhrjgzeivzrcpumkyk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI";
+
+    const supabase = (window.supabase && window.supabase.createClient) 
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    // 2. DICIONÁRIO OFICIAL DE USUÁRIOS & ROLES (RBAC)
+    const APP_USERS = {
+      // --- ADMINISTRADORES GERAIS (Acesso Total & Exclusão de Ordens) ---
+      "erick": {
+        username: "erick",
+        name: "Erick Finger",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "erick@vigi.com.br",
+        avatar: "EF"
+      },
+      "daniel": {
+        username: "daniel",
+        name: "Daniel Lazzarotto",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "daniel@vigi.com.br",
+        avatar: "DL"
+      },
+      "thiago": {
+        username: "thiago",
+        name: "Thiago Graxaim",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "thiago@vigi.com.br",
+        avatar: "TG"
+      },
+      "klaus": {
+        username: "klaus",
+        name: "Cleverson Klaus",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "klaus@vigi.com.br",
+        avatar: "CK"
+      },
+
+      // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
+      "beltrao1": {
+        username: "beltrao1",
+        name: "Técnico Beltrão 01",
+        role: "filial",
+        filial: "Francisco Beltrão",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        email: "beltrao1@vigi.com.br",
+        avatar: "B1"
+      },
+      "beltrao2": {
+        username: "beltrao2",
+        name: "Técnico Beltrão 02",
+        role: "filial",
+        filial: "Francisco Beltrão",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        email: "beltrao2@vigi.com.br",
+        avatar: "B2"
+      },
+      "palotina1": {
+        username: "palotina1",
+        name: "Técnico Palotina 01",
+        role: "filial",
+        filial: "Palotina",
+        dbBranch: "PALOTINA PR",
+        email: "palotina1@vigi.com.br",
+        avatar: "P1"
+      },
+      "barracao1": {
+        username: "barracao1",
+        name: "Técnico Barracão 01",
+        role: "filial",
+        filial: "Barracão",
+        dbBranch: "BARRACAO PR",
+        email: "barracao1@vigi.com.br",
+        avatar: "BR"
+      }
+    };
+
+    // 3. CATÁLOGO COMPLETO DE MATERIAIS
+    const CATALOGO_MATERIAIS = [
+      {
+        categoria: "CÂMERAS",
+        icon: "fa-video",
+        itens: ["Câmera Bullet Hikvision", "Câmera Bullet Hikvision ColorVu", "Câmera Bullet Positivo", "Câmera Bullet UNV", "Câmera Bullet UNV ColorVu", "Câmera Bullet UNV Dual Light", "Câmera Dome UNV", "Câmera Dome UNV ColorVu", "Câmera Dome UNV Dual Light", "Câmera Hik com Sirene", "Câmera Hik Robotizada Sirene", "Câmera IP Bullet Hikvision", "Câmera IP Bullet UNV", "Câmera IP Dome UNV", "Câmera IP EZVIZ", "Câmera TWO", "Câmera UNV Color Hunter com Áudio", "Câmera Varifocal"]
+      },
+      {
+        categoria: "GRAVADORES (DVRs)",
+        icon: "fa-server",
+        itens: ["DVR Hikvision 16CH", "DVR Hikvision 2CH", "DVR Hikvision 4CH", "DVR Hikvision 8CH", "DVR INTELBRAS 16CH", "DVR INTELBRAS 2CH", "DVR INTELBRAS 4CH", "DVR INTELBRAS 8CH", "DVR UNV 16CH", "DVR UNV 2CH", "DVR UNV 4CH", "DVR UNV 8CH"]
+      },
+      {
+        categoria: "CABOS E FIOS",
+        icon: "fa-network-wired",
+        itens: ["Arame de Espinar", "Bobina de Cabo Blindado", "Bobina de Cabo Coaxial", "Bobina de Cabo de Fibra", "Caixa de Cabo de Rede", "Lubrificante Passa Fio", "Rolo de Cabo de Alarme", "Rolo de Cabo de Energia"]
+      },
+      {
+        categoria: "CONECTORES E VÍDEO",
+        icon: "fa-plug",
+        itens: ["Conector BNC", "Conector de Energia", "Conector de Fibra", "Conector P4", "Conector RJ45", "Conector Wago", "Emenda de Energia", "Emenda de Vídeo", "Par de Balun", "Par de Injetor POE", "Par de Media Converter"]
+      },
+      {
+        categoria: "ALARMES E SENSORES",
+        icon: "fa-shield-halved",
+        itens: ["Central de Alarme", "Sensor de Presença Com Fio", "Sensor de Presença Sem Fio", "Sensor Magnético de Abertura", "Sirene", "Suporte de Alarme"]
+      },
+      {
+        categoria: "ELÉTRICA E PROTEÇÃO",
+        icon: "fa-bolt-lightning",
+        itens: ["Bateria", "Fonte 12V 2.5A", "Fonte 12V 3.0A", "Fonte 12V 3.5A", "FONTE DE PC 200W", "Nobreak 1200VA", "Régua de Tomadas 3 posições", "Régua de Tomadas 5 posições", "Régua de Tomadas 6 posições", "Tomada Macho"]
+      },
+      {
+        categoria: "INFRAESTRUTURA E FIXAÇÃO",
+        icon: "fa-cubes-stacked",
+        itens: ["Bucha 6", "Caixa Metálica", "Caixa Organizadora para DVR", "Caixinha de Passagem Branca", "Caixinha de Passagem Vedada", "Canaleta", "Cinta Metálica", "Cola para Canaleta", "Emenda de Canaleta", "Fita Dupla Face", "Fita Isolante Branca", "Fita Isolante Preta", "Miguelão de Concreto", "Miguelão de Madeira", "Parafuso 4x16", "Parafuso 4x20", "Parafuso 4x40", "Parafuso Brocante", "Prego para Concreto", "Presilha de Nylon 20cm", "Presilha de Nylon 40cm", "Super Bonder", "Tubo de Silicone"]
+      },
+      {
+        categoria: "EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)",
+        icon: "fa-wrench",
+        itens: ["Alicate de Bico", "Alicate de Corte", "Alicate de Crimpar", "Aplicador de Silicone", "Aspirador de Pó Vertical", "Broca de Aço", "Broca de Concreto", "Broca de Madeira", "Broca Escalonada", "Caixa de Ferramentas", "Escada", "Furadeira de Impacto", "Martelo", "Multímetro", "Parafusadeira", "Ponteira Philips", "Serrinha", "Testador de Cabo de Rede"]
+      },
+      {
+        categoria: "INFORMÁTICA E DIVERSOS",
+        icon: "fa-laptop",
+        itens: ["Cartão de Memória", "HD 1TB", "HD 2TB", "Hub Switch 4 Portas", "Hub Switch 8 Portas", "Kit de Fibra", "Monitor", "Repetidor de Internet", "SSD 240GB", "SSD 480GB"]
+      },
+      {
+        categoria: "MARKETING E OUTROS",
+        icon: "fa-bullhorn",
+        itens: ["Adesivo de Monitoramento", "Camisa VIGI", "Copo", "Plaquinha VIGI", "Sacola para Copos", "Ticket Sem Parar"]
+      }
+    ];
+
+    // Pipeline Steps
+    const PIPELINE_STEPS = [
+      { id: "aguardando", nome: "Aguardando Separação", num: 1 },
+      { id: "separando", nome: "Em Separação", num: 2 },
+      { id: "coleta", nome: "Pronto p/ Coleta", num: 3 },
+      { id: "enviado", nome: "Em Rota", num: 4 },
+      { id: "recebido", nome: "Entregue", num: 5 }
+    ];
+
+    // 4. ESTADO DA SESSÃO E CARRINHO
+    let currentUser = null;
+    let mobileCart = {};
+    let activeCategory = "todas";
+    let activeTab = "catalogo";
+    let myShipments = [];
+    let lastCreatedOrder = null;
+    let adminFilterBranch = "todas";
+
+    // Toast
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      let icon = '<i class="fa-solid fa-circle-check text-orange-400"></i>';
+      let border = 'border-orange-500/40 shadow-glow-vigi';
+      if (type === 'success') {
+        icon = '<i class="fa-solid fa-circle-check text-emerald-400"></i>';
+        border = 'border-emerald-500/40 shadow-glow-emerald';
+      } else if (type === 'error') {
+        icon = '<i class="fa-solid fa-triangle-exclamation text-rose-400"></i>';
+        border = 'border-rose-500/40 shadow-glow-rose';
+      }
+      toast.className = `glass-card pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl border ${border} text-xs text-white transform transition-all duration-300 -translate-y-3 opacity-0`;
+      toast.innerHTML = `${icon} <span class="font-medium">${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => toast.classList.remove('-translate-y-3', 'opacity-0'), 20);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    // 5. AUTENTICAÇÃO & ROLES
+    function switchLoginRoleTab(tab) {
+      const btnFiliais = document.getElementById('tab-login-filiais');
+      const btnAdmins = document.getElementById('tab-login-admins');
+      const secFiliais = document.getElementById('section-login-filiais');
+      const secAdmins = document.getElementById('section-login-admins');
+
+      if (tab === 'filiais') {
+        btnFiliais.className = "flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5";
+        btnAdmins.className = "flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+        secFiliais.classList.remove('hidden');
+        secAdmins.classList.add('hidden');
+      } else {
+        btnAdmins.className = "flex-1 py-2 rounded-xl transition bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center justify-center gap-1.5";
+        btnFiliais.className = "flex-1 py-2 rounded-xl transition text-slate-400 hover:text-white flex items-center justify-center gap-1.5";
+        secAdmins.classList.remove('hidden');
+        secFiliais.classList.add('hidden');
+      }
+    }
+
+    function checkAuth() {
+      const stored = localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_mobile_user');
+      if (stored && APP_USERS[stored]) {
+        currentUser = stored;
+        document.getElementById('view-login').classList.add('hidden');
+        setupUserInterface();
+        loadShipmentsFromSupabase();
+      } else {
+        document.getElementById('view-login').classList.remove('hidden');
+      }
+    }
+
+    function setQuickLogin(username) {
+      document.getElementById('login-username').value = username;
+      document.getElementById('login-password').value = "Clic@3369";
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('login-password');
+      const icon = document.getElementById('password-toggle-icon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const username = document.getElementById('login-username').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const btn = document.getElementById('btn-login-submit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
+
+      if (APP_USERS[username] && password === "Clic@3369") {
+        currentUser = username;
+        localStorage.setItem('vigi_auth_session', username);
+        localStorage.setItem('vigi_mobile_user', username);
+        document.getElementById('view-login').classList.add('hidden');
+        setupUserInterface();
+        loadShipmentsFromSupabase();
+        showToast(`Bem-vindo, ${APP_USERS[username].name}!`, 'success');
+      } else {
+        alert('Credenciais inválidas. Verifique o usuário e senha (padrão: Clic@3369).');
+      }
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>Entrar no Sistema</span> <i class="fa-solid fa-arrow-right"></i>';
+    }
+
+    function handleLogout() {
+      if (confirm('Deseja realmente desconectar desta sessão?')) {
+        localStorage.removeItem('vigi_auth_session');
+        localStorage.removeItem('vigi_mobile_user');
+        currentUser = null;
+        document.getElementById('view-login').classList.remove('hidden');
+      }
+    }
+
+    function setupUserInterface() {
+      if (!currentUser || !APP_USERS[currentUser]) return;
+      const u = APP_USERS[currentUser];
+      
+      document.getElementById('header-user-name').innerText = u.username;
+      document.getElementById('header-user-avatar').innerText = u.avatar || u.username.slice(0, 2).toUpperCase();
+      
+      const branchBadge = document.getElementById('user-branch-badge');
+      const checkoutSelect = document.getElementById('checkout-branch-select');
+      const lockNotice = document.getElementById('checkout-branch-lock-notice');
+      const adminFilter = document.getElementById('mobile-admin-branch-filter');
+      const trackingSubtitle = document.getElementById('tracking-subtitle');
+      const trackingRoleIndicator = document.getElementById('tracking-role-indicator');
+
+      if (u.role === 'admin') {
+        // Modo Administrador
+        branchBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-orange-400"></i> <span class="text-orange-300 font-black">Gestão Matriz</span>`;
+        document.getElementById('checkout-branch-subtitle').innerText = 'Destino: Selecione a Filial';
+        checkoutSelect.disabled = false;
+        lockNotice.classList.add('hidden');
+        adminFilter.classList.remove('hidden');
+        trackingSubtitle.innerText = 'Visão Geral Matriz: Acompanhe e gerencie ordens de todas as filiais';
+        trackingRoleIndicator.innerText = '🛡️ Admin • Acesso Total';
+        trackingRoleIndicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-300 border border-orange-500/40';
+      } else {
+        // Modo Filial (Restrito)
+        let colorClass = 'text-amber-300';
+        let dotColor = 'text-amber-400';
+        if (u.filial === 'Palotina') { colorClass = 'text-cyan-300'; dotColor = 'text-cyan-400'; }
+        if (u.filial === 'Barracão') { colorClass = 'text-emerald-300'; dotColor = 'text-emerald-400'; }
+
+        branchBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] ${dotColor}"></i> <span class="${colorClass}">${u.filial}</span>`;
+        document.getElementById('checkout-branch-subtitle').innerText = `Destino: ${u.filial}`;
+        
+        // Trava seleção de filial na filial do usuário
+        checkoutSelect.value = u.dbBranch;
+        checkoutSelect.disabled = true;
+        lockNotice.classList.remove('hidden');
+        adminFilter.classList.add('hidden');
+        trackingSubtitle.innerText = `Visualização exclusiva de solicitações de ${u.filial}`;
+        trackingRoleIndicator.innerText = `📍 Filial • ${u.filial}`;
+        trackingRoleIndicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded-full bg-slate-900 text-slate-300 border border-white/10';
+      }
+
+      // Preenche solicitante padrão
+      const solicitanteInput = document.getElementById('checkout-solicitante');
+      if (solicitanteInput && !solicitanteInput.value) {
+        solicitanteInput.value = u.name;
+      }
+    }
+
+    // 6. NAVEGAÇÃO DE ABAS MOBILE
+    function switchMobileTab(tab) {
+      activeTab = tab;
+      ['catalogo', 'rastreio', 'historico'].forEach(t => {
+        document.getElementById(`tab-content-${t}`).classList.add('hidden');
+        const btn = document.getElementById(`nav-btn-${t}`);
+        btn.className = "flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition";
+      });
+
+      document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
+      document.getElementById(`nav-btn-${tab}`).className = "flex flex-col items-center gap-1 text-orange-400 font-bold transition";
+
+      // Floating cart visibility
+      const totalItens = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+      const cartBar = document.getElementById('floating-cart-bar');
+      if (tab === 'catalogo' && totalItens > 0) {
+        cartBar.classList.remove('hidden');
+      } else {
+        cartBar.classList.add('hidden');
+      }
+
+      if (tab === 'rastreio' || tab === 'historico') {
+        loadShipmentsFromSupabase();
+      }
+    }
+
+    // 7. CATÁLOGO MOBILE & CHIPS
+    function initMobileCatalog() {
+      const chipsContainer = document.getElementById('mobile-category-chips');
+      chipsContainer.innerHTML = `
+        <button type="button" onclick="setMobileCategoryFilter('todas')" id="m-chip-todas" 
+                class="px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30">
+          Todos (${CATALOGO_MATERIAIS.reduce((acc, c) => acc + c.itens.length, 0)})
+        </button>
+      `;
+
+      CATALOGO_MATERIAIS.forEach((cat, idx) => {
+        chipsContainer.innerHTML += `
+          <button type="button" onclick="setMobileCategoryFilter('${cat.categoria}')" id="m-chip-${idx}" 
+                  class="px-3 py-1.5 rounded-xl font-semibold text-xs whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5">
+            <i class="fa-solid ${cat.icon} text-orange-400 text-[10px]"></i>
+            <span>${cat.categoria}</span>
+          </button>
+        `;
+      });
+
+      renderMobileCatalog();
+    }
+
+    function setMobileCategoryFilter(cat) {
+      activeCategory = cat;
+      const buttons = document.querySelectorAll('#mobile-category-chips button');
+      buttons.forEach(b => {
+        b.className = "px-3 py-1.5 rounded-xl font-semibold text-xs whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5";
+      });
+
+      if (cat === 'todas') {
+        document.getElementById('m-chip-todas').className = "px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30";
+      } else {
+        const catIdx = CATALOGO_MATERIAIS.findIndex(c => c.categoria === cat);
+        if (catIdx !== -1) {
+          const btn = document.getElementById(`m-chip-${catIdx}`);
+          if (btn) btn.className = "px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center gap-1.5";
+        }
+      }
+
+      renderMobileCatalog();
+    }
+
+    function renderMobileCatalog() {
+      const container = document.getElementById('mobile-catalog-grid');
+      const searchTerm = document.getElementById('mobile-search').value.toLowerCase();
+      const clearBtn = document.getElementById('btn-clear-search');
+      
+      if (searchTerm.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      container.innerHTML = '';
+      let matchCount = 0;
+
+      CATALOGO_MATERIAIS.forEach(cat => {
+        if (activeCategory !== 'todas' && cat.categoria !== activeCategory) return;
+
+        const filteredItens = cat.itens.filter(i => i.toLowerCase().includes(searchTerm));
+        if (filteredItens.length === 0) return;
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = "space-y-2";
+
+        let html = `
+          <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-orange-400 pt-1">
+            <span class="flex items-center gap-1.5"><i class="fa-solid ${cat.icon} text-orange-400"></i> ${cat.categoria}</span>
+            <span class="text-[10px] text-slate-500 font-mono">${filteredItens.length} itens</span>
+          </div>
+        `;
+
+        filteredItens.forEach(item => {
+          matchCount++;
+          const currentQty = mobileCart[item] || 0;
+          const isSelected = currentQty > 0;
+
+          html += `
+            <div class="glass-card rounded-2xl p-3 flex items-center justify-between gap-3 border ${
+              isSelected ? 'bg-orange-600/15 border-orange-500/50 shadow-glow-vigi' : 'border-white/5'
+            }">
+              <div class="flex-1 min-w-0">
+                <h4 class="text-xs font-bold text-white leading-snug line-clamp-2">${item}</h4>
+                <span class="text-[10px] text-slate-500">${cat.categoria}</span>
+              </div>
+
+              <!-- Stepper com Áreas de Toque Grandes (Touch-Friendly) -->
+              <div class="flex items-center gap-1.5 bg-slate-900 border border-white/10 rounded-xl p-1 shrink-0">
+                <button type="button" onclick="decrementMobileCart('${item.replace(/'/g, "\\'")}')" 
+                        class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-black flex items-center justify-center text-sm active:scale-90 transition">
+                  -
+                </button>
+                <span class="w-8 text-center font-mono text-xs font-black ${isSelected ? 'text-orange-400' : 'text-slate-400'}">
+                  ${currentQty}
+                </span>
+                <button type="button" onclick="incrementMobileCart('${item.replace(/'/g, "\\'")}')" 
+                        class="w-8 h-8 rounded-lg bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 text-white font-black flex items-center justify-center text-sm shadow-md shadow-orange-600/30 active:scale-90 transition">
+                  +
+                </button>
+              </div>
+            </div>
+          `;
+        });
+
+        groupDiv.innerHTML = html;
+        container.appendChild(groupDiv);
+      });
+
+      if (matchCount === 0) {
+        container.innerHTML = `
+          <div class="text-center py-16 text-slate-500 space-y-2">
+            <i class="fa-solid fa-magnifying-glass text-2xl opacity-40"></i>
+            <p class="text-xs">Nenhum material encontrado com o termo "<strong>${searchTerm}</strong>".</p>
+          </div>
+        `;
+      }
+    }
+
+    function clearSearch() {
+      document.getElementById('mobile-search').value = '';
+      renderMobileCatalog();
+    }
+
+    // 8. CONTROLE DO CARRINHO MOBILE
+    function incrementMobileCart(item) {
+      mobileCart[item] = (mobileCart[item] || 0) + 1;
+      updateMobileCartUI();
+    }
+
+    function decrementMobileCart(item) {
+      if (mobileCart[item] && mobileCart[item] > 0) {
+        mobileCart[item]--;
+        if (mobileCart[item] === 0) delete mobileCart[item];
+      }
+      updateMobileCartUI();
+    }
+
+    function clearMobileCart() {
+      mobileCart = {};
+      updateMobileCartUI();
+      closeCheckoutModal();
+      showToast('Lista zerada.');
+    }
+
+    function updateMobileCartUI() {
+      const keys = Object.keys(mobileCart);
+      const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+
+      const cartBar = document.getElementById('floating-cart-bar');
+      const cartCountText = document.getElementById('floating-cart-count');
+
+      if (totalUnits > 0 && activeTab === 'catalogo') {
+        cartCountText.innerText = `${totalUnits} ${totalUnits === 1 ? 'item' : 'itens'}`;
+        cartBar.classList.remove('hidden');
+      } else {
+        cartBar.classList.add('hidden');
+      }
+
+      renderMobileCatalog();
+      renderCheckoutList();
+    }
+
+    // 9. CHECKOUT BOTTOM SHEET
+    function openCheckoutModal() {
+      const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+      if (totalUnits === 0) {
+        alert('Selecione pelo menos um item no catálogo.');
+        return;
+      }
+      renderCheckoutList();
+      document.getElementById('modal-checkout').classList.remove('hidden');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('modal-checkout').classList.add('hidden');
+    }
+
+    function setCheckoutUrgencia(urg) {
+      document.getElementById('checkout-urgencia').value = urg;
+      ['normal', 'alta', 'urgente'].forEach(u => {
+        document.getElementById(`urg-btn-${u}`).className = "p-2 rounded-xl border text-[11px] font-semibold border-white/10 bg-slate-900 text-slate-400";
+      });
+      if (urg === 'Normal') {
+        document.getElementById('urg-btn-normal').className = "p-2 rounded-xl border text-[11px] font-bold border-emerald-500/40 bg-emerald-500/20 text-emerald-300";
+      } else if (urg === 'Alta') {
+        document.getElementById('urg-btn-alta').className = "p-2 rounded-xl border text-[11px] font-bold border-amber-500/40 bg-amber-500/20 text-amber-300";
+      } else {
+        document.getElementById('urg-btn-urgente').className = "p-2 rounded-xl border text-[11px] font-bold border-rose-500/40 bg-rose-500/20 text-rose-300";
+      }
+    }
+
+    function renderCheckoutList() {
+      const container = document.getElementById('checkout-items-list');
+      if (!container) return;
+      const keys = Object.keys(mobileCart);
+
+      if (keys.length === 0) {
+        container.innerHTML = '<p class="text-slate-500 italic py-4 text-center">Nenhum item selecionado.</p>';
+        return;
+      }
+
+      let html = '';
+      keys.forEach(item => {
+        const qty = mobileCart[item];
+        html += `
+          <div class="bg-slate-900 p-2.5 rounded-xl border border-white/5 flex items-center justify-between">
+            <span class="font-medium text-white truncate mr-2">${item}</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span class="font-mono font-bold text-orange-300 bg-orange-500/15 px-2 py-0.5 rounded-lg border border-orange-500/20 text-[11px]">${qty}x</span>
+              <button onclick="decrementMobileCart('${item.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-rose-400 p-1"><i class="fa-solid fa-minus"></i></button>
+              <button onclick="incrementMobileCart('${item.replace(/'/g, "\\'")}')" class="text-slate-500 hover:text-emerald-400 p-1"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // 10. SUBMISSÃO DIRETA NO SUPABASE
+    async function submitOrderToSupabase() {
+      if (!currentUser || !APP_USERS[currentUser]) {
+        alert('Faça login com sua conta primeiro.');
+        return;
+      }
+
+      const userConfig = APP_USERS[currentUser];
+      const solicitante = document.getElementById('checkout-solicitante').value.trim();
+      const urgencia = document.getElementById('checkout-urgencia').value;
+      const obs = document.getElementById('checkout-obs').value.trim();
+      const branchSelected = document.getElementById('checkout-branch-select').value;
+      const btn = document.getElementById('btn-submit-order');
+
+      if (!solicitante) {
+        alert('Por favor, informe seu nome de técnico solicitante.');
+        document.getElementById('checkout-solicitante').focus();
+        return;
+      }
+
+      const itemsKeys = Object.keys(mobileCart);
+      if (itemsKeys.length === 0) {
+        alert('Adicione pelo menos 1 material à solicitação.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Transmitindo para Matriz...';
+
+      // Define branch: se for admin, usa a escolhida; se for filial, força a filial dele
+      const targetDbBranch = userConfig.role === 'admin' ? branchSelected : userConfig.dbBranch;
+      const fullNotes = `[${urgencia.toUpperCase()}] ${obs ? obs : 'Solicitação operacional de filial'}`;
+
+      try {
+        // 1. Inserir em shipments
+        const shipmentPayload = {
+          branch_name: targetDbBranch,
+          sender_name: `${solicitante} (${currentUser})`,
+          driver_name: null,
+          notes: fullNotes,
+          status: 'aguardando'
+        };
+
+        const { data: shipData, error: shipError } = await supabase
+          .from('shipments')
+          .insert([shipmentPayload])
+          .select();
+
+        if (shipError) throw shipError;
+
+        const newShipment = shipData[0];
+
+        // 2. Inserir itens em shipment_items
+        const itemsPayload = itemsKeys.map(nome => {
+          let catNome = "OUTROS";
+          for (const c of CATALOGO_MATERIAIS) {
+            if (c.itens.includes(nome)) {
+              catNome = c.categoria;
+              break;
+            }
+          }
+          const slug = nome.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          return {
+            shipment_id: newShipment.id,
+            product_id: slug,
+            product_name: nome,
+            product_category: catNome,
+            quantity: mobileCart[nome]
+          };
+        });
+
+        const { data: itemsData, error: itemsError } = await supabase
+          .from('shipment_items')
+          .insert(itemsPayload)
+          .select();
+
+        if (itemsError) throw itemsError;
+
+        let displayFilial = "Francisco Beltrão";
+        if (targetDbBranch.includes("PALOTINA")) displayFilial = "Palotina";
+        if (targetDbBranch.includes("BARRACAO")) displayFilial = "Barracão";
+
+        lastCreatedOrder = {
+          id: newShipment.id,
+          filial: displayFilial,
+          solicitante: solicitante,
+          urgencia: urgencia,
+          obs: obs,
+          data: new Date().toLocaleString('pt-BR'),
+          itens: itemsKeys.map(k => ({ nome: k, qtd: mobileCart[k] }))
+        };
+
+        mobileCart = {};
+        updateMobileCartUI();
+        closeCheckoutModal();
+
+        openSuccessModal(lastCreatedOrder);
+        loadShipmentsFromSupabase();
+
+      } catch (err) {
+        console.error('Erro ao enviar pedido para Supabase:', err);
+        alert('Erro ao registrar no banco: ' + (err.message || 'Verifique sua conexão.'));
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Enviar para Separação</span>';
+      }
+    }
+
+    // 11. MODAL DE SUCESSO & WHATSAPP
+    function openSuccessModal(order) {
+      document.getElementById('success-code').innerText = `#ENV-${order.id.slice(0, 6).toUpperCase()}`;
+      document.getElementById('success-branch').innerText = order.filial;
+      const totalPcs = order.itens.reduce((a, b) => a + b.qtd, 0);
+      document.getElementById('success-items-count').innerText = `${totalPcs} peças (${order.itens.length} tipos)`;
+      document.getElementById('modal-success').classList.remove('hidden');
+    }
+
+    function closeSuccessModal() {
+      document.getElementById('modal-success').classList.add('hidden');
+      switchMobileTab('rastreio');
+    }
+
+    function copyAndSendWhatsAppSuccess() {
+      if (!lastCreatedOrder) return;
+      const o = lastCreatedOrder;
+
+      let msg = `📦 *VIGI SUPRIMENTOS - NOVA SOLICITAÇÃO*\n`;
+      msg += `📍 *Filial:* ${o.filial}\n`;
+      msg += `👤 *Solicitante:* ${o.solicitante}\n`;
+      msg += `⚡ *Prioridade:* ${o.urgencia}\n`;
+      msg += `🚨 *Status:* AGUARDANDO SEPARAÇÃO\n`;
+      if (o.obs) msg += `📝 *Obs:* ${o.obs}\n`;
+      msg += `\n📋 *LISTA DE MATERIAIS:*\n`;
+      o.itens.forEach(it => {
+        msg += `▪️ ${it.qtd}x - ${it.nome}\n`;
+      });
+      msg += `\n⏱ _Registrado via Sistema em ${o.data}_`;
+
+      navigator.clipboard.writeText(msg).then(() => {
+        showToast('Texto copiado! Cole no WhatsApp da filial.', 'success');
+      }).catch(() => {
+        prompt('Copie o texto para o grupo de WhatsApp:', msg);
+      });
+    }
+
+    // 12. ADMIN BRANCH FILTER NO MOBILE
+    function setMobileAdminFilter(filial) {
+      adminFilterBranch = filial;
+      ['todas', 'beltrao', 'palotina', 'barracao'].forEach(f => {
+        const btn = document.getElementById(`m-filter-${f}`);
+        if (btn) btn.className = "px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0";
+      });
+
+      let targetBtn = document.getElementById('m-filter-todas');
+      if (filial === 'Francisco Beltrão') targetBtn = document.getElementById('m-filter-beltrao');
+      if (filial === 'Palotina') targetBtn = document.getElementById('m-filter-palotina');
+      if (filial === 'Barracão') targetBtn = document.getElementById('m-filter-barracao');
+
+      if (targetBtn) {
+        targetBtn.className = "px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0";
+      }
+
+      renderTrackingOrders();
+    }
+
+    // 13. CARREGAR PEDIDOS & RASTREIO DIRETO DO SUPABASE COM RBAC
+    async function loadShipmentsFromSupabase() {
+      if (!currentUser || !APP_USERS[currentUser]) return;
+      const userConfig = APP_USERS[currentUser];
+
+      try {
+        let query = supabase
+          .from('shipments')
+          .select('*, shipment_items(*)')
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        // REGRA DE PERMISSÃO RIGOROSA:
+        // Usuários de filial APENAS podem consultar os dados de sua própria filial!
+        if (userConfig.role === 'filial') {
+          query = query.eq('branch_name', userConfig.dbBranch);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        myShipments = data || [];
+        renderTrackingOrders();
+
+      } catch (err) {
+        console.warn('Erro ao carregar solicitações do Supabase:', err);
+      }
+    }
+
+    function renderTrackingOrders() {
+      const trackingList = document.getElementById('tracking-orders-list');
+      const historyList = document.getElementById('history-orders-list');
+      const trackingBadge = document.getElementById('nav-tracking-badge');
+      const userConfig = APP_USERS[currentUser];
+
+      trackingList.innerHTML = '';
+      historyList.innerHTML = '';
+
+      // Filtro local adicional se for admin e tiver selecionado filtro
+      let filtered = myShipments;
+      if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
+        filtered = myShipments.filter(s => {
+          const b = (s.branch_name || "").toUpperCase();
+          if (adminFilterBranch === 'Francisco Beltrão') return b.includes('BELTRAO');
+          if (adminFilterBranch === 'Palotina') return b.includes('PALOTINA');
+          if (adminFilterBranch === 'Barracão') return b.includes('BARRACAO');
+          return true;
+        });
+      }
+
+      const activeOrders = filtered.filter(s => s.status !== 'recebido' && s.status !== 'chegou');
+      const finishedOrders = filtered.filter(s => s.status === 'recebido' || s.status === 'chegou');
+
+      if (activeOrders.length > 0) {
+        trackingBadge.classList.remove('hidden');
+      } else {
+        trackingBadge.classList.add('hidden');
+      }
+
+      if (activeOrders.length === 0) {
+        trackingList.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-500 space-y-2 border-dashed">
+            <i class="fa-solid fa-truck-ramp-box text-3xl opacity-30"></i>
+            <p class="text-xs font-semibold">Nenhuma solicitação em andamento no momento.</p>
+            <button onclick="switchMobileTab('catalogo')" class="text-xs text-orange-400 font-bold hover:underline">
+              Fazer novo pedido agora
+            </button>
+          </div>
+        `;
+      } else {
+        activeOrders.forEach(order => {
+          trackingList.appendChild(createOrderTrackingCard(order));
+        });
+      }
+
+      if (finishedOrders.length === 0) {
+        historyList.innerHTML = `
+          <div class="glass-card rounded-2xl p-8 text-center text-slate-500 space-y-1">
+            <i class="fa-solid fa-box-open text-2xl opacity-30"></i>
+            <p class="text-xs">Nenhum pedido histórico concluído.</p>
+          </div>
+        `;
+      } else {
+        finishedOrders.forEach(order => {
+          historyList.appendChild(createOrderTrackingCard(order, true));
+        });
+      }
+    }
+
+    function createOrderTrackingCard(order, isFinished = false) {
+      const card = document.createElement('div');
+      card.className = "glass-card rounded-2xl p-4 space-y-3 border-white/10";
+
+      const createdDate = new Date(order.created_at).toLocaleDateString('pt-BR') + ' ' + new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const items = order.shipment_items || [];
+      const totalPcs = items.reduce((a, b) => a + (b.quantity || 0), 0);
+
+      // Normaliza Filial
+      let branchLabel = "Francisco Beltrão";
+      let branchColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
+      const bUpper = (order.branch_name || "").toUpperCase();
+      if (bUpper.includes("PALOTINA")) {
+        branchLabel = "Palotina";
+        branchColor = "text-cyan-400 border-cyan-500/30 bg-cyan-500/10";
+      } else if (bUpper.includes("BARRACAO")) {
+        branchLabel = "Barracão";
+        branchColor = "text-emerald-400 border-emerald-500/30 bg-emerald-500/10";
+      }
+
+      // Status Pipeline Index
+      let statusStep = 1;
+      let statusColor = "text-amber-400";
+      let statusName = "Aguardando Separação";
+      if (order.status === 'separando') { statusStep = 2; statusColor = "text-blue-400"; statusName = "Em Separação"; }
+      else if (order.status === 'coleta') { statusStep = 3; statusColor = "text-purple-400"; statusName = "Pronto p/ Coleta"; }
+      else if (order.status === 'enviado') { statusStep = 4; statusColor = "text-cyan-400"; statusName = "Em Rota / Trânsito"; }
+      else if (order.status === 'recebido' || order.status === 'chegou') { statusStep = 5; statusColor = "text-emerald-400"; statusName = "Entregue e Recebido"; }
+
+      // Pipeline Dots Bar
+      let pipelineBar = '<div class="flex items-center gap-1.5 w-full py-1">';
+      for (let i = 1; i <= 5; i++) {
+        const isDone = i <= statusStep;
+        const isCurrent = i === statusStep;
+        pipelineBar += `
+          <div class="flex-1 h-1.5 rounded-full ${
+            isCurrent ? 'bg-gradient-to-r from-orange-500 to-amber-400 shadow-glow-vigi' : isDone ? 'bg-orange-500' : 'bg-slate-800'
+          }"></div>
+        `;
+      }
+      pipelineBar += '</div>';
+
+      const previewItems = items.slice(0, 3).map(it => `
+        <li class="flex justify-between text-[11px] text-slate-300 py-0.5">
+          <span class="truncate">${it.product_name}</span>
+          <span class="font-mono font-bold text-orange-300 ml-2">x${it.quantity}</span>
+        </li>
+      `).join('');
+
+      // REGRA DE PERMISSÃO PARA EXCLUSÃO:
+      // O botão de exclusão SÓ É RENDERIZADO para Administradores (erick, daniel, thiago, klaus)!
+      const userConfig = APP_USERS[currentUser];
+      const isAdminUser = userConfig && userConfig.role === 'admin';
+
+      const deleteButtonHtml = isAdminUser ? `
+        <button onclick="deleteShipmentFromMobile('${order.id}')" title="Excluir este pedido (Ação Admin)" 
+                class="text-rose-400 hover:text-white hover:bg-rose-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-rose-500/30 font-bold transition flex items-center gap-1">
+          <i class="fa-solid fa-trash-can text-[9px]"></i>
+          <span>Excluir</span>
+        </button>
+      ` : '';
+
+      card.innerHTML = `
+        <div class="flex items-start justify-between">
+          <div class="space-y-1">
+            <div class="flex items-center gap-1.5">
+              <span class="font-mono text-xs font-black text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
+                #ENV-${order.id.slice(0, 6).toUpperCase()}
+              </span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg border ${branchColor}">
+                ${branchLabel}
+              </span>
+            </div>
+            <span class="text-[10px] text-slate-400 block">${createdDate}</span>
+          </div>
+          <span class="text-xs font-black ${statusColor} bg-slate-900 px-2.5 py-1 rounded-xl border border-white/5">
+            ${statusName}
+          </span>
+        </div>
+
+        ${pipelineBar}
+
+        <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+          <div class="flex justify-between text-[10px] uppercase font-bold text-slate-400">
+            <span>Itens Solicitados</span>
+            <span class="text-orange-400 font-mono">${totalPcs} un</span>
+          </div>
+          <ul>${previewItems}</ul>
+          ${items.length > 3 ? `<p class="text-[10px] text-slate-500 text-center pt-0.5">+ ${items.length - 3} outros itens</p>` : ''}
+        </div>
+
+        ${order.notes ? `
+          <p class="text-[11px] text-slate-400 bg-slate-900/40 p-2 rounded-lg border border-white/5 truncate">
+            <i class="fa-solid fa-quote-left text-slate-600 mr-1"></i>${order.notes}
+          </p>
+        ` : ''}
+
+        <div class="flex items-center justify-between pt-1 text-[11px]">
+          <span class="text-slate-400 truncate max-w-[140px]"><i class="fa-regular fa-user mr-1 text-slate-500"></i> ${order.sender_name || 'Técnico'}</span>
+          <div class="flex items-center gap-2">
+            ${deleteButtonHtml}
+            ${isFinished ? '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Concluído</span>' : `
+              <span class="text-slate-500 text-[10px] font-mono">Etapa ${statusStep}/5</span>
+            `}
+          </div>
+        </div>
+      `;
+
+      return card;
+    }
+
+    // 14. EXCLUSÃO PROTEGIDA POR RBAC
+    async function deleteShipmentFromMobile(shipmentId) {
+      const userConfig = APP_USERS[currentUser];
+      if (!userConfig || userConfig.role !== 'admin') {
+        alert('Permissão Negada: Apenas administradores (Erick, Daniel, Thiago, Klaus) possuem autorização para excluir ordens.');
+        return;
+      }
+
+      if (!confirm('CONFIRMAÇÃO DE ADMINISTRADOR:\nDeseja realmente excluir permanentemente esta solicitação e todos os seus itens do banco de dados?')) {
+        return;
+      }
+
+      try {
+        await supabase.from('shipment_items').delete().eq('shipment_id', shipmentId);
+        const { error } = await supabase.from('shipments').delete().eq('id', shipmentId);
+        if (error) throw error;
+
+        showToast('Solicitação excluída do banco com sucesso!', 'success');
+        loadShipmentsFromSupabase();
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        alert('Erro ao excluir: ' + (err.message || 'Verifique sua conexão.'));
+      }
+    }
+
+    // 15. REALTIME LISTENER (ATUALIZAÇÃO INSTANTÂNEA)
+    function initRealtime() {
+      if (!supabase) return;
+      try {
+        supabase
+          .channel('vigi-mobile-realtime')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
+            loadShipmentsFromSupabase();
+          })
+          .subscribe();
+      } catch (err) {
+        console.warn('Realtime fallback:', err);
+      }
+    }
+
+    // Polling a cada 20s
+    setInterval(() => {
+      if (currentUser && (activeTab === 'rastreio' || activeTab === 'historico')) {
+        loadShipmentsFromSupabase();
+      }
+    }, 20000);
+
+    // Inicialização
+    window.onload = function() {
+      initMobileCatalog();
+      checkAuth();
+      initRealtime();
+    };
+  </script>
+</body>
+</html>
