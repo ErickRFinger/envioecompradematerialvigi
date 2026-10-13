@@ -174,7 +174,7 @@
         <div id="section-login-filiais" class="space-y-2">
           <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider">
             <span>Toque para selecionar sua filial</span>
-            <span class="text-amber-400 font-mono text-[10px]">5 acessos</span>
+            <span class="text-amber-400 font-mono text-[10px]">6 acessos</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
             <button type="button" onclick="setQuickLogin('beltrao1')" id="mobile-quick-beltrao1" data-user="beltrao1" class="mobile-quick-card p-3 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 text-yellow-300 font-bold text-xs hover:bg-yellow-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
@@ -201,16 +201,23 @@
             <button type="button" onclick="setQuickLogin('barracao1')" id="mobile-quick-barracao1" data-user="barracao1" class="mobile-quick-card p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold text-xs hover:bg-emerald-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                <span class="truncate">Barracão</span>
+                <span class="truncate">Giseli</span>
               </span>
-              <span class="text-[10px] text-emerald-400/70 font-mono">BAR 1</span>
+              <span class="text-[10px] text-emerald-400/70 font-mono">BAR</span>
             </button>
-            <button type="button" onclick="setQuickLogin('pato')" id="mobile-quick-pato" data-user="pato" class="mobile-quick-card p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold text-xs hover:bg-purple-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer col-span-2">
+            <button type="button" onclick="setQuickLogin('pato')" id="mobile-quick-pato" data-user="pato" class="mobile-quick-card p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold text-xs hover:bg-purple-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>
                 <span class="truncate">Leonardo</span>
               </span>
               <span class="text-[10px] text-purple-400/70 font-mono">PATO</span>
+            </button>
+            <button type="button" onclick="setQuickLogin('smo')" id="mobile-quick-smo" data-user="smo" class="mobile-quick-card p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold text-xs hover:bg-blue-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0"></span>
+                <span class="truncate">Terceiros SMO</span>
+              </span>
+              <span class="text-[10px] text-blue-400/70 font-mono">SMO</span>
             </button>
           </div>
           <p class="text-[10px] text-slate-500 italic text-center pt-1">
@@ -321,6 +328,12 @@
 
     <!-- User Info & Actions -->
     <div class="flex items-center gap-1.5">
+      <!-- BOTÃO DIRETO PARA ENCERRAR PEDIDO (QUANDO HOUVER ITENS) -->
+      <button id="header-btn-encerrar" onclick="openCheckoutModal()" class="hidden px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white font-extrabold text-[11px] shadow-lg shadow-orange-600/40 border border-white/20 flex items-center gap-1.5 active:scale-95 transition cursor-pointer">
+        <i class="fa-solid fa-cart-shopping text-[10px]"></i>
+        <span>Encerrar (<span id="header-cart-count">0</span>)</span>
+      </button>
+
       <div id="header-user-badge" class="flex items-center gap-1.5 font-mono text-[11px] font-bold text-slate-300 bg-slate-950/90 border border-white/10 px-2.5 py-1 rounded-xl">
         <span id="header-user-avatar" class="w-4 h-4 rounded-full bg-orange-500/20 text-orange-400 text-[9px] flex items-center justify-center font-black">U</span>
         <span id="header-user-name" class="truncate max-w-[90px]">usuario</span>
@@ -359,6 +372,25 @@
         <!-- Rendered by JS -->
       </div>
 
+      <!-- Banner Fixo de Ação quando houver materiais no pedido -->
+      <div id="catalog-action-strip" class="hidden p-3 rounded-2xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 text-white border border-white/20 shadow-xl shadow-orange-600/30 flex items-center justify-between transition-all">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-sm shadow-inner">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <div class="text-xs font-black flex items-center gap-1.5">
+              <span id="strip-cart-count">0 itens</span> selecionados
+            </div>
+            <p class="text-[10px] text-orange-100 font-medium">Toque para conferir e fechar</p>
+          </div>
+        </div>
+        <button onclick="openCheckoutModal()" class="px-3.5 py-2 rounded-xl bg-white text-orange-600 font-black text-xs shadow-md hover:bg-orange-50 active:scale-95 transition flex items-center gap-1.5 cursor-pointer">
+          <span>ENCERRAR PEDIDO</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </button>
+      </div>
+
       <!-- Items Grid (Mobile Friendly Cards) -->
       <div id="mobile-catalog-grid" class="space-y-2.5">
         <!-- Rendered by JS -->
@@ -389,8 +421,9 @@
         <button onclick="setMobileAdminFilter('Beltrão (Iury)')" id="m-filter-beltrao-iury" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Iury)</button>
         <button onclick="setMobileAdminFilter('Beltrão (Cleverson)')" id="m-filter-beltrao-cleverson" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Cleverson)</button>
         <button onclick="setMobileAdminFilter('Palotina (Adilson)')" id="m-filter-palotina" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Palotina (Adilson)</button>
-        <button onclick="setMobileAdminFilter('Barracão')" id="m-filter-barracao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Barracão</button>
+        <button onclick="setMobileAdminFilter('Barracão (Giseli)')" id="m-filter-barracao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Barracão (Giseli)</button>
         <button onclick="setMobileAdminFilter('Pato Branco')" id="m-filter-pato" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Pato Branco</button>
+        <button onclick="setMobileAdminFilter('Terceiros SMO')" id="m-filter-smo" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Terceiros SMO</button>
       </div>
 
       <!-- Pedidos List -->
@@ -416,47 +449,58 @@
   </main>
 
   <!-- ======================================================== -->
-  <!-- FLOATING CART STRIP (SURFACE QUANDO ITENS > 0) -->
+  <!-- FLOATING CART STRIP (SUPER VISÍVEL QUANDO ITENS > 0) -->
   <!-- ======================================================== -->
-  <div id="floating-cart-bar" class="fixed bottom-16 left-4 right-4 z-40 max-w-lg mx-auto hidden animate-in slide-in-from-bottom-4 duration-200">
-    <div onclick="openCheckoutModal()" class="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 rounded-2xl p-3 px-4 shadow-xl shadow-orange-600/40 border border-white/20 flex items-center justify-between cursor-pointer active:scale-95 transition transform">
+  <div id="floating-cart-bar" class="fixed bottom-20 left-3 right-3 z-50 max-w-lg mx-auto hidden animate-in slide-in-from-bottom-4 duration-200">
+    <div onclick="openCheckoutModal()" class="bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 rounded-2xl p-3 px-4 shadow-2xl shadow-orange-600/50 border-2 border-white/30 flex items-center justify-between cursor-pointer active:scale-95 transition transform">
       <div class="flex items-center gap-3">
         <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white text-base font-bold shadow-inner">
           <i class="fa-solid fa-cart-shopping"></i>
         </div>
         <div>
           <div class="text-xs font-black text-white flex items-center gap-2">
-            <span id="floating-cart-count">0 itens</span> selecionados
+            <span id="floating-cart-count">0 itens</span> no carrinho
           </div>
-          <p class="text-[10px] text-orange-100 font-medium">Toque para revisar e enviar para Matriz</p>
+          <p class="text-[10px] text-orange-100 font-medium">Toque para conferir e fechar</p>
         </div>
       </div>
-      <div class="flex items-center gap-1.5 bg-white/25 px-3 py-1.5 rounded-xl text-xs font-extrabold text-white shadow-sm">
-        <span>Revisar</span>
+      <div class="flex items-center gap-1.5 bg-white text-orange-600 px-3.5 py-2 rounded-xl text-xs font-black shadow-md">
+        <span>ENCERRAR PEDIDO</span>
         <i class="fa-solid fa-arrow-right text-[10px]"></i>
       </div>
     </div>
   </div>
 
   <!-- ======================================================== -->
-  <!-- BOTTOM APP NAVIGATION BAR (TAB BAR) -->
+  <!-- BOTTOM APP NAVIGATION BAR (TAB BAR COM BOTÃO DE ENCERRAR) -->
   <!-- ======================================================== -->
-  <nav class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-40 px-6 py-2">
-    <div class="max-w-lg mx-auto flex items-center justify-around text-center">
+  <nav class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-40 px-3 py-2">
+    <div class="max-w-lg mx-auto grid grid-cols-4 items-center text-center">
       
       <button onclick="switchMobileTab('catalogo')" id="nav-btn-catalogo" class="flex flex-col items-center gap-1 text-orange-400 font-bold transition">
-        <i class="fa-solid fa-boxes-stacked text-lg"></i>
-        <span class="text-[10px]">Solicitar</span>
+        <i class="fa-solid fa-boxes-stacked text-base"></i>
+        <span class="text-[10px]">Catálogo</span>
+      </button>
+
+      <!-- Botão Visível de Encerrar Pedido na Barra Inferior -->
+      <button onclick="handleNavEncerrarClick()" id="nav-btn-encerrar" class="flex flex-col items-center gap-1 text-slate-400 hover:text-white font-semibold transition relative cursor-pointer">
+        <div class="relative">
+          <i class="fa-solid fa-clipboard-check text-base"></i>
+          <span id="nav-cart-badge" class="absolute -top-1 -right-2.5 px-1.5 py-0.2 rounded-full bg-orange-500 text-white font-black text-[9px] shadow-sm hidden">0</span>
+        </div>
+        <span class="text-[10px]" id="nav-encerrar-label">Encerrar</span>
       </button>
 
       <button onclick="switchMobileTab('rastreio')" id="nav-btn-rastreio" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition relative">
-        <i class="fa-solid fa-truck-fast text-lg"></i>
+        <div class="relative">
+          <i class="fa-solid fa-truck-fast text-base"></i>
+          <span id="nav-tracking-badge" class="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-orange-400 animate-pulse hidden"></span>
+        </div>
         <span class="text-[10px]">Rastreio</span>
-        <span id="nav-tracking-badge" class="absolute -top-1 right-1 w-2 h-2 rounded-full bg-orange-400 animate-pulse hidden"></span>
       </button>
 
       <button onclick="switchMobileTab('historico')" id="nav-btn-historico" class="flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition">
-        <i class="fa-solid fa-clock-rotate-left text-lg"></i>
+        <i class="fa-solid fa-clock-rotate-left text-base"></i>
         <span class="text-[10px]">Histórico</span>
       </button>
 
@@ -506,11 +550,13 @@
           <!-- Seletor de Filial (Apenas Admins podem alterar, Filiais ficam travadas) -->
           <div id="checkout-branch-selector-container">
             <label class="block font-semibold text-slate-300 mb-1">Filial de Destino</label>
+            <select id="checkout-branch-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500">
               <option value="BELTRAO_IURY">Beltrão (Iury)</option>
               <option value="BELTRAO_CLEVERSON">Beltrão (Cleverson)</option>
               <option value="PALOTINA PR">Palotina (Adilson)</option>
-              <option value="BARRACAO PR">Barracão (PR)</option>
+              <option value="BARRACAO PR">Barracão (Giseli)</option>
               <option value="PATO BRANCO PR">Pato Branco (Leonardo)</option>
+              <option value="TERCEIROS SMO">Terceiros SMO</option>
             </select>
             <p id="checkout-branch-lock-notice" class="text-[10px] text-slate-500 mt-1 italic hidden">
               <i class="fa-solid fa-lock text-[9px] mr-1"></i> Sua conta está vinculada exclusivamente a esta base.
@@ -551,11 +597,97 @@
       <!-- Checkout Footer -->
       <div class="p-4 bg-slate-950 border-t border-white/10 flex items-center justify-between gap-3">
         <button onclick="closeCheckoutModal()" class="px-4 py-2.5 rounded-xl font-semibold text-slate-400 hover:text-white text-xs">
-          Voltar
+          Voltar ao Catálogo
         </button>
-        <button onclick="submitOrderToSupabase()" id="btn-submit-order" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:from-orange-500 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition transform active:scale-95 flex items-center justify-center gap-2">
-          <i class="fa-solid fa-paper-plane"></i>
-          <span>Enviar para Separação</span>
+        <button onclick="openConferenciaModal()" id="btn-ir-conferencia" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-orange-600 via-orange-500 to-amber-600 hover:from-orange-500 text-white font-extrabold text-xs shadow-lg shadow-orange-600/30 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-clipboard-check text-sm"></i>
+          <span>Avançar para Conferência</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- TELA DE CONFERÊNCIA OFICIAL (OBRIGATÓRIA ANTES DO ENVIO) -->
+  <!-- ======================================================== -->
+  <div id="modal-conferencia" style="display: none;" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-orange-500/40 shadow-glow-vigi animate-in slide-in-from-bottom duration-250">
+      
+      <!-- Header da Conferência -->
+      <div class="px-5 py-4 bg-slate-950 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/40 flex items-center justify-center text-base font-black shadow-glow-vigi">
+            <i class="fa-solid fa-clipboard-check"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-white flex items-center gap-2">
+              <span>Conferência da Solicitação</span>
+              <span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-bold">Passo Final</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Verifique os itens e dados com atenção antes do envio</p>
+          </div>
+        </div>
+        <button onclick="voltarParaCheckoutModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center cursor-pointer">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Corpo da Conferência -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+        
+        <!-- Card de Destino e Solicitante -->
+        <div class="bg-slate-900/90 rounded-2xl p-3.5 border border-white/10 space-y-2">
+          <div class="flex items-center justify-between pb-2 border-b border-white/10 text-[11px]">
+            <span class="text-slate-400 font-semibold">Destino do Envio:</span>
+            <span id="conf-branch-badge" class="font-bold text-white flex items-center gap-1.5"></span>
+          </div>
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="text-slate-400 font-semibold">Técnico Solicitante:</span>
+            <span id="conf-solicitante" class="font-bold text-white"></span>
+          </div>
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="text-slate-400 font-semibold">Nível de Prioridade:</span>
+            <span id="conf-urgencia" class="font-bold text-emerald-400"></span>
+          </div>
+          <div id="conf-obs-container" class="pt-1 text-[11px] text-slate-300 hidden">
+            <span class="text-slate-400 font-semibold">Observações:</span>
+            <p id="conf-obs" class="mt-0.5 italic text-slate-300 bg-black/30 p-2 rounded-xl border border-white/5"></p>
+          </div>
+        </div>
+
+        <!-- Card com Lista de Materiais Conferidos -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-[11px] font-bold text-slate-300 uppercase tracking-wider">
+            <span class="flex items-center gap-1.5">
+              <i class="fa-solid fa-boxes-packing text-orange-400"></i>
+              <span>Itens Selecionados</span>
+            </span>
+            <span id="conf-total-volumes" class="text-orange-400 font-mono font-bold">0 un • 0 tipos</span>
+          </div>
+
+          <div id="conf-items-list" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+            <!-- Injetado por JS -->
+          </div>
+        </div>
+
+        <!-- Aviso Importante -->
+        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-200 text-[11px] flex items-start gap-2.5">
+          <i class="fa-solid fa-circle-exclamation text-amber-400 mt-0.5 text-xs"></i>
+          <span>Ao confirmar, este pedido será registrado no banco e entrará imediatamente na fila de separação da equipe da Matriz.</span>
+        </div>
+
+      </div>
+
+      <!-- Rodapé da Conferência -->
+      <div class="p-4 bg-slate-950 border-t border-white/10 flex items-center justify-between gap-3">
+        <button onclick="voltarParaCheckoutModal()" class="px-4 py-3 rounded-xl font-bold text-slate-300 hover:text-white bg-slate-900 border border-white/10 text-xs flex items-center gap-1.5 cursor-pointer">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Voltar e Ajustar</span>
+        </button>
+        <button onclick="confirmarEEnviarPedidoFinal()" id="btn-submit-order" class="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 text-white font-black text-xs shadow-xl shadow-emerald-600/30 transition transform active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-solid fa-circle-check text-sm"></i>
+          <span>CONFIRMAR E ENVIAR PEDIDO</span>
         </button>
       </div>
 
@@ -690,12 +822,30 @@
       },
       "barracao1": {
         username: "barracao1",
-        name: "Técnico Barracão 01",
+        name: "Giseli (Barracão)",
         role: "filial",
-        filial: "Barracão",
+        filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
-        email: "barracao1@vigi.com.br",
-        avatar: "BR"
+        email: "giseli.barracao@vigi.com.br",
+        avatar: "GI"
+      },
+      "barracao": {
+        username: "barracao",
+        name: "Giseli (Barracão)",
+        role: "filial",
+        filial: "Barracão (Giseli)",
+        dbBranch: "BARRACAO PR",
+        email: "giseli.barracao@vigi.com.br",
+        avatar: "GI"
+      },
+      "giseli": {
+        username: "giseli",
+        name: "Giseli (Barracão)",
+        role: "filial",
+        filial: "Barracão (Giseli)",
+        dbBranch: "BARRACAO PR",
+        email: "giseli.barracao@vigi.com.br",
+        avatar: "GI"
       },
       "pato": {
         username: "pato",
@@ -705,6 +855,24 @@
         dbBranch: "PATO BRANCO PR",
         email: "leonardo.pato@vigi.com.br",
         avatar: "LE"
+      },
+      "smo": {
+        username: "smo",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        email: "smo@vigi.com.br",
+        avatar: "SM"
+      },
+      "terceiros": {
+        username: "terceiros",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        email: "smo@vigi.com.br",
+        avatar: "SM"
       }
     };
 
@@ -967,8 +1135,9 @@
         if (u.filial.includes('Iury')) { colorClass = 'text-yellow-300'; dotColor = 'text-yellow-400'; }
         else if (u.filial.includes('Cleverson')) { colorClass = 'text-amber-300'; dotColor = 'text-amber-400'; }
         else if (u.filial.includes('Palotina') || u.filial.includes('Adilson')) { colorClass = 'text-cyan-300'; dotColor = 'text-cyan-400'; }
-        else if (u.filial.includes('Barracão')) { colorClass = 'text-emerald-300'; dotColor = 'text-emerald-400'; }
-        else if (u.filial.includes('Pato')) { colorClass = 'text-purple-300'; dotColor = 'text-purple-400'; }
+        else if (u.filial.includes('Barracão') || u.filial.includes('Giseli')) { colorClass = 'text-emerald-300'; dotColor = 'text-emerald-400'; }
+        else if (u.filial.includes('Pato') || u.filial.includes('Leonardo')) { colorClass = 'text-purple-300'; dotColor = 'text-purple-400'; }
+        else if (u.filial.includes('SMO') || u.filial.includes('Terceiros')) { colorClass = 'text-blue-300'; dotColor = 'text-blue-400'; }
 
         branchBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] ${dotColor}"></i> <span class="${colorClass}">${u.filial}</span>`;
         document.getElementById('checkout-branch-subtitle').innerText = `Destino: ${u.filial}`;
@@ -980,8 +1149,12 @@
           checkoutSelect.value = 'BELTRAO_CLEVERSON';
         } else if (u.filial.includes('Palotina') || u.filial.includes('Adilson')) {
           checkoutSelect.value = 'PALOTINA PR';
-        } else if (u.filial.includes('Pato')) {
+        } else if (u.filial.includes('Barracão') || u.filial.includes('Giseli')) {
+          checkoutSelect.value = 'BARRACAO PR';
+        } else if (u.filial.includes('Pato') || u.filial.includes('Leonardo')) {
           checkoutSelect.value = 'PATO BRANCO PR';
+        } else if (u.filial.includes('SMO') || u.filial.includes('Terceiros')) {
+          checkoutSelect.value = 'TERCEIROS SMO';
         } else {
           checkoutSelect.value = u.dbBranch;
         }
@@ -1177,16 +1350,56 @@
 
       const cartBar = document.getElementById('floating-cart-bar');
       const cartCountText = document.getElementById('floating-cart-count');
+      const headerCartBtn = document.getElementById('header-btn-encerrar');
+      const headerCartCount = document.getElementById('header-cart-count');
+      const actionStrip = document.getElementById('catalog-action-strip');
+      const stripCartCount = document.getElementById('strip-cart-count');
+      const navCartBadge = document.getElementById('nav-cart-badge');
+      const navEncerrarBtn = document.getElementById('nav-btn-encerrar');
+      const navEncerrarLabel = document.getElementById('nav-encerrar-label');
 
-      if (totalUnits > 0 && activeTab === 'catalogo') {
-        cartCountText.innerText = `${totalUnits} ${totalUnits === 1 ? 'item' : 'itens'}`;
-        cartBar.classList.remove('hidden');
+      if (totalUnits > 0) {
+        if (cartCountText) cartCountText.innerText = `${totalUnits} ${totalUnits === 1 ? 'item' : 'itens'}`;
+        if (cartBar && activeTab === 'catalogo') cartBar.classList.remove('hidden');
+        
+        if (headerCartBtn) {
+          headerCartBtn.classList.remove('hidden');
+          if (headerCartCount) headerCartCount.innerText = totalUnits;
+        }
+        if (actionStrip && activeTab === 'catalogo') {
+          actionStrip.classList.remove('hidden');
+          if (stripCartCount) stripCartCount.innerText = `${totalUnits} ${totalUnits === 1 ? 'item' : 'itens'}`;
+        }
+        if (navCartBadge) {
+          navCartBadge.innerText = totalUnits;
+          navCartBadge.classList.remove('hidden');
+        }
+        if (navEncerrarBtn) {
+          navEncerrarBtn.className = "flex flex-col items-center gap-1 text-orange-400 font-bold transition relative cursor-pointer";
+        }
+        if (navEncerrarLabel) navEncerrarLabel.innerText = `Encerrar (${totalUnits})`;
       } else {
-        cartBar.classList.add('hidden');
+        if (cartBar) cartBar.classList.add('hidden');
+        if (headerCartBtn) headerCartBtn.classList.add('hidden');
+        if (actionStrip) actionStrip.classList.add('hidden');
+        if (navCartBadge) navCartBadge.classList.add('hidden');
+        if (navEncerrarBtn) {
+          navEncerrarBtn.className = "flex flex-col items-center gap-1 text-slate-400 hover:text-white font-semibold transition relative cursor-pointer";
+        }
+        if (navEncerrarLabel) navEncerrarLabel.innerText = "Encerrar";
       }
 
       renderMobileCatalog();
       renderCheckoutList();
+    }
+
+    function handleNavEncerrarClick() {
+      const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+      if (totalUnits > 0) {
+        openCheckoutModal();
+      } else {
+        showToast('Adicione materiais do catálogo antes de encerrar o pedido.', 'info');
+      }
     }
 
     // 9. CHECKOUT BOTTOM SHEET
@@ -1249,6 +1462,148 @@
       container.innerHTML = html;
     }
 
+    // ========================================================
+    // TELA DE CONFERÊNCIA OFICIAL (OBRIGATÓRIA ANTES DO ENVIO)
+    // ========================================================
+    function openConferenciaModal() {
+      const solicitante = (document.getElementById('checkout-solicitante').value || '').trim();
+      if (!solicitante) {
+        alert('Por favor, informe seu nome de técnico solicitante para conferência.');
+        document.getElementById('checkout-solicitante').focus();
+        return;
+      }
+
+      const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+      const itemsKeys = Object.keys(mobileCart);
+      if (totalUnits === 0 || itemsKeys.length === 0) {
+        alert('Selecione pelo menos um item no catálogo antes de avançar para a conferência.');
+        return;
+      }
+
+      // Preenche dados da conferência
+      const userConfig = currentUser ? APP_USERS[currentUser] : null;
+      const branchSelected = document.getElementById('checkout-branch-select').value;
+      const urgencia = document.getElementById('checkout-urgencia').value;
+      const obs = (document.getElementById('checkout-obs').value || '').trim();
+
+      // Identifica label do destino
+      let displayFilial = "Beltrão (Iury)";
+      let branchBadgeClass = "bg-yellow-500/20 text-yellow-300 border-yellow-500/30";
+      let branchIcon = "fa-user-check";
+
+      const effectiveChoice = (userConfig && userConfig.role === 'admin')
+        ? branchSelected
+        : (userConfig && userConfig.filial.includes('Iury') ? 'BELTRAO_IURY'
+          : (userConfig && userConfig.filial.includes('Cleverson') ? 'BELTRAO_CLEVERSON'
+            : (userConfig && (userConfig.filial.includes('Palotina') || userConfig.filial.includes('Adilson')) ? 'PALOTINA PR'
+              : (userConfig && (userConfig.filial.includes('Barracão') || userConfig.filial.includes('Giseli')) ? 'BARRACAO PR'
+                : (userConfig && (userConfig.filial.includes('Pato') || userConfig.filial.includes('Leonardo')) ? 'PATO BRANCO PR'
+                  : (userConfig && (userConfig.filial.includes('SMO') || userConfig.filial.includes('Terceiros')) ? 'TERCEIROS SMO'
+                    : (userConfig ? userConfig.dbBranch : 'FRANCISCO BELTRAO PR')))))));
+
+      if (effectiveChoice === 'BELTRAO_IURY') {
+        displayFilial = "Beltrão • Iury";
+        branchBadgeClass = "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
+      } else if (effectiveChoice === 'BELTRAO_CLEVERSON') {
+        displayFilial = "Beltrão • Cleverson";
+        branchBadgeClass = "bg-amber-500/20 text-amber-300 border-amber-500/40";
+      } else if (effectiveChoice.includes('PALOTINA')) {
+        displayFilial = "Palotina • Adilson";
+        branchBadgeClass = "bg-cyan-500/20 text-cyan-300 border-cyan-500/40";
+      } else if (effectiveChoice.includes('BARRACAO')) {
+        displayFilial = "Barracão • Giseli";
+        branchBadgeClass = "bg-emerald-500/20 text-emerald-300 border-emerald-500/40";
+      } else if (effectiveChoice.includes('PATO')) {
+        displayFilial = "Pato Branco • Leonardo";
+        branchBadgeClass = "bg-purple-500/20 text-purple-300 border-purple-500/40";
+      } else if (effectiveChoice.includes('SMO') || effectiveChoice.includes('TERCEIROS')) {
+        displayFilial = "Terceiros SMO";
+        branchBadgeClass = "bg-blue-500/20 text-blue-300 border-blue-500/40";
+        branchIcon = "fa-users";
+      }
+
+      document.getElementById('conf-branch-badge').innerHTML = `
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-black border ${branchBadgeClass}">
+          <i class="fa-solid ${branchIcon}"></i> ${displayFilial}
+        </span>
+      `;
+      document.getElementById('conf-solicitante').innerText = solicitante;
+      
+      const urgEl = document.getElementById('conf-urgencia');
+      if (urgencia === 'Urgente') {
+        urgEl.innerHTML = '<span class="text-rose-400 font-black"><i class="fa-solid fa-triangle-exclamation"></i> Crítica / Urgente</span>';
+      } else if (urgencia === 'Alta') {
+        urgEl.innerHTML = '<span class="text-amber-400 font-black"><i class="fa-solid fa-bolt"></i> Alta</span>';
+      } else {
+        urgEl.innerHTML = '<span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Normal / Rotina</span>';
+      }
+
+      const obsContainer = document.getElementById('conf-obs-container');
+      const obsEl = document.getElementById('conf-obs');
+      if (obs) {
+        obsEl.innerText = obs;
+        obsContainer.classList.remove('hidden');
+      } else {
+        obsContainer.classList.add('hidden');
+      }
+
+      document.getElementById('conf-total-volumes').innerText = `${totalUnits} ${totalUnits === 1 ? 'peça' : 'peças'} • ${itemsKeys.length} tipos`;
+
+      // Renderiza checklist dos itens
+      const confList = document.getElementById('conf-items-list');
+      let html = '';
+      itemsKeys.forEach((item, idx) => {
+        const qty = mobileCart[item];
+        let catNome = "Geral";
+        for (const c of CATALOGO_MATERIAIS) {
+          if (c.itens.includes(item)) { catNome = c.categoria; break; }
+        }
+
+        html += `
+          <div class="bg-slate-900/90 p-3 rounded-2xl border border-white/10 flex items-center justify-between gap-3 shadow-sm">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-6 h-6 rounded-lg bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-[10px] shrink-0 font-black">
+                <i class="fa-solid fa-check"></i>
+              </span>
+              <div class="truncate">
+                <div class="font-bold text-white text-xs truncate">${item}</div>
+                <div class="text-[10px] text-slate-400">${catNome}</div>
+              </div>
+            </div>
+            <div class="shrink-0 text-right">
+              <span class="font-mono font-black text-sm px-2.5 py-1 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40">
+                ${qty}x
+              </span>
+            </div>
+          </div>
+        `;
+      });
+      confList.innerHTML = html;
+
+      // Fecha modal anterior e abre modal de conferência
+      const checkoutModal = document.getElementById('modal-checkout');
+      checkoutModal.style.display = 'none';
+      checkoutModal.classList.add('hidden');
+
+      const confModal = document.getElementById('modal-conferencia');
+      confModal.style.display = 'flex';
+      confModal.classList.remove('hidden');
+    }
+
+    function voltarParaCheckoutModal() {
+      const confModal = document.getElementById('modal-conferencia');
+      confModal.style.display = 'none';
+      confModal.classList.add('hidden');
+
+      const checkoutModal = document.getElementById('modal-checkout');
+      checkoutModal.style.display = 'flex';
+      checkoutModal.classList.remove('hidden');
+    }
+
+    function confirmarEEnviarPedidoFinal() {
+      submitOrderToSupabase();
+    }
+
     // 10. SUBMISSÃO DIRETA NO SUPABASE
     async function submitOrderToSupabase() {
       if (!currentUser || !APP_USERS[currentUser]) {
@@ -1275,11 +1630,14 @@
         return;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Transmitindo para Matriz...';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Transmitindo para Matriz...';
+      }
 
       // Define branch e destinatário
       let targetDbBranch = "FRANCISCO BELTRAO PR";
+      let recipientTag = '';
       const effectiveChoice = userConfig.role === 'admin' 
         ? branchSelected 
         : (userConfig.filial.includes('Iury') 
@@ -1288,7 +1646,13 @@
                 ? 'BELTRAO_CLEVERSON' 
                 : (userConfig.filial.includes('Palotina') || userConfig.filial.includes('Adilson') 
                     ? 'PALOTINA PR' 
-                    : (userConfig.filial.includes('Pato') ? 'PATO BRANCO PR' : userConfig.dbBranch)));
+                    : (userConfig.filial.includes('Barracão') || userConfig.filial.includes('Giseli')
+                        ? 'BARRACAO PR'
+                        : (userConfig.filial.includes('Pato') || userConfig.filial.includes('Leonardo')
+                            ? 'PATO BRANCO PR'
+                            : (userConfig.filial.includes('SMO') || userConfig.filial.includes('Terceiros')
+                                ? 'TERCEIROS SMO'
+                                : userConfig.dbBranch)))));
 
       if (effectiveChoice === 'BELTRAO_IURY') {
         targetDbBranch = 'FRANCISCO BELTRAO PR';
@@ -1301,9 +1665,13 @@
         recipientTag = '[ADILSON] ';
       } else if (effectiveChoice.includes('BARRACAO')) {
         targetDbBranch = 'BARRACAO PR';
+        recipientTag = '[GISELI] ';
       } else if (effectiveChoice.includes('PATO')) {
         targetDbBranch = 'PATO BRANCO PR';
         recipientTag = '[PATO BRANCO] ';
+      } else if (effectiveChoice.includes('SMO') || effectiveChoice.includes('TERCEIROS')) {
+        targetDbBranch = 'TERCEIROS SMO';
+        recipientTag = '[TERCEIROS SMO] ';
       }
 
       const fullNotes = `[${urgencia.toUpperCase()}] ${recipientTag}${obs ? obs : 'Solicitação operacional de filial'}`;
@@ -1357,8 +1725,9 @@
         if (effectiveChoice === 'BELTRAO_CLEVERSON') displayFilial = "Beltrão (Cleverson)";
         else if (effectiveChoice === 'BELTRAO_IURY') displayFilial = "Beltrão (Iury)";
         else if (targetDbBranch.includes("PALOTINA")) displayFilial = "Palotina (Adilson)";
-        else if (targetDbBranch.includes("BARRACAO")) displayFilial = "Barracão";
+        else if (targetDbBranch.includes("BARRACAO")) displayFilial = "Barracão (Giseli)";
         else if (targetDbBranch.includes("PATO")) displayFilial = "Pato Branco (Leonardo)";
+        else if (targetDbBranch.includes("SMO") || targetDbBranch.includes("TERCEIROS")) displayFilial = "Terceiros SMO";
 
         lastCreatedOrder = {
           id: newShipment.id,
@@ -1374,6 +1743,12 @@
         updateMobileCartUI();
         closeCheckoutModal();
 
+        const confModal = document.getElementById('modal-conferencia');
+        if (confModal) {
+          confModal.style.display = 'none';
+          confModal.classList.add('hidden');
+        }
+
         openSuccessModal(lastCreatedOrder);
         loadShipmentsFromSupabase();
 
@@ -1381,8 +1756,10 @@
         console.error('Erro ao enviar pedido para Supabase:', err);
         alert('Erro ao registrar no banco: ' + (err.message || 'Verifique sua conexão.'));
       } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Enviar para Separação</span>';
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-circle-check text-sm"></i> <span>CONFIRMAR E ENVIAR PEDIDO</span>';
+        }
       }
     }
 
@@ -1428,7 +1805,7 @@
     // 12. ADMIN BRANCH FILTER NO MOBILE
     function setMobileAdminFilter(filial) {
       adminFilterBranch = filial;
-      ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato'].forEach(f => {
+      ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato', 'smo'].forEach(f => {
         const btn = document.getElementById(`m-filter-${f}`);
         if (btn) btn.className = "px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0";
       });
@@ -1437,8 +1814,9 @@
       if (filial === 'Beltrão (Iury)') targetBtn = document.getElementById('m-filter-beltrao-iury');
       if (filial === 'Beltrão (Cleverson)') targetBtn = document.getElementById('m-filter-beltrao-cleverson');
       if (filial === 'Palotina (Adilson)' || filial === 'Palotina') targetBtn = document.getElementById('m-filter-palotina');
-      if (filial === 'Barracão') targetBtn = document.getElementById('m-filter-barracao');
+      if (filial === 'Barracão (Giseli)' || filial === 'Barracão') targetBtn = document.getElementById('m-filter-barracao');
       if (filial === 'Pato Branco' || filial.includes('Pato')) targetBtn = document.getElementById('m-filter-pato');
+      if (filial === 'Terceiros SMO' || filial.includes('SMO')) targetBtn = document.getElementById('m-filter-smo');
 
       if (targetBtn) {
         targetBtn.className = "px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0";
@@ -1498,7 +1876,8 @@
             return b.includes('BELTRAO') && !txt.includes('iury') && !txt.includes('iuri');
           }
           if (adminFilterBranch.includes('Palotina') || adminFilterBranch.includes('Adilson')) return b.includes('PALOTINA');
-          if (adminFilterBranch === 'Barracão') return b.includes('BARRACAO');
+          if (adminFilterBranch === 'Barracão (Giseli)' || adminFilterBranch === 'Barracão') return b.includes('BARRACAO') || txt.includes('giseli');
+          if (adminFilterBranch === 'Terceiros SMO' || adminFilterBranch.includes('SMO')) return b.includes('SMO') || b.includes('TERCEIROS') || txt.includes('smo');
           if (adminFilterBranch.includes('Pato') || adminFilterBranch.includes('Leonardo')) return b.includes('PATO') || txt.includes('pato') || txt.includes('leonardo');
           return true;
         });
@@ -1588,9 +1967,12 @@
       if (bUpper.includes("PALOTINA")) {
         branchLabel = "Palotina • Adilson";
         branchColor = "text-cyan-400 border-cyan-500/30 bg-cyan-500/10";
-      } else if (bUpper.includes("BARRACAO")) {
-        branchLabel = "Barracão";
+      } else if (bUpper.includes("BARRACAO") || (order.notes || "").toUpperCase().includes("GISELI") || (order.sender_name || "").toUpperCase().includes("GISELI")) {
+        branchLabel = "Barracão • Giseli";
         branchColor = "text-emerald-400 border-emerald-500/30 bg-emerald-500/10";
+      } else if (bUpper.includes("SMO") || bUpper.includes("TERCEIROS") || (order.notes || "").toUpperCase().includes("SMO") || (order.notes || "").toUpperCase().includes("TERCEIROS")) {
+        branchLabel = "Terceiros SMO";
+        branchColor = "text-blue-400 border-blue-500/30 bg-blue-500/10";
       } else if (bUpper.includes("PATO") || (order.notes || "").toUpperCase().includes("PATO") || (order.sender_name || "").toUpperCase().includes("LEONARDO")) {
         branchLabel = "Pato Branco • Leonardo";
         branchColor = "text-purple-400 border-purple-500/30 bg-purple-500/10";

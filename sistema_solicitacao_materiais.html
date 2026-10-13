@@ -291,15 +291,15 @@
             </button>
             <button type="button" onclick="selectQuickUserDesktop('barracao1')" id="quick-card-barracao1" data-user="barracao1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
               <div class="flex items-center gap-2 truncate">
-                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-emerald-500/30">BC</div>
+                <div class="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-emerald-500/30">GI</div>
                 <div class="text-left truncate">
-                  <span class="block truncate text-white">Barracão 1</span>
+                  <span class="block truncate text-white">Giseli</span>
                   <span class="text-[10px] text-emerald-400 font-semibold block">Barracão</span>
                 </div>
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-emerald-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-emerald-400"></i></span>
             </button>
-            <button type="button" onclick="selectQuickUserDesktop('pato')" id="quick-card-pato" data-user="pato" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group col-span-2">
+            <button type="button" onclick="selectQuickUserDesktop('pato')" id="quick-card-pato" data-user="pato" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
               <div class="flex items-center gap-2 truncate">
                 <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-purple-500/30">LE</div>
                 <div class="text-left truncate">
@@ -308,6 +308,16 @@
                 </div>
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-purple-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-purple-400"></i></span>
+            </button>
+            <button type="button" onclick="selectQuickUserDesktop('smo')" id="quick-card-smo" data-user="smo" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group col-span-2">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-blue-500/30">SM</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Terceiros SMO</span>
+                  <span class="text-[10px] text-blue-400 font-semibold block">São Miguel do Oeste</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-blue-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-blue-400"></i></span>
             </button>
           </div>
         </div>
@@ -550,11 +560,14 @@
           <button onclick="setBranchFilter('Palotina (Adilson)')" id="filter-btn-palotina" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-cyan-400 transition flex items-center gap-1.5 cursor-pointer">
             <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Palotina (Adilson)
           </button>
-          <button onclick="setBranchFilter('Barracão')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão
+          <button onclick="setBranchFilter('Barracão (Giseli)')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão (Giseli)
           </button>
           <button onclick="setBranchFilter('Pato Branco')" id="filter-btn-pato" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-purple-400 transition flex items-center gap-1.5 cursor-pointer">
             <span class="w-2 h-2 rounded-full bg-purple-400"></span> Pato Branco (Leonardo)
+          </button>
+          <button onclick="setBranchFilter('Terceiros SMO')" id="filter-btn-smo" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer">
+            <span class="w-2 h-2 rounded-full bg-blue-400"></span> Terceiros SMO
           </button>
         </div>
 
@@ -858,17 +871,24 @@
             </button>
             <button onclick="switchCurrentUser('barracao1')" id="switch-btn-barracao1" class="p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold hover:bg-emerald-500/20 transition text-left cursor-pointer flex items-center justify-between">
               <div>
-                <span>Barracão</span>
-                <span class="block text-[10px] text-slate-400 font-normal">Barracão 1</span>
+                <span>Giseli</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Barracão</span>
               </div>
               <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('pato')" id="switch-btn-pato" class="p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold hover:bg-purple-500/20 transition text-left cursor-pointer flex items-center justify-between col-span-2">
+            <button onclick="switchCurrentUser('pato')" id="switch-btn-pato" class="p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold hover:bg-purple-500/20 transition text-left cursor-pointer flex items-center justify-between">
               <div>
                 <span>Leonardo</span>
                 <span class="block text-[10px] text-slate-400 font-normal">Pato Branco</span>
               </div>
               <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+            </button>
+            <button onclick="switchCurrentUser('smo')" id="switch-btn-smo" class="p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold hover:bg-blue-500/20 transition text-left cursor-pointer flex items-center justify-between col-span-2">
+              <div>
+                <span>Terceiros SMO</span>
+                <span class="block text-[10px] text-slate-400 font-normal">São Miguel do Oeste</span>
+              </div>
+              <span class="active-user-badge hidden text-[10px] text-blue-400 font-black">✓</span>
             </button>
           </div>
         </div>
@@ -920,11 +940,14 @@
               <button type="button" onclick="selectModalFilial('Palotina (Adilson)')" id="btn-filial-palotina" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-cyan-500/40 cursor-pointer">
                 Palotina (Adilson)
               </button>
-              <button type="button" onclick="selectModalFilial('Barracão')" id="btn-filial-barracao" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-emerald-500/40 cursor-pointer">
-                Barracão
+              <button type="button" onclick="selectModalFilial('Barracão (Giseli)')" id="btn-filial-barracao" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-emerald-500/40 cursor-pointer">
+                Barracão (Giseli)
               </button>
-              <button type="button" onclick="selectModalFilial('Pato Branco')" id="btn-filial-pato" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-purple-500/40 cursor-pointer col-span-2">
+              <button type="button" onclick="selectModalFilial('Pato Branco')" id="btn-filial-pato" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-purple-500/40 cursor-pointer">
                 Pato Branco (Leonardo)
+              </button>
+              <button type="button" onclick="selectModalFilial('Terceiros SMO')" id="btn-filial-smo" class="p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-blue-500/40 cursor-pointer col-span-2">
+                Terceiros SMO
               </button>
             </div>
             <input type="hidden" id="req-filial" value="Beltrão (Iury)">
@@ -1200,11 +1223,27 @@
       },
       "barracao1": {
         username: "barracao1",
-        name: "Técnico Barracão 01",
+        name: "Giseli (Barracão)",
         role: "filial",
-        filial: "Barracão",
+        filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
-        avatar: "BR"
+        avatar: "GI"
+      },
+      "barracao": {
+        username: "barracao",
+        name: "Giseli (Barracão)",
+        role: "filial",
+        filial: "Barracão (Giseli)",
+        dbBranch: "BARRACAO PR",
+        avatar: "GI"
+      },
+      "giseli": {
+        username: "giseli",
+        name: "Giseli (Barracão)",
+        role: "filial",
+        filial: "Barracão (Giseli)",
+        dbBranch: "BARRACAO PR",
+        avatar: "GI"
       },
       "pato": {
         username: "pato",
@@ -1213,6 +1252,22 @@
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
+      },
+      "smo": {
+        username: "smo",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        avatar: "SM"
+      },
+      "terceiros": {
+        username: "terceiros",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        avatar: "SM"
       }
     };
 
@@ -1620,8 +1675,10 @@
             const txt = `${row.notes || ''} ${row.sender_name || ''}`.toLowerCase();
             if (b.includes("PALOTINA") || (row.notes || "").toUpperCase().includes("PALOTINA") || txt.includes("adilson") || txt.includes("palotina")) {
               filial = "Palotina (Adilson)";
-            } else if (b.includes("BARRACAO")) {
-              filial = "Barracão";
+            } else if (b.includes("BARRACAO") || txt.includes("barracao") || txt.includes("giseli")) {
+              filial = "Barracão (Giseli)";
+            } else if (b.includes("SMO") || b.includes("TERCEIROS") || txt.includes("smo") || txt.includes("terceiros")) {
+              filial = "Terceiros SMO";
             } else if (b.includes("PATO") || (row.notes || "").toUpperCase().includes("PATO") || txt.includes("leonardo")) {
               filial = "Pato Branco";
             } else {
@@ -1775,7 +1832,8 @@
       if (tf.includes('iury') || tf.includes('iuri')) return it.includes('iury') || it.includes('iuri');
       if (tf.includes('cleverson')) return it.includes('cleverson');
       if (tf.includes('palotina') || tf.includes('adilson')) return it.includes('palotina') || it.includes('adilson');
-      if (tf.includes('barracao') || tf.includes('barracão')) return it.includes('barracao') || it.includes('barracão');
+      if (tf.includes('barracao') || tf.includes('barracão') || tf.includes('giseli')) return it.includes('barracao') || it.includes('barracão') || it.includes('giseli');
+      if (tf.includes('smo') || tf.includes('terceiros')) return it.includes('smo') || it.includes('terceiros');
       if (tf.includes('pato') || tf.includes('leonardo')) return it.includes('pato') || it.includes('leonardo');
       return it === tf;
     }
@@ -1788,7 +1846,7 @@
       }
 
       activeBranchFilter = filial;
-      ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato'].forEach(f => {
+      ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato', 'smo'].forEach(f => {
         const btn = document.getElementById(`filter-btn-${f}`);
         if (!btn) return;
         btn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer";
@@ -1805,12 +1863,15 @@
       } else if (filial === 'Palotina (Adilson)' || filial === 'Palotina') {
         activeId = 'filter-btn-palotina';
         activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan cursor-pointer";
-      } else if (filial === 'Barracão') {
+      } else if (filial === 'Barracão (Giseli)' || filial === 'Barracão') {
         activeId = 'filter-btn-barracao';
         activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-glow-emerald cursor-pointer";
       } else if (filial === 'Pato Branco' || filial.includes('Pato')) {
         activeId = 'filter-btn-pato';
         activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-purple-500/30 text-purple-300 border border-purple-500/50 shadow-glow-purple cursor-pointer";
+      } else if (filial === 'Terceiros SMO' || filial.includes('SMO')) {
+        activeId = 'filter-btn-smo';
+        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-blue-500/30 text-blue-300 border border-blue-500/50 shadow-glow-blue cursor-pointer";
       }
 
       const activeEl = document.getElementById(activeId);
@@ -1869,10 +1930,14 @@
         return '<span class="inline-flex items-center gap-1.5 bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-user-check text-cyan-400"></i> Palotina • Adilson</span>';
       } else if (filial.includes('Pato') || filial.includes('Leonardo')) {
         return '<span class="inline-flex items-center gap-1.5 bg-purple-500/15 text-purple-300 border border-purple-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-user-check text-purple-400"></i> Pato Branco • Leonardo</span>';
+      } else if (filial.includes('SMO') || filial.includes('Terceiros') || filial.includes('smo')) {
+        return '<span class="inline-flex items-center gap-1.5 bg-blue-500/15 text-blue-300 border border-blue-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-users text-blue-400"></i> Terceiros SMO</span>';
+      } else if (filial.includes('Barracão') || filial.includes('Giseli')) {
+        return '<span class="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-user-check text-emerald-400"></i> Barracão • Giseli</span>';
       } else if (filial.includes('Beltrão')) {
         return '<span class="inline-flex items-center gap-1.5 bg-amber-500/15 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-amber-400"></i> Beltrão</span>';
       } else {
-        return '<span class="inline-flex items-center gap-1.5 bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-emerald-400"></i> Barracão</span>';
+        return '<span class="inline-flex items-center gap-1.5 bg-slate-500/15 text-slate-300 border border-slate-500/40 px-2.5 py-0.5 rounded-lg text-[10px] font-black"><i class="fa-solid fa-location-dot text-slate-400"></i> ' + filial + '</span>';
       }
     }
 
@@ -2429,7 +2494,7 @@
     // 17. MODAIS & CATÁLOGO
     function selectModalFilial(filial) {
       document.getElementById('req-filial').value = filial;
-      ['beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato'].forEach(f => {
+      ['beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato', 'smo'].forEach(f => {
         const btn = document.getElementById(`btn-filial-${f}`);
         if (btn) btn.className = "p-2.5 rounded-xl text-xs font-semibold border transition text-center bg-slate-900 text-slate-400 border-white/10 hover:border-orange-500/40 cursor-pointer";
       });
@@ -2445,14 +2510,18 @@
         const b = document.getElementById('btn-filial-palotina');
         if (b) b.className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-cyan-500/20 text-cyan-300 border-cyan-500/50 shadow-glow-cyan cursor-pointer";
         document.getElementById('req-filial').value = 'Palotina (Adilson)';
-      } else if (filial.includes('Pato')) {
+      } else if (filial.includes('Pato') || filial.includes('Leonardo')) {
         const b = document.getElementById('btn-filial-pato');
         if (b) b.className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-purple-500/20 text-purple-300 border-purple-500/50 shadow-glow-purple cursor-pointer";
         document.getElementById('req-filial').value = 'Pato Branco (Leonardo)';
+      } else if (filial.includes('SMO') || filial.includes('Terceiros')) {
+        const b = document.getElementById('btn-filial-smo');
+        if (b) b.className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-blue-500/20 text-blue-300 border-blue-500/50 shadow-glow-blue cursor-pointer";
+        document.getElementById('req-filial').value = 'Terceiros SMO';
       } else {
         const b = document.getElementById('btn-filial-barracao');
         if (b) b.className = "p-2.5 rounded-xl text-xs font-bold border transition text-center bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-glow-emerald cursor-pointer";
-        document.getElementById('req-filial').value = 'Barracão';
+        document.getElementById('req-filial').value = 'Barracão (Giseli)';
       }
     }
 
@@ -2610,15 +2679,18 @@
 
       let dbBranch = "FRANCISCO BELTRAO PR";
       if (filial.includes('Palotina') || filial.includes('Adilson')) dbBranch = "PALOTINA PR";
-      else if (filial.includes('Barracão')) dbBranch = "BARRACAO PR";
-      else if (filial.includes('Pato')) dbBranch = "PATO BRANCO PR";
+      else if (filial.includes('Barracão') || filial.includes('Giseli')) dbBranch = "BARRACAO PR";
+      else if (filial.includes('SMO') || filial.includes('Terceiros')) dbBranch = "TERCEIROS SMO";
+      else if (filial.includes('Pato') || filial.includes('Leonardo')) dbBranch = "PATO BRANCO PR";
 
       try {
         let recipientTag = '';
         if (filial.includes('Iury')) recipientTag = '[IURY] ';
         else if (filial.includes('Cleverson')) recipientTag = '[CLEVERSON] ';
         else if (filial.includes('Palotina') || filial.includes('Adilson')) recipientTag = '[ADILSON] ';
-        else if (filial.includes('Pato')) recipientTag = '[PATO BRANCO] ';
+        else if (filial.includes('Barracão') || filial.includes('Giseli')) recipientTag = '[GISELI] ';
+        else if (filial.includes('SMO') || filial.includes('Terceiros')) recipientTag = '[TERCEIROS SMO] ';
+        else if (filial.includes('Pato') || filial.includes('Leonardo')) recipientTag = '[PATO BRANCO] ';
 
         const fullNotes = `[${urgencia.toUpperCase()}] ${recipientTag}${obs ? obs : 'Solicitação lançada pelo painel'}`;
 
