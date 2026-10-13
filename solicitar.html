@@ -177,33 +177,33 @@
             <span class="text-amber-400 font-mono text-[10px]">5 acessos</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <button type="button" onclick="setQuickLogin('beltrao1')" id="mobile-quick-beltrao1" data-user="beltrao1" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span class="flex items-center gap-1.5 truncate">
-                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
-                <span class="truncate">Cleverson</span>
-              </span>
-              <span class="text-[10px] text-amber-400/70 font-mono">BEL</span>
-            </button>
-            <button type="button" onclick="setQuickLogin('beltrao2')" id="mobile-quick-beltrao2" data-user="beltrao2" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+            <button type="button" onclick="setQuickLogin('beltrao1')" id="mobile-quick-beltrao1" data-user="beltrao1" class="mobile-quick-card p-3 rounded-2xl border border-yellow-500/30 bg-yellow-500/10 text-yellow-300 font-bold text-xs hover:bg-yellow-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-yellow-400 shrink-0"></span>
                 <span class="truncate">Iury</span>
               </span>
-              <span class="text-[10px] text-yellow-400/70 font-mono">BEL</span>
+              <span class="text-[10px] text-yellow-400/70 font-mono">BEL 1</span>
+            </button>
+            <button type="button" onclick="setQuickLogin('beltrao2')" id="mobile-quick-beltrao2" data-user="beltrao2" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                <span class="truncate">Cleverson</span>
+              </span>
+              <span class="text-[10px] text-amber-400/70 font-mono">BEL 2</span>
             </button>
             <button type="button" onclick="setQuickLogin('palotina1')" id="mobile-quick-palotina1" data-user="palotina1" class="mobile-quick-card p-3 rounded-2xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 font-bold text-xs hover:bg-cyan-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-cyan-400 shrink-0"></span>
-                <span class="truncate">Palotina 1</span>
+                <span class="truncate">Adilson</span>
               </span>
-              <span class="text-[10px] text-cyan-400/70 font-mono">PAL</span>
+              <span class="text-[10px] text-cyan-400/70 font-mono">PAL 1</span>
             </button>
             <button type="button" onclick="setQuickLogin('barracao1')" id="mobile-quick-barracao1" data-user="barracao1" class="mobile-quick-card p-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-300 font-bold text-xs hover:bg-emerald-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                <span class="truncate">Barracão 1</span>
+                <span class="truncate">Barracão</span>
               </span>
-              <span class="text-[10px] text-emerald-400/70 font-mono">BAR</span>
+              <span class="text-[10px] text-emerald-400/70 font-mono">BAR 1</span>
             </button>
             <button type="button" onclick="setQuickLogin('pato')" id="mobile-quick-pato" data-user="pato" class="mobile-quick-card p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold text-xs hover:bg-purple-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer col-span-2">
               <span class="flex items-center gap-1.5 truncate">
@@ -386,9 +386,9 @@
       <!-- Admin Branch Filter Ribbon (Visível APENAS para Admins no celular) -->
       <div id="mobile-admin-branch-filter" class="hidden flex items-center gap-1.5 bg-slate-950 p-1 rounded-2xl border border-white/10 overflow-x-auto no-scrollbar text-xs">
         <button onclick="setMobileAdminFilter('todas')" id="m-filter-todas" class="px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0">Todas</button>
-        <button onclick="setMobileAdminFilter('Beltrão (Cleverson)')" id="m-filter-beltrao-cleverson" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Cleverson)</button>
         <button onclick="setMobileAdminFilter('Beltrão (Iury)')" id="m-filter-beltrao-iury" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Iury)</button>
-        <button onclick="setMobileAdminFilter('Palotina')" id="m-filter-palotina" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Palotina</button>
+        <button onclick="setMobileAdminFilter('Beltrão (Cleverson)')" id="m-filter-beltrao-cleverson" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Beltrão (Cleverson)</button>
+        <button onclick="setMobileAdminFilter('Palotina (Adilson)')" id="m-filter-palotina" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Palotina (Adilson)</button>
         <button onclick="setMobileAdminFilter('Barracão')" id="m-filter-barracao" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Barracão</button>
         <button onclick="setMobileAdminFilter('Pato Branco')" id="m-filter-pato" class="px-3 py-1 rounded-xl font-semibold text-slate-400 hover:text-white shrink-0">Pato Branco</button>
       </div>
@@ -506,12 +506,11 @@
           <!-- Seletor de Filial (Apenas Admins podem alterar, Filiais ficam travadas) -->
           <div id="checkout-branch-selector-container">
             <label class="block font-semibold text-slate-300 mb-1">Filial de Destino</label>
-            <select id="checkout-branch-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-orange-500 disabled:opacity-75 disabled:cursor-not-allowed">
-              <option value="BELTRAO_CLEVERSON">Beltrão (Cleverson)</option>
               <option value="BELTRAO_IURY">Beltrão (Iury)</option>
-              <option value="PALOTINA PR">Palotina (PR)</option>
+              <option value="BELTRAO_CLEVERSON">Beltrão (Cleverson)</option>
+              <option value="PALOTINA PR">Palotina (Adilson)</option>
               <option value="BARRACAO PR">Barracão (PR)</option>
-              <option value="PATO BRANCO PR">Pato Branco (PR)</option>
+              <option value="PATO BRANCO PR">Pato Branco (Leonardo)</option>
             </select>
             <p id="checkout-branch-lock-notice" class="text-[10px] text-slate-500 mt-1 italic hidden">
               <i class="fa-solid fa-lock text-[9px] mr-1"></i> Sua conta está vinculada exclusivamente a esta base.
@@ -664,15 +663,6 @@
       // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
       "beltrao1": {
         username: "beltrao1",
-        name: "Cleverson (Beltrão)",
-        role: "filial",
-        filial: "Beltrão (Cleverson)",
-        dbBranch: "FRANCISCO BELTRAO PR",
-        email: "cleverson.beltrao@vigi.com.br",
-        avatar: "CL"
-      },
-      "beltrao2": {
-        username: "beltrao2",
         name: "Iury (Beltrão)",
         role: "filial",
         filial: "Beltrão (Iury)",
@@ -680,14 +670,23 @@
         email: "iury.beltrao@vigi.com.br",
         avatar: "IU"
       },
+      "beltrao2": {
+        username: "beltrao2",
+        name: "Cleverson (Beltrão)",
+        role: "filial",
+        filial: "Beltrão (Cleverson)",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        email: "cleverson.beltrao@vigi.com.br",
+        avatar: "CL"
+      },
       "palotina1": {
         username: "palotina1",
-        name: "Técnico Palotina 01",
+        name: "Adilson (Palotina)",
         role: "filial",
-        filial: "Palotina",
+        filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
-        email: "palotina1@vigi.com.br",
-        avatar: "P1"
+        email: "adilson.palotina@vigi.com.br",
+        avatar: "AD"
       },
       "barracao1": {
         username: "barracao1",
@@ -965,18 +964,22 @@
         // Modo Filial (Restrito)
         let colorClass = 'text-amber-300';
         let dotColor = 'text-amber-400';
-        if (u.filial === 'Palotina') { colorClass = 'text-cyan-300'; dotColor = 'text-cyan-400'; }
-        if (u.filial === 'Barracão') { colorClass = 'text-emerald-300'; dotColor = 'text-emerald-400'; }
-        if (u.filial.includes('Pato')) { colorClass = 'text-purple-300'; dotColor = 'text-purple-400'; }
+        if (u.filial.includes('Iury')) { colorClass = 'text-yellow-300'; dotColor = 'text-yellow-400'; }
+        else if (u.filial.includes('Cleverson')) { colorClass = 'text-amber-300'; dotColor = 'text-amber-400'; }
+        else if (u.filial.includes('Palotina') || u.filial.includes('Adilson')) { colorClass = 'text-cyan-300'; dotColor = 'text-cyan-400'; }
+        else if (u.filial.includes('Barracão')) { colorClass = 'text-emerald-300'; dotColor = 'text-emerald-400'; }
+        else if (u.filial.includes('Pato')) { colorClass = 'text-purple-300'; dotColor = 'text-purple-400'; }
 
         branchBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] ${dotColor}"></i> <span class="${colorClass}">${u.filial}</span>`;
         document.getElementById('checkout-branch-subtitle').innerText = `Destino: ${u.filial}`;
         
         // Trava seleção de filial na filial do usuário
-        if (u.filial.includes('Cleverson')) {
-          checkoutSelect.value = 'BELTRAO_CLEVERSON';
-        } else if (u.filial.includes('Iury')) {
+        if (u.filial.includes('Iury')) {
           checkoutSelect.value = 'BELTRAO_IURY';
+        } else if (u.filial.includes('Cleverson')) {
+          checkoutSelect.value = 'BELTRAO_CLEVERSON';
+        } else if (u.filial.includes('Palotina') || u.filial.includes('Adilson')) {
+          checkoutSelect.value = 'PALOTINA PR';
         } else if (u.filial.includes('Pato')) {
           checkoutSelect.value = 'PATO BRANCO PR';
         } else {
@@ -1279,20 +1282,23 @@
       let targetDbBranch = "FRANCISCO BELTRAO PR";
       const effectiveChoice = userConfig.role === 'admin' 
         ? branchSelected 
-        : (userConfig.filial.includes('Cleverson') 
-            ? 'BELTRAO_CLEVERSON' 
-            : userConfig.filial.includes('Iury') 
-                ? 'BELTRAO_IURY' 
-                : (userConfig.filial.includes('Pato') ? 'PATO BRANCO PR' : userConfig.dbBranch));
+        : (userConfig.filial.includes('Iury') 
+            ? 'BELTRAO_IURY' 
+            : userConfig.filial.includes('Cleverson') 
+                ? 'BELTRAO_CLEVERSON' 
+                : (userConfig.filial.includes('Palotina') || userConfig.filial.includes('Adilson') 
+                    ? 'PALOTINA PR' 
+                    : (userConfig.filial.includes('Pato') ? 'PATO BRANCO PR' : userConfig.dbBranch)));
 
-      if (effectiveChoice === 'BELTRAO_CLEVERSON') {
-        targetDbBranch = 'FRANCISCO BELTRAO PR';
-        recipientTag = '[CLEVERSON] ';
-      } else if (effectiveChoice === 'BELTRAO_IURY') {
+      if (effectiveChoice === 'BELTRAO_IURY') {
         targetDbBranch = 'FRANCISCO BELTRAO PR';
         recipientTag = '[IURY] ';
+      } else if (effectiveChoice === 'BELTRAO_CLEVERSON') {
+        targetDbBranch = 'FRANCISCO BELTRAO PR';
+        recipientTag = '[CLEVERSON] ';
       } else if (effectiveChoice.includes('PALOTINA')) {
         targetDbBranch = 'PALOTINA PR';
+        recipientTag = '[ADILSON] ';
       } else if (effectiveChoice.includes('BARRACAO')) {
         targetDbBranch = 'BARRACAO PR';
       } else if (effectiveChoice.includes('PATO')) {
@@ -1347,9 +1353,12 @@
 
         if (itemsError) throw itemsError;
 
-        let displayFilial = "Francisco Beltrão";
-        if (targetDbBranch.includes("PALOTINA")) displayFilial = "Palotina";
-        if (targetDbBranch.includes("BARRACAO")) displayFilial = "Barracão";
+        let displayFilial = "Beltrão (Iury)";
+        if (effectiveChoice === 'BELTRAO_CLEVERSON') displayFilial = "Beltrão (Cleverson)";
+        else if (effectiveChoice === 'BELTRAO_IURY') displayFilial = "Beltrão (Iury)";
+        else if (targetDbBranch.includes("PALOTINA")) displayFilial = "Palotina (Adilson)";
+        else if (targetDbBranch.includes("BARRACAO")) displayFilial = "Barracão";
+        else if (targetDbBranch.includes("PATO")) displayFilial = "Pato Branco (Leonardo)";
 
         lastCreatedOrder = {
           id: newShipment.id,
@@ -1425,11 +1434,11 @@
       });
 
       let targetBtn = document.getElementById('m-filter-todas');
-      if (filial === 'Beltrão (Cleverson)') targetBtn = document.getElementById('m-filter-beltrao-cleverson');
       if (filial === 'Beltrão (Iury)') targetBtn = document.getElementById('m-filter-beltrao-iury');
-      if (filial === 'Palotina') targetBtn = document.getElementById('m-filter-palotina');
+      if (filial === 'Beltrão (Cleverson)') targetBtn = document.getElementById('m-filter-beltrao-cleverson');
+      if (filial === 'Palotina (Adilson)' || filial === 'Palotina') targetBtn = document.getElementById('m-filter-palotina');
       if (filial === 'Barracão') targetBtn = document.getElementById('m-filter-barracao');
-      if (filial === 'Pato Branco') targetBtn = document.getElementById('m-filter-pato');
+      if (filial === 'Pato Branco' || filial.includes('Pato')) targetBtn = document.getElementById('m-filter-pato');
 
       if (targetBtn) {
         targetBtn.className = "px-3 py-1 rounded-xl font-bold bg-orange-600 text-white shrink-0";
@@ -1482,25 +1491,25 @@
         filtered = myShipments.filter(s => {
           const b = (s.branch_name || "").toUpperCase();
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
-          if (adminFilterBranch === 'Beltrão (Cleverson)') {
-            return b.includes('BELTRAO') && !txt.includes('iury') && !txt.includes('iuri');
-          }
           if (adminFilterBranch === 'Beltrão (Iury)') {
             return b.includes('BELTRAO') && (txt.includes('iury') || txt.includes('iuri'));
           }
-          if (adminFilterBranch === 'Palotina') return b.includes('PALOTINA');
+          if (adminFilterBranch === 'Beltrão (Cleverson)') {
+            return b.includes('BELTRAO') && !txt.includes('iury') && !txt.includes('iuri');
+          }
+          if (adminFilterBranch.includes('Palotina') || adminFilterBranch.includes('Adilson')) return b.includes('PALOTINA');
           if (adminFilterBranch === 'Barracão') return b.includes('BARRACAO');
-          if (adminFilterBranch === 'Pato Branco') return b.includes('PATO') || txt.includes('pato') || txt.includes('leonardo');
+          if (adminFilterBranch.includes('Pato') || adminFilterBranch.includes('Leonardo')) return b.includes('PATO') || txt.includes('pato') || txt.includes('leonardo');
           return true;
         });
       } else if (userConfig && userConfig.role === 'filial') {
         filtered = myShipments.filter(s => {
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
-          if (userConfig.filial.includes('Cleverson')) {
-            return !txt.includes('iury') && !txt.includes('iuri');
-          }
           if (userConfig.filial.includes('Iury')) {
             return txt.includes('iury') || txt.includes('iuri');
+          }
+          if (userConfig.filial.includes('Cleverson')) {
+            return !txt.includes('iury') && !txt.includes('iuri');
           }
           return true;
         });
@@ -1577,17 +1586,17 @@
       let branchColor = "text-amber-400 border-amber-500/30 bg-amber-500/10";
       const bUpper = (order.branch_name || "").toUpperCase();
       if (bUpper.includes("PALOTINA")) {
-        branchLabel = "Palotina";
+        branchLabel = "Palotina • Adilson";
         branchColor = "text-cyan-400 border-cyan-500/30 bg-cyan-500/10";
       } else if (bUpper.includes("BARRACAO")) {
         branchLabel = "Barracão";
         branchColor = "text-emerald-400 border-emerald-500/30 bg-emerald-500/10";
       } else if (bUpper.includes("PATO") || (order.notes || "").toUpperCase().includes("PATO") || (order.sender_name || "").toUpperCase().includes("LEONARDO")) {
-        branchLabel = "Pato Branco";
+        branchLabel = "Pato Branco • Leonardo";
         branchColor = "text-purple-400 border-purple-500/30 bg-purple-500/10";
       } else {
         const txt = `${order.notes || ''} ${order.sender_name || ''}`.toLowerCase();
-        if (txt.includes('iury') || txt.includes('iuri') || txt.includes('beltrao 02') || txt.includes('beltrao2')) {
+        if (txt.includes('iury') || txt.includes('iuri') || txt.includes('beltrao 01') || txt.includes('beltrao1') || txt.includes('beltrao 1')) {
           branchLabel = "Beltrão • Iury";
           branchColor = "text-yellow-400 border-yellow-500/30 bg-yellow-500/10";
         } else {
