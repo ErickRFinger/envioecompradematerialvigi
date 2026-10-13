@@ -641,7 +641,7 @@
             </span>
           </h2>
           <p class="text-xs text-slate-400 mt-0.5" id="pipeline-description-text">
-            Arraste os cards entre as colunas para atualizar a fase de separação, romaneio e transporte.
+            Arraste os cards ou use o botão de 1 clique em cada card para avançar a fase de separação e transporte.
           </p>
         </div>
 
@@ -649,6 +649,44 @@
           <button onclick="loadSupabaseShipments()" class="text-xs font-bold text-orange-400 hover:text-white bg-slate-950 border border-white/10 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5 cursor-pointer">
             <i class="fa-solid fa-rotate"></i> <span>Sincronizar Banco</span>
           </button>
+        </div>
+      </div>
+
+      <!-- GUIA VISUAL DE ESTEIRA OPERACIONAL (FLUXO EM 5 PASSOS SIMPLES) -->
+      <div class="glass-surface rounded-2xl p-3 border border-white/10 bg-slate-950/70 hidden sm:block mb-1">
+        <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-2">
+          <span class="flex items-center gap-1.5 text-slate-200">
+            <i class="fa-solid fa-route text-orange-400"></i>
+            <span>Fluxo Simplificado de Expedição • Sequência das 5 Etapas</span>
+          </span>
+          <span class="text-[10px] text-orange-400 font-mono bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded-lg">Avanço direto em 1 clique no card</span>
+        </div>
+        <div class="grid grid-cols-5 gap-2 text-center text-xs">
+          <div class="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 font-semibold flex flex-col items-center">
+            <span class="text-[9px] font-mono text-amber-400/80 uppercase font-black">1. Fila Matriz</span>
+            <span class="font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-inbox text-amber-400"></i> Aguardando</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 font-normal">Pedido novo recebido</span>
+          </div>
+          <div class="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-300 font-semibold flex flex-col items-center">
+            <span class="text-[9px] font-mono text-blue-400/80 uppercase font-black">2. Na Bancada</span>
+            <span class="font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-boxes-stacked text-blue-400"></i> Separando</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 font-normal">Conferindo peças</span>
+          </div>
+          <div class="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-300 font-semibold flex flex-col items-center">
+            <span class="text-[9px] font-mono text-purple-400/80 uppercase font-black">3. Embalado</span>
+            <span class="font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-boxes-packing text-purple-400"></i> Pronto Coleta</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 font-normal">Caixa selada p/ van</span>
+          </div>
+          <div class="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 font-semibold flex flex-col items-center">
+            <span class="text-[9px] font-mono text-cyan-400/80 uppercase font-black">4. Na Van</span>
+            <span class="font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-truck-fast text-cyan-400"></i> Em Rota</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 font-normal">Motorista em trânsito</span>
+          </div>
+          <div class="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 font-semibold flex flex-col items-center">
+            <span class="text-[9px] font-mono text-emerald-400/80 uppercase font-black">5. Na Filial</span>
+            <span class="font-bold flex items-center gap-1 mt-0.5"><i class="fa-solid fa-circle-check text-emerald-400"></i> Entregue</span>
+            <span class="text-[10px] text-slate-400 mt-0.5 font-normal">Recebido e concluído</span>
+          </div>
         </div>
       </div>
 
@@ -2109,6 +2147,55 @@
           card.ondragend = (e) => handleDragEnd(e);
         }
 
+        // Botão de Ação Principal em Destaque (1 Clique direto na esteira)
+        let primaryActionBtnHtml = '';
+        if (adminPerm) {
+          if (pedido.status === 'aguardando') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', 'separando')" 
+                      title="Clique para iniciar a separação física deste pedido"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-play text-[11px]"></i>
+                <span>1. INICIAR SEPARAÇÃO ➔</span>
+              </button>
+            `;
+          } else if (pedido.status === 'separando') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', 'coleta')" 
+                      title="Clique para marcar como embalado e pronto para coleta"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-purple-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-boxes-packing text-[11px]"></i>
+                <span>2. MARCAR PRONTO P/ COLETA ➔</span>
+              </button>
+            `;
+          } else if (pedido.status === 'coleta') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', 'enviado')" 
+                      title="Clique para confirmar embarque na van e despacho em rota"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-cyan-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-truck-fast text-[11px]"></i>
+                <span>3. DESPACHAR (EM ROTA) ➔</span>
+              </button>
+            `;
+          } else if (pedido.status === 'enviado') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', 'chegou')" 
+                      title="Clique para confirmar o recebimento final pela filial"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-circle-check text-[11px]"></i>
+                <span>4. CONFIRMAR ENTREGA NA FILIAL ✓</span>
+              </button>
+            `;
+          } else {
+            primaryActionBtnHtml = `
+              <div class="w-full py-2 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <span>✓ Pedido Entregue e Concluído</span>
+              </div>
+            `;
+          }
+        }
+
         card.innerHTML = `
           <!-- Card Header & Badges -->
           <div class="flex items-start justify-between gap-1">
@@ -2146,31 +2233,32 @@
             ${maisItens}
           </div>
 
-          <!-- Bottom Action Buttons -->
-          <div class="flex items-center justify-between pt-1 gap-1">
-            <button onclick="event.stopPropagation(); openCardDetails('${pedido.id}')" 
-                    class="text-[11px] font-bold text-orange-400 hover:text-white flex items-center gap-1.5 bg-orange-500/15 hover:bg-orange-500/30 px-3 py-1.5 rounded-xl border border-orange-500/30 transition cursor-pointer">
-              <i class="fa-solid fa-list-check"></i> Romaneio
-            </button>
+          <!-- Botão Principal de Ação em 1 Clique (Ultra Simples e Destacado) -->
+          ${primaryActionBtnHtml}
 
-            <button onclick="event.stopPropagation(); sendToWhatsApp('${pedido.id}')" 
-                    title="Copiar aviso para o WhatsApp da filial" 
-                    class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/30 px-3 py-1.5 rounded-xl border border-emerald-500/30 transition cursor-pointer">
-              <i class="fa-brands fa-whatsapp text-sm"></i> Zap
-            </button>
+          <!-- Barra Secundária de Ferramentas (Romaneio, Zap, Voltar e Excluir) -->
+          <div class="flex items-center justify-between pt-1 gap-1 border-t border-white/5">
+            <div class="flex items-center gap-1.5">
+              <button onclick="event.stopPropagation(); openCardDetails('${pedido.id}')" 
+                      title="Conferir itens, marcar checklist e ajustar quantidades"
+                      class="text-[11px] font-bold text-orange-400 hover:text-white flex items-center gap-1 bg-orange-500/15 hover:bg-orange-500/30 px-2.5 py-1.5 rounded-xl border border-orange-500/30 transition cursor-pointer">
+                <i class="fa-solid fa-list-check"></i> Romaneio
+              </button>
 
-            <!-- Setas Rápidas de Avanço & Excluir -->
+              <button onclick="event.stopPropagation(); sendToWhatsApp('${pedido.id}')" 
+                      title="Copiar mensagem formatada para o WhatsApp da filial" 
+                      class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1 bg-emerald-500/15 hover:bg-emerald-500/30 px-2.5 py-1.5 rounded-xl border border-emerald-500/30 transition cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Zap
+              </button>
+            </div>
+
             <div class="flex items-center gap-1 ml-auto">
               ${adminPerm && prevCol ? `
-                <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', '${prevCol.id}')" title="Voltar para: ${prevCol.nome}" 
-                        class="w-7 h-7 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 flex items-center justify-center text-[10px] transition cursor-pointer">
-                  <i class="fa-solid fa-chevron-left"></i>
-                </button>
-              ` : ''}
-              ${adminPerm && nextCol ? `
-                <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', '${nextCol.id}')" title="Avançar para: ${nextCol.nome}" 
-                        class="w-7 h-7 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 text-white flex items-center justify-center text-[10px] font-bold shadow-md shadow-orange-600/30 transition cursor-pointer">
-                  <i class="fa-solid fa-chevron-right"></i>
+                <button onclick="event.stopPropagation(); movePedidoEnvio('${pedido.id}', '${prevCol.id}')" 
+                        title="Voltar etapa para: ${prevCol.nome}" 
+                        class="px-2 py-1.5 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-400 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer">
+                  <i class="fa-solid fa-chevron-left text-[10px]"></i>
+                  <span class="text-[10px]">Voltar</span>
                 </button>
               ` : ''}
               ${deleteBtnHtml}
