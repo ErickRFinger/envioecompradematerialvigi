@@ -465,131 +465,143 @@
   <!-- ======================================================== -->
   <!-- HIGH-END KPI ANALYTICS RIBBON (5 CARDS DE MÉTRICAS) -->
   <!-- ======================================================== -->
-  <section class="border-b border-white/5 bg-slate-950/40 backdrop-blur-md px-5 lg:px-8 py-3.5">
-    <div class="max-w-[1920px] mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+  <section class="border-b border-white/5 bg-slate-950/60 backdrop-blur-md px-4 sm:px-6 lg:px-8 py-3.5 space-y-3">
+    <div class="max-w-[1920px] mx-auto space-y-3">
       
-      <!-- 5 Metric Cards with Semantic Glow -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 flex-1 max-w-5xl">
+      <!-- LINHA 1: 5 CARDS DE MÉTRICAS (GRID DEDICADO, SEMPRE ESPAÇOSO E SEM COLISÃO) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 w-full">
         
         <!-- 1. Aguardando -->
-        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-amber-500/20 hover:border-amber-500/40 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black shadow-glow-amber">
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-amber-500/20 hover:border-amber-500/40 transition shadow-sm">
+          <div class="flex items-center gap-2.5 truncate">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center text-xs font-black shadow-glow-amber shrink-0">
               <i class="fa-solid fa-clock"></i>
             </div>
-            <div>
-              <p class="text-[10px] uppercase font-bold tracking-wider text-amber-300/80">Aguardando</p>
-              <p class="text-[10px] text-slate-400">Fila da Matriz</p>
+            <div class="truncate">
+              <p class="text-[10px] uppercase font-bold tracking-wider text-amber-300/80 truncate">Aguardando</p>
+              <p class="text-[10px] text-slate-400 truncate">Fila da Matriz</p>
             </div>
           </div>
-          <span id="stat-aguardando" class="font-mono font-black text-amber-400 text-lg">0</span>
+          <span id="stat-aguardando" class="font-mono font-black text-amber-400 text-lg ml-2 shrink-0">0</span>
         </div>
 
         <!-- 2. Separando -->
-        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-blue-500/20 hover:border-blue-500/40 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xs font-black">
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-blue-500/20 hover:border-blue-500/40 transition shadow-sm">
+          <div class="flex items-center gap-2.5 truncate">
+            <div class="w-8 h-8 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30 flex items-center justify-center text-xs font-black shrink-0">
               <i class="fa-solid fa-dolly"></i>
             </div>
-            <div>
-              <p class="text-[10px] uppercase font-bold tracking-wider text-blue-300/80">Separando</p>
-              <p class="text-[10px] text-slate-400">Almoxarifado</p>
+            <div class="truncate">
+              <p class="text-[10px] uppercase font-bold tracking-wider text-blue-300/80 truncate">Separando</p>
+              <p class="text-[10px] text-slate-400 truncate">Almoxarifado</p>
             </div>
           </div>
-          <span id="stat-separando" class="font-mono font-black text-blue-400 text-lg">0</span>
+          <span id="stat-separando" class="font-mono font-black text-blue-400 text-lg ml-2 shrink-0">0</span>
         </div>
 
         <!-- 3. Pronto / Coleta -->
-        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-purple-500/20 hover:border-purple-500/40 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-black shadow-glow-purple">
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-purple-500/20 hover:border-purple-500/40 transition shadow-sm">
+          <div class="flex items-center gap-2.5 truncate">
+            <div class="w-8 h-8 rounded-xl bg-purple-500/15 text-purple-400 border border-purple-500/30 flex items-center justify-center text-xs font-black shadow-glow-purple shrink-0">
               <i class="fa-solid fa-boxes-packing"></i>
             </div>
-            <div>
-              <p class="text-[10px] uppercase font-bold tracking-wider text-purple-300/80">Pronto p/ Coleta</p>
-              <p class="text-[10px] text-slate-400">Embalado e selado</p>
+            <div class="truncate">
+              <p class="text-[10px] uppercase font-bold tracking-wider text-purple-300/80 truncate">Pronto p/ Coleta</p>
+              <p class="text-[10px] text-slate-400 truncate">Embalado e selado</p>
             </div>
           </div>
-          <span id="stat-coleta" class="font-mono font-black text-purple-400 text-lg">0</span>
+          <span id="stat-coleta" class="font-mono font-black text-purple-400 text-lg ml-2 shrink-0">0</span>
         </div>
 
         <!-- 4. Em Rota -->
-        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-cyan-500/20 hover:border-cyan-500/40 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xs font-black shadow-glow-cyan">
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-cyan-500/20 hover:border-cyan-500/40 transition shadow-sm">
+          <div class="flex items-center gap-2.5 truncate">
+            <div class="w-8 h-8 rounded-xl bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-xs font-black shadow-glow-cyan shrink-0">
               <i class="fa-solid fa-van-shuttle"></i>
             </div>
-            <div>
-              <p class="text-[10px] uppercase font-bold tracking-wider text-cyan-300/80">Em Rota</p>
-              <p class="text-[10px] text-slate-400">Na rodovia / van</p>
+            <div class="truncate">
+              <p class="text-[10px] uppercase font-bold tracking-wider text-cyan-300/80 truncate">Em Rota</p>
+              <p class="text-[10px] text-slate-400 truncate">Na rodovia / van</p>
             </div>
           </div>
-          <span id="stat-enviado" class="font-mono font-black text-cyan-400 text-lg">0</span>
+          <span id="stat-enviado" class="font-mono font-black text-cyan-400 text-lg ml-2 shrink-0">0</span>
         </div>
 
         <!-- 5. Entregues -->
-        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-emerald-500/20 hover:border-emerald-500/40 transition">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs font-black shadow-glow-emerald">
+        <div class="glass-surface rounded-2xl p-2.5 px-3.5 flex items-center justify-between border-emerald-500/20 hover:border-emerald-500/40 transition shadow-sm col-span-2 sm:col-span-1">
+          <div class="flex items-center gap-2.5 truncate">
+            <div class="w-8 h-8 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-xs font-black shadow-glow-emerald shrink-0">
               <i class="fa-solid fa-check-double"></i>
             </div>
-            <div>
-              <p class="text-[10px] uppercase font-bold tracking-wider text-emerald-300/80">Entregues</p>
-              <p class="text-[10px] text-slate-400">Concluídos</p>
+            <div class="truncate">
+              <p class="text-[10px] uppercase font-bold tracking-wider text-emerald-300/80 truncate">Entregues</p>
+              <p class="text-[10px] text-slate-400 truncate">Concluídos</p>
             </div>
           </div>
-          <span id="stat-chegou" class="font-mono font-black text-emerald-400 text-lg">0</span>
+          <span id="stat-chegou" class="font-mono font-black text-emerald-400 text-lg ml-2 shrink-0">0</span>
         </div>
 
       </div>
 
-      <!-- Quick Controls: Filters & Search -->
-      <div class="flex items-center gap-3 flex-wrap justify-between lg:justify-end">
+      <!-- LINHA 2: CONTROLES, FILTROS POR FILIAL E PESQUISA (LINHA PRÓPRIA, NUNCA SOBREPÕE) -->
+      <div class="pt-2.5 border-t border-white/5 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3">
         
-        <!-- Branch Pills Filter with Distinct Branch Accent -->
-        <div id="desktop-branch-filters-container" class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs flex-wrap gap-1">
-          <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer">
-            Todas
-          </button>
-          <button onclick="setBranchFilter('Beltrão (Iury)')" id="filter-btn-beltrao-iury" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-yellow-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-yellow-400"></span> Beltrão (Iury)
-          </button>
-          <button onclick="setBranchFilter('Beltrão (Cleverson)')" id="filter-btn-beltrao-cleverson" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-amber-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Beltrão (Cleverson)
-          </button>
-          <button onclick="setBranchFilter('Palotina (Adilson)')" id="filter-btn-palotina" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-cyan-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Palotina (Adilson)
-          </button>
-          <button onclick="setBranchFilter('Barracão (Giseli)')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão (Giseli)
-          </button>
-          <button onclick="setBranchFilter('Pato Branco')" id="filter-btn-pato" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-purple-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-purple-400"></span> Pato Branco (Leonardo)
-          </button>
-          <button onclick="setBranchFilter('Terceiros SMO')" id="filter-btn-smo" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer">
-            <span class="w-2 h-2 rounded-full bg-blue-400"></span> Terceiros SMO
-          </button>
+        <!-- Filtros Rápidos por Filial com Scroll Horizontal caso necessário -->
+        <div class="flex items-center gap-2 min-w-0 overflow-x-auto no-scrollbar py-0.5">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap shrink-0 flex items-center gap-1.5 mr-1">
+            <i class="fa-solid fa-filter text-orange-400 text-[10px]"></i>
+            <span>Filtrar:</span>
+          </span>
+          <div id="desktop-branch-filters-container" class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs gap-1 shrink-0">
+            <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer whitespace-nowrap">
+              Todas
+            </button>
+            <button onclick="setBranchFilter('Beltrão (Iury)')" id="filter-btn-beltrao-iury" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-yellow-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-yellow-400"></span> Beltrão (Iury)
+            </button>
+            <button onclick="setBranchFilter('Beltrão (Cleverson)')" id="filter-btn-beltrao-cleverson" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-amber-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span> Beltrão (Cleverson)
+            </button>
+            <button onclick="setBranchFilter('Palotina (Adilson)')" id="filter-btn-palotina" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-cyan-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Palotina (Adilson)
+            </button>
+            <button onclick="setBranchFilter('Barracão (Giseli)')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão (Giseli)
+            </button>
+            <button onclick="setBranchFilter('Pato Branco')" id="filter-btn-pato" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-purple-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span> Pato Branco (Leonardo)
+            </button>
+            <button onclick="setBranchFilter('Terceiros SMO')" id="filter-btn-smo" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-blue-400"></span> Terceiros SMO
+            </button>
+          </div>
         </div>
 
-        <!-- View Switcher (Kanban vs Table) -->
-        <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs">
-          <button id="view-mode-kanban-btn" onclick="setViewMode('kanban')" title="Visualização Kanban em Colunas" class="px-2.5 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40 cursor-pointer">
-            <i class="fa-solid fa-table-columns mr-1"></i> Kanban
-          </button>
-          <button id="view-mode-table-btn" onclick="setViewMode('table')" title="Visualização em Lista / Tabela de Expedição" class="px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer">
-            <i class="fa-solid fa-list-check mr-1"></i> Tabela
-          </button>
-        </div>
+        <!-- Controles da Direita: View Switcher e Search -->
+        <div class="flex items-center gap-2.5 justify-end shrink-0">
+          
+          <!-- View Switcher (Kanban vs Table) -->
+          <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs shrink-0">
+            <button id="view-mode-kanban-btn" onclick="setViewMode('kanban')" title="Visualização Kanban em Colunas" class="px-3 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+              <i class="fa-solid fa-table-columns"></i> <span>Kanban</span>
+            </button>
+            <button id="view-mode-table-btn" onclick="setViewMode('table')" title="Visualização em Lista / Tabela de Expedição" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check"></i> <span>Tabela</span>
+            </button>
+          </div>
 
-        <!-- Search Bar with Shortcut -->
-        <div class="relative">
-          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-          <input type="text" id="filter-search" oninput="renderAll()" placeholder="Filtrar pedidos ou materiais..." 
-                 class="bg-slate-950/80 border border-white/10 rounded-xl pl-8 pr-12 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 w-52 sm:w-64 transition-all">
-          <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500 bg-slate-900 border border-white/10 px-1.5 py-0.5 rounded">/</span>
+          <!-- Search Bar with Shortcut -->
+          <div class="relative shrink-0">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+            <input type="text" id="filter-search" oninput="renderAll()" placeholder="Filtrar pedidos ou materiais..." 
+                   class="bg-slate-950/80 border border-white/10 rounded-xl pl-8 pr-10 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 w-48 sm:w-60 transition-all">
+            <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500 bg-slate-900 border border-white/10 px-1.5 py-0.5 rounded pointer-events-none">/</span>
+          </div>
+
         </div>
 
       </div>
+
     </div>
   </section>
 
