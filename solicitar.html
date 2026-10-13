@@ -235,28 +235,28 @@
             <button type="button" onclick="setQuickLogin('erick')" id="mobile-quick-erick" data-user="erick" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
-                <span class="truncate">Erick Finger</span>
-              </span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
-            </button>
-            <button type="button" onclick="setQuickLogin('daniel')" id="mobile-quick-daniel" data-user="daniel" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span class="flex items-center gap-1.5 truncate">
-                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
-                <span class="truncate">Daniel L.</span>
-              </span>
-              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
-            </button>
-            <button type="button" onclick="setQuickLogin('thiago')" id="mobile-quick-thiago" data-user="thiago" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
-              <span class="flex items-center gap-1.5 truncate">
-                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
-                <span class="truncate">Thiago G.</span>
+                <span class="truncate">Erick</span>
               </span>
               <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
             </button>
             <button type="button" onclick="setQuickLogin('klaus')" id="mobile-quick-klaus" data-user="klaus" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
-                <span class="truncate">Cleverson K.</span>
+                <span class="truncate">Klaus</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+            <button type="button" onclick="setQuickLogin('daniel')" id="mobile-quick-daniel" data-user="daniel" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Daniel</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
+            </button>
+            <button type="button" onclick="setQuickLogin('thiago')" id="mobile-quick-thiago" data-user="thiago" class="mobile-quick-card p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold text-xs hover:bg-orange-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-orange-400 shrink-0"></span>
+                <span class="truncate">Thiago</span>
               </span>
               <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
             </button>
@@ -757,39 +757,39 @@
       // --- ADMINISTRADORES GERAIS (Acesso Total & Exclusão de Ordens) ---
       "erick": {
         username: "erick",
-        name: "Erick Finger",
+        name: "Erick",
         role: "admin",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "erick@vigi.com.br",
-        avatar: "EF"
-      },
-      "daniel": {
-        username: "daniel",
-        name: "Daniel Lazzarotto",
-        role: "admin",
-        filial: "Todas as Filiais",
-        dbBranch: "MATRIZ",
-        email: "daniel@vigi.com.br",
-        avatar: "DL"
-      },
-      "thiago": {
-        username: "thiago",
-        name: "Thiago Graxaim",
-        role: "admin",
-        filial: "Todas as Filiais",
-        dbBranch: "MATRIZ",
-        email: "thiago@vigi.com.br",
-        avatar: "TG"
+        avatar: "ER"
       },
       "klaus": {
         username: "klaus",
-        name: "Cleverson Klaus",
+        name: "Klaus",
         role: "admin",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "klaus@vigi.com.br",
-        avatar: "CK"
+        avatar: "KL"
+      },
+      "daniel": {
+        username: "daniel",
+        name: "Daniel",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "daniel@vigi.com.br",
+        avatar: "DA"
+      },
+      "thiago": {
+        username: "thiago",
+        name: "Thiago",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        email: "thiago@vigi.com.br",
+        avatar: "TH"
       },
 
       // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
@@ -2146,7 +2146,7 @@
     async function deleteShipmentFromMobile(shipmentId) {
       const userConfig = APP_USERS[currentUser];
       if (!userConfig || userConfig.role !== 'admin') {
-        alert('Permissão Negada: Apenas administradores (Erick, Daniel, Thiago, Klaus) possuem autorização para excluir ordens.');
+        alert('Permissão Negada: Apenas administradores (Erick, Klaus, Daniel, Thiago) possuem autorização para excluir ordens.');
         return;
       }
 
