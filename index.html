@@ -553,26 +553,39 @@
             <span>Filtrar:</span>
           </span>
           <div id="desktop-branch-filters-container" class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs gap-1 shrink-0">
-            <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer whitespace-nowrap">
-              Todas
+            <button onclick="setBranchFilter('todas')" id="filter-btn-todas" class="px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+              <span>Todas</span>
+              <span id="fcount-todas" class="px-1.5 py-0.2 rounded-md bg-white/20 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Beltrão (Iury)')" id="filter-btn-beltrao-iury" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-yellow-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-yellow-400"></span> Beltrão (Iury)
+              <span class="w-2 h-2 rounded-full bg-yellow-400"></span>
+              <span>Beltrão (Iury)</span>
+              <span id="fcount-beltrao-iury" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-yellow-300 border border-yellow-500/30 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Beltrão (Cleverson)')" id="filter-btn-beltrao-cleverson" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-amber-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-amber-400"></span> Beltrão (Cleverson)
+              <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+              <span>Beltrão (Cleverson)</span>
+              <span id="fcount-beltrao-cleverson" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-amber-300 border border-amber-500/30 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Palotina (Adilson)')" id="filter-btn-palotina" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-cyan-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Palotina (Adilson)
+              <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+              <span>Palotina (Adilson)</span>
+              <span id="fcount-palotina" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-cyan-300 border border-cyan-500/30 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Barracão (Giseli)')" id="filter-btn-barracao" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-emerald-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Barracão (Giseli)
+              <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span>Barracão (Giseli)</span>
+              <span id="fcount-barracao" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-emerald-300 border border-emerald-500/30 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Pato Branco')" id="filter-btn-pato" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-purple-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-purple-400"></span> Pato Branco (Leonardo)
+              <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+              <span>Pato Branco (Leonardo)</span>
+              <span id="fcount-pato" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-purple-300 border border-purple-500/30 text-[10px] font-mono font-black">0</span>
             </button>
             <button onclick="setBranchFilter('Terceiros SMO')" id="filter-btn-smo" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-blue-400 transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
-              <span class="w-2 h-2 rounded-full bg-blue-400"></span> Terceiros SMO
+              <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+              <span>Terceiros SMO</span>
+              <span id="fcount-smo" class="px-1.5 py-0.2 rounded-md bg-slate-900 text-blue-300 border border-blue-500/30 text-[10px] font-mono font-black">0</span>
             </button>
           </div>
         </div>
@@ -602,6 +615,11 @@
               <i class="fa-solid fa-list-check"></i> <span class="hidden sm:inline">Tabela</span>
             </button>
           </div>
+
+          <!-- Botão Som e Notificações Sonoras -->
+          <button onclick="toggleAudioNotifications()" id="btn-sound-toggle" title="Notificações sonoras ativas (clique para silenciar)" class="w-8 h-8 rounded-xl bg-slate-950/80 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xs transition cursor-pointer hover:bg-slate-800 shrink-0">
+            <i class="fa-solid fa-bell text-amber-400"></i>
+          </button>
 
           <!-- Botão Sincronizar Agora -->
           <button onclick="refreshManual()" id="btn-manual-sync" title="Atualizar dados do Supabase agora" class="w-8 h-8 rounded-xl bg-slate-950/80 border border-white/10 hover:border-orange-500/40 text-slate-400 hover:text-orange-400 flex items-center justify-center text-xs transition cursor-pointer shrink-0">
@@ -1733,6 +1751,71 @@
       }
     }
 
+    // 7.1 SISTEMA DE NOTIFICAÇÕES SONORAS (WEB AUDIO API - ZERO DEPENDÊNCIA)
+    let soundNotificationsEnabled = localStorage.getItem('vigi_sound_enabled') !== 'false';
+    let knownShipmentIds = new Set();
+    let isInitialShipmentLoad = true;
+
+    function playNotificationChime(type = 'new_order') {
+      if (!soundNotificationsEnabled) return;
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'new_order') {
+          // Tom duplo de alerta ("Ding-Dong!")
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+          osc.frequency.setValueAtTime(880.00, ctx.currentTime + 0.12); // A5
+          gain.gain.setValueAtTime(0.18, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.45);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.45);
+        } else if (type === 'action') {
+          // Clique sutil de confirmação
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime); // E5
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+          osc.start(ctx.currentTime);
+          osc.stop(ctx.currentTime + 0.15);
+        }
+      } catch (err) {
+        // Silenciosamente ignora se o navegador restringir audio
+      }
+    }
+
+    function toggleAudioNotifications() {
+      soundNotificationsEnabled = !soundNotificationsEnabled;
+      localStorage.setItem('vigi_sound_enabled', soundNotificationsEnabled ? 'true' : 'false');
+      updateSoundButtonUI();
+      if (soundNotificationsEnabled) {
+        playNotificationChime('action');
+        showToast('Notificações sonoras ATIVADAS 🔔', 'info');
+      } else {
+        showToast('Notificações sonoras desativadas 🔕', 'info');
+      }
+    }
+
+    function updateSoundButtonUI() {
+      const btn = document.getElementById('btn-sound-toggle');
+      if (!btn) return;
+      if (soundNotificationsEnabled) {
+        btn.innerHTML = '<i class="fa-solid fa-bell text-amber-400"></i>';
+        btn.title = "Notificações sonoras ativas (clique para silenciar)";
+        btn.className = "w-8 h-8 rounded-xl bg-slate-950/80 border border-amber-500/30 text-amber-400 flex items-center justify-center text-xs transition cursor-pointer hover:bg-slate-800 shrink-0";
+      } else {
+        btn.innerHTML = '<i class="fa-solid fa-bell-slash text-slate-500"></i>';
+        btn.title = "Notificações sonoras mudas (clique para ativar)";
+        btn.className = "w-8 h-8 rounded-xl bg-slate-950/80 border border-white/10 text-slate-500 flex items-center justify-center text-xs transition cursor-pointer hover:bg-slate-800 shrink-0";
+      }
+    }
+
     // 8. CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
     async function loadSupabaseShipments() {
       if (!supabase) return;
@@ -1754,6 +1837,19 @@
         if (error) throw error;
 
         if (data) {
+          // Detecta novos pedidos aguardando para tocar o alerta sonoro e notificar o almoxarifado
+          if (!isInitialShipmentLoad) {
+            const newOrders = data.filter(s => (s.status === 'aguardando' || !s.status) && !knownShipmentIds.has(s.id));
+            if (newOrders.length > 0) {
+              playNotificationChime('new_order');
+              const firstNew = newOrders[0];
+              const bName = firstNew.branch_name || 'Filial';
+              showToast(`🔔 Novo pedido de ${bName}! (#ENV-${firstNew.id.slice(0, 6).toUpperCase()})`, 'warning');
+            }
+          }
+          isInitialShipmentLoad = false;
+          knownShipmentIds = new Set(data.map(s => s.id));
+
           pedidosEnvio = data.map(row => {
             let filial = "Francisco Beltrão";
             const b = (row.branch_name || "").toUpperCase();
@@ -2030,6 +2126,27 @@
       document.getElementById('col-count-coleta').innerText = counts.coleta;
       document.getElementById('col-count-enviado').innerText = counts.enviado;
       document.getElementById('col-count-chegou').innerText = counts.chegou;
+
+      // Atualiza badges com quantidade de pedidos ativos em cada filial
+      const activeShipments = pedidosEnvio.filter(p => p.status !== 'chegou');
+      const bCounts = {
+        todas: activeShipments.length,
+        iury: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Beltrão (Iury)')).length,
+        cleverson: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Beltrão (Cleverson)')).length,
+        palotina: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Palotina (Adilson)')).length,
+        barracao: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Barracão (Giseli)')).length,
+        pato: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Pato Branco')).length,
+        smo: activeShipments.filter(p => matchesBranchFilter(p.filial, 'Terceiros SMO')).length,
+      };
+
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+      setEl('fcount-todas', bCounts.todas);
+      setEl('fcount-beltrao-iury', bCounts.iury);
+      setEl('fcount-beltrao-cleverson', bCounts.cleverson);
+      setEl('fcount-palotina', bCounts.palotina);
+      setEl('fcount-barracao', bCounts.barracao);
+      setEl('fcount-pato', bCounts.pato);
+      setEl('fcount-smo', bCounts.smo);
     }
 
     function getFilialBadge(filial) {
@@ -2084,6 +2201,8 @@
           item.id.toLowerCase().includes(searchTerm) ||
           item.filial.toLowerCase().includes(searchTerm) ||
           item.solicitante.toLowerCase().includes(searchTerm) ||
+          item.status.toLowerCase().includes(searchTerm) ||
+          (item.urgencia && item.urgencia.toLowerCase().includes(searchTerm)) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
 
         if (filterOnlyUrgente && !isPedidoUrgente(item)) return false;
@@ -2307,6 +2426,8 @@
           item.id.toLowerCase().includes(searchTerm) ||
           item.filial.toLowerCase().includes(searchTerm) ||
           item.solicitante.toLowerCase().includes(searchTerm) ||
+          item.status.toLowerCase().includes(searchTerm) ||
+          (item.urgencia && item.urgencia.toLowerCase().includes(searchTerm)) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
 
         if (filterOnlyUrgente && !isPedidoUrgente(item)) return false;
@@ -2631,6 +2752,7 @@
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (pedido) {
         pedido.status = newStatus;
+        playNotificationChime('action');
         saveState();
         renderAll();
         const statusObj = ENVIOS_COLUNAS.find(c => c.id === newStatus);

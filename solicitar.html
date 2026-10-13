@@ -727,13 +727,18 @@
       </div>
 
       <div class="space-y-2 pt-1">
-        <button onclick="copyAndSendWhatsAppSuccess()" class="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition flex items-center justify-center gap-2">
-          <i class="fa-brands fa-whatsapp text-base"></i>
-          <span>Copiar Mensagem p/ WhatsApp</span>
+        <button onclick="directSendWhatsAppSuccess()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 text-white font-black text-xs shadow-xl shadow-emerald-600/30 transition flex items-center justify-center gap-2 cursor-pointer active:scale-95">
+          <i class="fa-brands fa-whatsapp text-lg"></i>
+          <span>Enviar Diretamente no WhatsApp ➔</span>
         </button>
 
-        <button onclick="closeSuccessModal()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-white/10 text-slate-300 font-semibold text-xs hover:bg-slate-800 transition">
-          Ver Fila de Pedidos
+        <button onclick="copyAndSendWhatsAppSuccess()" class="w-full py-2.5 rounded-xl bg-slate-900 border border-white/10 text-slate-300 hover:text-white font-semibold text-xs hover:bg-slate-800 transition flex items-center justify-center gap-2 cursor-pointer">
+          <i class="fa-regular fa-copy text-xs"></i>
+          <span>Copiar Mensagem de Texto</span>
+        </button>
+
+        <button onclick="closeSuccessModal()" class="w-full py-2.5 rounded-xl bg-slate-950 border border-white/5 text-slate-400 font-medium text-xs hover:bg-slate-900 transition cursor-pointer">
+          Ver Meus Pedidos & Rastreio
         </button>
       </div>
 
@@ -1375,13 +1380,25 @@
       renderMobileCatalog();
     }
 
-    // 8. CONTROLE DO CARRINHO MOBILE
+    // 8. CONTROLE DO CARRINHO MOBILE COM FEEDBACK TÁTIL (HAPTIC)
+    function triggerHaptic(type = 'light') {
+      if ('vibrate' in navigator) {
+        try {
+          if (type === 'light') navigator.vibrate(20);
+          else if (type === 'medium') navigator.vibrate(40);
+          else if (type === 'success') navigator.vibrate([25, 45, 30]);
+        } catch (e) {}
+      }
+    }
+
     function incrementMobileCart(item) {
+      triggerHaptic('light');
       mobileCart[item] = (mobileCart[item] || 0) + 1;
       updateMobileCartUI();
     }
 
     function decrementMobileCart(item) {
+      triggerHaptic('light');
       if (mobileCart[item] && mobileCart[item] > 0) {
         mobileCart[item]--;
         if (mobileCart[item] === 0) delete mobileCart[item];
@@ -1390,6 +1407,7 @@
     }
 
     function addQuantityMobileCart(item, amount) {
+      triggerHaptic('medium');
       mobileCart[item] = (mobileCart[item] || 0) + amount;
       updateMobileCartUI();
     }
@@ -1402,6 +1420,7 @@
         delete mobileCart[item];
       } else {
         mobileCart[item] = num;
+        triggerHaptic('medium');
       }
       updateMobileCartUI();
     }
@@ -1818,6 +1837,7 @@
           confModal.classList.add('hidden');
         }
 
+        triggerHaptic('success');
         openSuccessModal(lastCreatedOrder);
         loadShipmentsFromSupabase();
 
@@ -1848,10 +1868,7 @@
       switchMobileTab('rastreio');
     }
 
-    function copyAndSendWhatsAppSuccess() {
-      if (!lastCreatedOrder) return;
-      const o = lastCreatedOrder;
-
+    function buildOrderWhatsAppMessage(o) {
       let msg = `📦 *VIGI SUPRIMENTOS - NOVA SOLICITAÇÃO*\n`;
       msg += `📍 *Filial:* ${o.filial}\n`;
       msg += `👤 *Solicitante:* ${o.solicitante}\n`;
@@ -1863,12 +1880,55 @@
         msg += `▪️ ${it.qtd}x - ${it.nome}\n`;
       });
       msg += `\n⏱ _Registrado via Sistema em ${o.data}_`;
+      return msg;
+    }
 
+    function directSendWhatsAppSuccess() {
+      if (!lastCreatedOrder) return;
+      const msg = buildOrderWhatsAppMessage(lastCreatedOrder);
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    function copyAndSendWhatsAppSuccess() {
+      if (!lastCreatedOrder) return;
+      const msg = buildOrderWhatsAppMessage(lastCreatedOrder);
       navigator.clipboard.writeText(msg).then(() => {
         showToast('Texto copiado! Cole no WhatsApp da filial.', 'success');
       }).catch(() => {
         prompt('Copie o texto para o grupo de WhatsApp:', msg);
       });
+    }
+
+    // Compartilhar status de qualquer pedido no WhatsApp
+    function shareTrackingOrderWhatsApp(orderId) {
+      const order = myShipments.find(s => s.id === orderId);
+      if (!order) return;
+      const statusNames = {
+        'aguardando': '1/5 • AGUARDANDO NA MATRIZ',
+        'separando': '2/5 • SEPARANDO PEÇAS',
+        'coleta': '3/5 • PRONTO P/ EMBARQUE',
+        'enviado': '4/5 • EM TRANSPORTE (VAN)',
+        'recebido': '5/5 • ENTREGUE NA FILIAL',
+        'chegou': '5/5 • ENTREGUE NA FILIAL'
+      };
+      const stName = statusNames[order.status] || order.status.toUpperCase();
+      const items = order.shipment_items || [];
+      const totalPcs = items.reduce((a, b) => a + (b.quantity || 0), 0);
+
+      let msg = `🚚 *VIGI RASTREIO - PEDIDO #ENV-${order.id.slice(0, 6).toUpperCase()}*\n`;
+      msg += `📍 *Destino:* ${order.branch_name || 'Filial'}\n`;
+      msg += `🚨 *Status Atual:* ${stName}\n`;
+      msg += `📦 *Volume Total:* ${totalPcs} peças\n`;
+      msg += `\n📋 *Itens:* \n`;
+      items.slice(0, 8).forEach(it => {
+        msg += `▪️ ${it.quantity}x ${it.product_name}\n`;
+      });
+      if (items.length > 8) msg += `... e mais ${items.length - 8} itens.\n`;
+      msg += `\n⏱ _Acompanhamento ao vivo VIGI Suprimentos_`;
+
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
 
     // 12. ADMIN BRANCH FILTER NO MOBILE
@@ -2180,7 +2240,11 @@
         <div class="flex items-center justify-between pt-1 text-[11px]">
           <span class="text-slate-400 truncate max-w-[130px]"><i class="fa-regular fa-user mr-1 text-slate-500"></i> ${order.sender_name || 'Técnico'}</span>
           <div class="flex items-center gap-1.5 flex-wrap justify-end">
-            <button onclick="repeatOrderInCart('${order.id}')" title="Copiar itens deste pedido para o carrinho" class="text-amber-400 hover:text-white hover:bg-amber-500/20 text-[10px] px-2 py-1 rounded-lg border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+            <button onclick="shareTrackingOrderWhatsApp('${order.id}')" title="Compartilhar status no WhatsApp" class="text-emerald-400 hover:text-white hover:bg-emerald-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+              <i class="fa-brands fa-whatsapp text-[10px]"></i>
+              <span>Zap</span>
+            </button>
+            <button onclick="repeatOrderInCart('${order.id}')" title="Copiar itens deste pedido para o carrinho" class="text-amber-400 hover:text-white hover:bg-amber-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
               <i class="fa-solid fa-cart-plus text-[9px]"></i>
               <span>Repetir</span>
             </button>
