@@ -205,19 +205,19 @@
               </span>
               <span class="text-[10px] text-emerald-400/70 font-mono">BAR</span>
             </button>
-            <button type="button" onclick="setQuickLogin('pato')" id="mobile-quick-pato" data-user="pato" class="mobile-quick-card p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold text-xs hover:bg-purple-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+            <button type="button" onclick="setQuickLogin('pato1')" id="mobile-quick-pato1" data-user="pato1" class="mobile-quick-card p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold text-xs hover:bg-purple-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-purple-400 shrink-0"></span>
                 <span class="truncate">Leonardo</span>
               </span>
-              <span class="text-[10px] text-purple-400/70 font-mono">PATO</span>
+              <span class="text-[10px] text-purple-400/70 font-mono">PATO 1</span>
             </button>
-            <button type="button" onclick="setQuickLogin('smo')" id="mobile-quick-smo" data-user="smo" class="mobile-quick-card p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold text-xs hover:bg-blue-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+            <button type="button" onclick="setQuickLogin('smo1')" id="mobile-quick-smo1" data-user="smo1" class="mobile-quick-card p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold text-xs hover:bg-blue-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
               <span class="flex items-center gap-1.5 truncate">
                 <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0"></span>
                 <span class="truncate">Terceiros SMO</span>
               </span>
-              <span class="text-[10px] text-blue-400/70 font-mono">SMO</span>
+              <span class="text-[10px] text-blue-400/70 font-mono">SMO 1</span>
             </button>
           </div>
           <p class="text-[10px] text-slate-500 italic text-center pt-1">
@@ -847,8 +847,8 @@
         email: "giseli.barracao@vigi.com.br",
         avatar: "GI"
       },
-      "pato": {
-        username: "pato",
+      "pato1": {
+        username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
         filial: "Pato Branco",
@@ -856,8 +856,26 @@
         email: "leonardo.pato@vigi.com.br",
         avatar: "LE"
       },
+      "pato": {
+        username: "pato1",
+        name: "Leonardo (Pato Branco)",
+        role: "filial",
+        filial: "Pato Branco",
+        dbBranch: "PATO BRANCO PR",
+        email: "leonardo.pato@vigi.com.br",
+        avatar: "LE"
+      },
+      "smo1": {
+        username: "smo1",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        email: "smo@vigi.com.br",
+        avatar: "SM"
+      },
       "smo": {
-        username: "smo",
+        username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
         filial: "Terceiros SMO",
@@ -866,7 +884,7 @@
         avatar: "SM"
       },
       "terceiros": {
-        username: "terceiros",
+        username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
         filial: "Terceiros SMO",
@@ -1031,7 +1049,7 @@
         c.classList.remove('ring-2', 'ring-orange-500/50', 'ring-amber-500/50', 'scale-[1.03]', 'border-orange-500', 'border-amber-500', 'bg-orange-500/25', 'bg-amber-500/25');
       });
 
-      const card = document.getElementById(`mobile-quick-${username}`);
+      const card = document.getElementById(`mobile-quick-${username}`) || (u && document.getElementById(`mobile-quick-${u.username}`));
       if (card) {
         const isAdm = u.role === 'admin';
         const activeStyles = isAdm 

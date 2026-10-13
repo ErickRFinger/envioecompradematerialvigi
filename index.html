@@ -299,22 +299,22 @@
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-emerald-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-emerald-400"></i></span>
             </button>
-            <button type="button" onclick="selectQuickUserDesktop('pato')" id="quick-card-pato" data-user="pato" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+            <button type="button" onclick="selectQuickUserDesktop('pato1')" id="quick-card-pato1" data-user="pato1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
               <div class="flex items-center gap-2 truncate">
                 <div class="w-7 h-7 rounded-lg bg-purple-500/20 text-purple-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-purple-500/30">LE</div>
                 <div class="text-left truncate">
                   <span class="block truncate text-white">Leonardo</span>
-                  <span class="text-[10px] text-purple-400 font-semibold block">Pato Branco</span>
+                  <span class="text-[10px] text-purple-400 font-semibold block">Pato Branco (pato1)</span>
                 </div>
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-purple-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-purple-400"></i></span>
             </button>
-            <button type="button" onclick="selectQuickUserDesktop('smo')" id="quick-card-smo" data-user="smo" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group col-span-2">
+            <button type="button" onclick="selectQuickUserDesktop('smo1')" id="quick-card-smo1" data-user="smo1" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group col-span-2">
               <div class="flex items-center gap-2 truncate">
                 <div class="w-7 h-7 rounded-lg bg-blue-500/20 text-blue-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-blue-500/30">SM</div>
                 <div class="text-left truncate">
                   <span class="block truncate text-white">Terceiros SMO</span>
-                  <span class="text-[10px] text-blue-400 font-semibold block">São Miguel do Oeste</span>
+                  <span class="text-[10px] text-blue-400 font-semibold block">São Miguel do Oeste (smo1)</span>
                 </div>
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-blue-400 transition text-xs"><i class="fa-solid fa-location-dot text-[10px] text-blue-400"></i></span>
@@ -383,7 +383,7 @@
               VIGI <span class="text-[10px] font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-blue-500/20 text-orange-400 border border-orange-500/30">SUPRIMENTOS & EXPEDIÇÃO</span>
             </h1>
             <span id="supabase-status-badge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Supabase Nuvem
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Supabase Nuvem • <span id="sync-time-indicator" class="font-mono text-[10px] text-emerald-300">Ao vivo</span>
             </span>
           </div>
           <div class="text-[11px] text-slate-400 mt-0.5 flex items-center gap-2">
@@ -577,24 +577,42 @@
           </div>
         </div>
 
-        <!-- Controles da Direita: View Switcher e Search -->
-        <div class="flex items-center gap-2.5 justify-end shrink-0">
+        <!-- Controles da Direita: Urgência, Exportar CSV, View Switcher, Sync e Search -->
+        <div class="flex items-center gap-2 justify-end shrink-0 flex-wrap">
           
+          <!-- Filtro Rápido de Urgência -->
+          <button id="filter-urgencia-btn" onclick="toggleUrgenciaFilter()" title="Filtrar apenas remessas Urgentes ou com Alta Prioridade" class="px-2.5 py-1.5 rounded-xl border border-white/10 bg-slate-950/80 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+            <i class="fa-solid fa-bolt text-amber-400 text-[10px]"></i>
+            <span class="hidden sm:inline">Urgentes</span>
+            <span id="badge-urgentes-count" class="bg-rose-500/20 text-rose-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full border border-rose-500/30">0</span>
+          </button>
+
+          <!-- Botão Exportar Planilha Excel / CSV -->
+          <button onclick="exportDataToCSV()" title="Exportar dados filtrados para planilha Excel (CSV UTF-8)" class="px-2.5 py-1.5 rounded-xl border border-white/10 bg-slate-950/80 hover:bg-emerald-500/15 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/40 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+            <i class="fa-solid fa-file-excel text-emerald-400 text-xs"></i>
+            <span class="hidden md:inline">Exportar Planilha</span>
+          </button>
+
           <!-- View Switcher (Kanban vs Table) -->
           <div class="flex items-center bg-slate-950/80 p-1 rounded-xl border border-white/10 text-xs shrink-0">
-            <button id="view-mode-kanban-btn" onclick="setViewMode('kanban')" title="Visualização Kanban em Colunas" class="px-3 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
-              <i class="fa-solid fa-table-columns"></i> <span>Kanban</span>
+            <button id="view-mode-kanban-btn" onclick="setViewMode('kanban')" title="Visualização Kanban em Colunas" class="px-2.5 py-1.5 rounded-lg font-bold bg-orange-600/25 text-orange-400 border border-orange-500/40 cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+              <i class="fa-solid fa-table-columns"></i> <span class="hidden sm:inline">Kanban</span>
             </button>
-            <button id="view-mode-table-btn" onclick="setViewMode('table')" title="Visualização em Lista / Tabela de Expedição" class="px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
-              <i class="fa-solid fa-list-check"></i> <span>Tabela</span>
+            <button id="view-mode-table-btn" onclick="setViewMode('table')" title="Visualização em Lista / Tabela de Expedição" class="px-2.5 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer whitespace-nowrap flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check"></i> <span class="hidden sm:inline">Tabela</span>
             </button>
           </div>
+
+          <!-- Botão Sincronizar Agora -->
+          <button onclick="refreshManual()" id="btn-manual-sync" title="Atualizar dados do Supabase agora" class="w-8 h-8 rounded-xl bg-slate-950/80 border border-white/10 hover:border-orange-500/40 text-slate-400 hover:text-orange-400 flex items-center justify-center text-xs transition cursor-pointer shrink-0">
+            <i class="fa-solid fa-rotate" id="icon-manual-sync"></i>
+          </button>
 
           <!-- Search Bar with Shortcut -->
           <div class="relative shrink-0">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
             <input type="text" id="filter-search" oninput="renderAll()" placeholder="Filtrar pedidos ou materiais..." 
-                   class="bg-slate-950/80 border border-white/10 rounded-xl pl-8 pr-10 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 w-48 sm:w-60 transition-all">
+                   class="bg-slate-950/80 border border-white/10 rounded-xl pl-8 pr-10 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 w-40 sm:w-52 transition-all">
             <span class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[9px] font-mono text-slate-500 bg-slate-900 border border-white/10 px-1.5 py-0.5 rounded pointer-events-none">/</span>
           </div>
 
@@ -888,17 +906,17 @@
               </div>
               <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('pato')" id="switch-btn-pato" class="p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold hover:bg-purple-500/20 transition text-left cursor-pointer flex items-center justify-between">
+            <button onclick="switchCurrentUser('pato1')" id="switch-btn-pato1" class="p-3 rounded-2xl border border-purple-500/30 bg-purple-500/10 text-purple-300 font-bold hover:bg-purple-500/20 transition text-left cursor-pointer flex items-center justify-between">
               <div>
                 <span>Leonardo</span>
-                <span class="block text-[10px] text-slate-400 font-normal">Pato Branco</span>
+                <span class="block text-[10px] text-slate-400 font-normal">Pato Branco (pato1)</span>
               </div>
               <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
             </button>
-            <button onclick="switchCurrentUser('smo')" id="switch-btn-smo" class="p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold hover:bg-blue-500/20 transition text-left cursor-pointer flex items-center justify-between col-span-2">
+            <button onclick="switchCurrentUser('smo1')" id="switch-btn-smo1" class="p-3 rounded-2xl border border-blue-500/30 bg-blue-500/10 text-blue-300 font-bold hover:bg-blue-500/20 transition text-left cursor-pointer flex items-center justify-between col-span-2">
               <div>
                 <span>Terceiros SMO</span>
-                <span class="block text-[10px] text-slate-400 font-normal">São Miguel do Oeste</span>
+                <span class="block text-[10px] text-slate-400 font-normal">São Miguel do Oeste (smo1)</span>
               </div>
               <span class="active-user-badge hidden text-[10px] text-blue-400 font-black">✓</span>
             </button>
@@ -1053,8 +1071,9 @@
       <div class="p-6 space-y-3.5 text-xs">
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Item / Descrição do Material *</label>
-          <input type="text" id="compra-item" placeholder="Ex: Conector RJ45 blindado, Câmera UNV Color Hunter..." 
+          <input type="text" id="compra-item" list="compra-materiais-datalist" placeholder="Ex: Conector RJ45 blindado, Câmera UNV Color Hunter..." 
                  class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <datalist id="compra-materiais-datalist"></datalist>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -1257,16 +1276,32 @@
         dbBranch: "BARRACAO PR",
         avatar: "GI"
       },
-      "pato": {
-        username: "pato",
+      "pato1": {
+        username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
       },
+      "pato": {
+        username: "pato1",
+        name: "Leonardo (Pato Branco)",
+        role: "filial",
+        filial: "Pato Branco",
+        dbBranch: "PATO BRANCO PR",
+        avatar: "LE"
+      },
+      "smo1": {
+        username: "smo1",
+        name: "Terceiros SMO",
+        role: "filial",
+        filial: "Terceiros SMO",
+        dbBranch: "TERCEIROS SMO",
+        avatar: "SM"
+      },
       "smo": {
-        username: "smo",
+        username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
         filial: "Terceiros SMO",
@@ -1274,7 +1309,7 @@
         avatar: "SM"
       },
       "terceiros": {
-        username: "terceiros",
+        username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
         filial: "Terceiros SMO",
@@ -1905,6 +1940,28 @@
       document.getElementById('badge-count-compras').innerText = pedidosCompra.filter(c => c.status !== 'emestoque').length;
     }
 
+    let filterOnlyUrgente = false;
+
+    function isPedidoUrgente(pedido) {
+      if (!pedido || !pedido.urgencia) return false;
+      const u = pedido.urgencia.toLowerCase();
+      return u.includes('urgente') || u.includes('alta') || u.includes('crítica') || u.includes('critica');
+    }
+
+    function toggleUrgenciaFilter() {
+      filterOnlyUrgente = !filterOnlyUrgente;
+      const btn = document.getElementById('filter-urgencia-btn');
+      if (btn) {
+        if (filterOnlyUrgente) {
+          btn.className = "px-2.5 py-1.5 rounded-xl border border-rose-500/60 bg-rose-500/20 text-rose-300 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shadow-glow-rose shrink-0";
+        } else {
+          btn.className = "px-2.5 py-1.5 rounded-xl border border-white/10 bg-slate-950/80 hover:bg-rose-500/10 text-slate-400 hover:text-rose-400 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0";
+        }
+      }
+      renderAll();
+      showToast(filterOnlyUrgente ? 'Filtro ativado: exibindo apenas pedidos Urgentes' : 'Filtro desativado: exibindo todos os pedidos');
+    }
+
     function updateStats() {
       const counts = { aguardando: 0, separando: 0, coleta: 0, enviado: 0, chegou: 0 };
       
@@ -1919,6 +1976,10 @@
       filteredForStats.forEach(p => {
         if (counts[p.status] !== undefined) counts[p.status]++;
       });
+
+      const urgentesCount = pedidosEnvio.filter(p => isPedidoUrgente(p) && p.status !== 'chegou').length;
+      const badgeUrg = document.getElementById('badge-urgentes-count');
+      if (badgeUrg) badgeUrg.innerText = urgentesCount;
 
       document.getElementById('stat-aguardando').innerText = counts.aguardando;
       document.getElementById('stat-separando').innerText = counts.separando;
@@ -1987,6 +2048,8 @@
           item.solicitante.toLowerCase().includes(searchTerm) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
 
+        if (filterOnlyUrgente && !isPedidoUrgente(item)) return false;
+
         return matchFilial && matchSearch;
       });
 
@@ -2037,8 +2100,9 @@
           </button>
         ` : '';
 
+        const isUrg = isPedidoUrgente(pedido);
         const card = document.createElement('div');
-        card.className = "glass-surface-card rounded-2xl p-4 space-y-3 cursor-grab active:cursor-grabbing relative group";
+        card.className = `glass-surface-card rounded-2xl p-4 space-y-3 cursor-grab active:cursor-grabbing relative group ${isUrg ? 'border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-slate-900/40 to-slate-950/80 shadow-glow-amber ring-1 ring-amber-500/30' : ''}`;
         card.draggable = adminPerm;
         if (adminPerm) {
           card.ondragstart = (e) => handleDragStart(e, pedido.id);
@@ -2157,6 +2221,8 @@
           item.solicitante.toLowerCase().includes(searchTerm) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
 
+        if (filterOnlyUrgente && !isPedidoUrgente(item)) return false;
+
         return matchFilial && matchSearch;
       });
 
@@ -2175,8 +2241,9 @@
         const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
         const totalItens = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
 
+        const isUrg = isPedidoUrgente(pedido);
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-900/60 transition cursor-pointer";
+        tr.className = `hover:bg-slate-900/60 transition cursor-pointer ${isUrg ? 'border-l-2 border-amber-400 bg-amber-500/[0.04]' : ''}`;
         tr.onclick = () => openCardDetails(pedido.id);
 
         const deleteActionHtml = adminPerm ? `
@@ -2217,7 +2284,50 @@
       });
     }
 
-    // Exportar Tabela de Envios para CSV / Excel
+    // Exportar Tabela de Envios / Compras para CSV / Excel
+    function exportDataToCSV() {
+      const activeTab = document.getElementById('view-envios')?.style.display !== 'none' ? 'envios' : 'compras';
+      if (activeTab === 'envios') {
+        exportEnviosToCSV();
+      } else {
+        exportComprasToCSV();
+      }
+    }
+
+    function exportComprasToCSV() {
+      if (!pedidosCompra || pedidosCompra.length === 0) {
+        showToast('Nenhuma solicitação de compra para exportar.', 'warning');
+        return;
+      }
+      const headers = ['Código', 'Item / Material', 'Quantidade', 'Solicitante', 'Urgência', 'Status', 'Data', 'Observações'];
+      const escapeCSV = (val) => `"${String(val == null ? '' : val).replace(/"/g, '""')}"`;
+      const rows = pedidosCompra.map(c => {
+        const statusLabel = c.status === 'emestoque' ? 'Em Estoque' : c.status === 'comprado' ? 'Comprado / Em Trânsito' : 'Aberto / Necessário';
+        return [
+          escapeCSV(c.id),
+          escapeCSV(c.item),
+          escapeCSV(c.qtd),
+          escapeCSV(c.solicitante),
+          escapeCSV(c.urgencia),
+          escapeCSV(statusLabel),
+          escapeCSV(c.data),
+          escapeCSV(c.obs || '')
+        ].join(';');
+      });
+      const csvContent = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      const timestamp = new Date().toISOString().slice(0, 10);
+      link.setAttribute('download', `VIGI_Suprimentos_Compras_${timestamp}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showToast(`${pedidosCompra.length} itens de compra exportados com sucesso!`, 'success');
+    }
+
     function exportEnviosToCSV() {
       const searchTerm = (document.getElementById('filter-search')?.value || '').toLowerCase();
       const adminPerm = isAdmin();
@@ -2236,6 +2346,8 @@
           item.filial.toLowerCase().includes(searchTerm) ||
           item.solicitante.toLowerCase().includes(searchTerm) ||
           item.itens.some(it => it.nome.toLowerCase().includes(searchTerm));
+
+        if (filterOnlyUrgente && !isPedidoUrgente(item)) return false;
 
         return matchFilial && matchSearch;
       });
@@ -2277,7 +2389,7 @@
       const link = document.createElement('a');
       link.setAttribute('href', url);
       const timestamp = new Date().toISOString().slice(0, 10);
-      link.setAttribute('download', `relatorio_envios_vigi_${timestamp}.csv`);
+      link.setAttribute('download', `VIGI_Expedicao_Materiais_${timestamp}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -3498,6 +3610,54 @@
       }
     });
 
+    // 20. SINCRONIZAÇÃO & INDICADOR DE TEMPO REAL
+    let lastSyncTimestamp = new Date();
+
+    function updateSyncTimeUI() {
+      const el = document.getElementById('sync-time-indicator');
+      if (!el) return;
+      const secondsAgo = Math.floor((new Date() - lastSyncTimestamp) / 1000);
+      if (secondsAgo < 8) {
+        el.innerText = 'Ao vivo';
+      } else if (secondsAgo < 60) {
+        el.innerText = `há ${secondsAgo}s`;
+      } else {
+        const mins = Math.floor(secondsAgo / 60);
+        el.innerText = `há ${mins}m`;
+      }
+    }
+    setInterval(updateSyncTimeUI, 10000);
+
+    async function refreshManual() {
+      const icon = document.getElementById('icon-manual-sync');
+      if (icon) icon.classList.add('fa-spin');
+      try {
+        await loadSupabaseShipments();
+        lastSyncTimestamp = new Date();
+        updateSyncTimeUI();
+        showToast('Dados sincronizados com o Supabase!', 'success');
+      } catch (err) {
+        showToast('Erro ao atualizar dados.', 'error');
+      } finally {
+        if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 600);
+      }
+    }
+
+    function populateCatalogDatalist() {
+      const dl = document.getElementById('compra-materiais-datalist');
+      if (!dl) return;
+      dl.innerHTML = '';
+      const allItems = new Set();
+      CATALOGO_MATERIAIS.forEach(cat => {
+        cat.itens.forEach(it => allItems.add(it));
+      });
+      Array.from(allItems).sort().forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item;
+        dl.appendChild(opt);
+      });
+    }
+
     // Supabase Realtime Listener
     function initRealtime() {
       if (!supabase) return;
@@ -3506,6 +3666,8 @@
           .channel('vigi-matriz-realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
             loadSupabaseShipments();
+            lastSyncTimestamp = new Date();
+            updateSyncTimeUI();
           })
           .subscribe();
       } catch (err) {
@@ -3516,6 +3678,8 @@
     setInterval(() => {
       if (currentUser) {
         loadSupabaseShipments();
+        lastSyncTimestamp = new Date();
+        updateSyncTimeUI();
       }
     }, 20000);
 
@@ -3536,6 +3700,7 @@
 
     window.onload = function() {
       initCatalogUI();
+      populateCatalogDatalist();
       checkDesktopAuth();
       initRealtime();
     };
