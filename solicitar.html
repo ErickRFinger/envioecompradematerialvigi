@@ -782,6 +782,7 @@
         username: "erick",
         name: "Erick",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "erick@vigi.com.br",
@@ -791,6 +792,7 @@
         username: "klaus",
         name: "Klaus",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "klaus@vigi.com.br",
@@ -800,6 +802,7 @@
         username: "daniel",
         name: "Daniel",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "daniel@vigi.com.br",
@@ -809,17 +812,19 @@
         username: "thiago",
         name: "Thiago",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         email: "thiago@vigi.com.br",
         avatar: "TH"
       },
 
-      // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
+      // --- FILIAIS / OPERADORES REGIONAIS (Senha: clic3369) ---
       "beltrao1": {
         username: "beltrao1",
         name: "Iury (Beltrão)",
         role: "filial",
+        password: "clic3369",
         filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
         email: "iury.beltrao@vigi.com.br",
@@ -829,6 +834,7 @@
         username: "beltrao2",
         name: "Cleverson (Beltrão)",
         role: "filial",
+        password: "clic3369",
         filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
         email: "cleverson.beltrao@vigi.com.br",
@@ -838,6 +844,7 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
+        password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
         email: "adilson.palotina@vigi.com.br",
@@ -847,6 +854,7 @@
         username: "barracao1",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         email: "giseli.barracao@vigi.com.br",
@@ -856,6 +864,7 @@
         username: "barracao",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         email: "giseli.barracao@vigi.com.br",
@@ -865,6 +874,7 @@
         username: "giseli",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         email: "giseli.barracao@vigi.com.br",
@@ -874,6 +884,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         email: "leonardo.pato@vigi.com.br",
@@ -883,6 +894,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         email: "leonardo.pato@vigi.com.br",
@@ -892,6 +904,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         email: "smo@vigi.com.br",
@@ -901,6 +914,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         email: "smo@vigi.com.br",
@@ -910,6 +924,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         email: "smo@vigi.com.br",
@@ -1108,7 +1123,10 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
 
-      if (APP_USERS[username] && password === "Clic@3369") {
+      const user = APP_USERS[username];
+      const expectedPassword = user ? (user.password || (user.role === 'admin' ? "Clic@3369" : "clic3369")) : null;
+
+      if (user && expectedPassword && password === expectedPassword) {
         currentUser = username;
         sessionStorage.setItem('vigi_mobile_session', username);
         localStorage.setItem('vigi_auth_session', username);
@@ -1119,9 +1137,9 @@
         }
         setupUserInterface();
         loadShipmentsFromSupabase();
-        showToast(`Bem-vindo, ${APP_USERS[username].name}!`, 'success');
+        showToast(`Bem-vindo, ${user.name}!`, 'success');
       } else {
-        alert('Credenciais inválidas. Verifique o usuário e senha (padrão: Clic@3369).');
+        alert('Credenciais inválidas. Verifique o usuário e a senha informados.');
       }
 
       btn.disabled = false;

@@ -92,10 +92,12 @@ graph TD
 - **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin`
 
 #### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
-- **`beltrao1`** (`beltrao1@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
-- **`beltrao2`** (`beltrao2@vigi.com.br`) • Francisco Beltrão • Senha: `Clic@3369` • Role: `filial`
-- **`palotina1`** (`palotina1@vigi.com.br`) • Palotina • Senha: `Clic@3369` • Role: `filial`
-- **`barracao1`** (`barracao1@vigi.com.br`) • Barracão • Senha: `Clic@3369` • Role: `filial`
+- **`beltrao1`** • Iury (Beltrão) • Senha: `clic3369` • Role: `filial`
+- **`beltrao2`** • Cleverson (Beltrão) • Senha: `clic3369` • Role: `filial`
+- **`palotina1`** • Adilson (Palotina) • Senha: `clic3369` • Role: `filial`
+- **`barracao1`** • Giseli (Barracão) • Senha: `clic3369` • Role: `filial`
+- **`pato1`** • Leonardo (Pato) • Senha: `clic3369` • Role: `filial`
+- **`smo1`** • Terceiros SMO (SMO) • Senha: `clic3369` • Role: `filial`
 
 ---
 

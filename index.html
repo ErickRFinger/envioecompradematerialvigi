@@ -982,7 +982,7 @@
       </div>
 
       <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
-        <span class="text-[11px] text-slate-500">Senha padrão: Clic@3369</span>
+        <span class="text-[11px] text-slate-500"><i class="fa-solid fa-key text-[10px] mr-1 text-slate-400"></i> Senhas: Filiais <span class="font-mono text-amber-400 font-bold">clic3369</span> • Admins <span class="font-mono text-orange-400 font-bold">Clic@3369</span></span>
         <button onclick="closeUserSwitchModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Fechar</button>
       </div>
 
@@ -1254,6 +1254,7 @@
         username: "erick",
         name: "Erick",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "ER"
@@ -1262,6 +1263,7 @@
         username: "klaus",
         name: "Klaus",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "KL"
@@ -1270,6 +1272,7 @@
         username: "daniel",
         name: "Daniel",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "DA"
@@ -1278,16 +1281,18 @@
         username: "thiago",
         name: "Thiago",
         role: "admin",
+        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "TH"
       },
 
-      // --- FILIAIS / OPERADORES (Apenas Solicitação & Visualização da Própria Filial) ---
+      // --- FILIAIS / OPERADORES REGIONAIS (Senha: clic3369) ---
       "beltrao1": {
         username: "beltrao1",
         name: "Iury (Beltrão)",
         role: "filial",
+        password: "clic3369",
         filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "IU"
@@ -1296,6 +1301,7 @@
         username: "beltrao2",
         name: "Cleverson (Beltrão)",
         role: "filial",
+        password: "clic3369",
         filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "CL"
@@ -1304,6 +1310,7 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
+        password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
         avatar: "AD"
@@ -1312,6 +1319,7 @@
         username: "barracao1",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1320,6 +1328,7 @@
         username: "barracao",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1328,6 +1337,7 @@
         username: "giseli",
         name: "Giseli (Barracão)",
         role: "filial",
+        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1336,6 +1346,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
@@ -1344,6 +1355,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
@@ -1352,6 +1364,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1360,6 +1373,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1368,6 +1382,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1639,16 +1654,19 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
 
-      if (APP_USERS[username] && password === "Clic@3369") {
+      const user = APP_USERS[username];
+      const expectedPassword = user ? (user.password || (user.role === 'admin' ? "Clic@3369" : "clic3369")) : null;
+
+      if (user && expectedPassword && password === expectedPassword) {
         currentUser = username;
         sessionStorage.setItem('vigi_active_session', username);
         localStorage.setItem('vigi_auth_session', username);
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
-        showToast(`Bem-vindo, ${APP_USERS[username].name}!`, 'success');
+        showToast(`Bem-vindo, ${user.name}!`, 'success');
       } else {
-        alert('Credenciais inválidas. Verifique o usuário e a senha (padrão: Clic@3369).');
+        alert('Credenciais inválidas. Verifique o usuário e a senha informados.');
       }
 
       btn.disabled = false;
