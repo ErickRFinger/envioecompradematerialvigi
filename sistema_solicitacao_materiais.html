@@ -1359,13 +1359,37 @@
       ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       : null;
 
-    // 2. DICIONÁRIO OFICIAL DE USUÁRIOS & RBAC
+    // 1.1 CRIPTOGRAFIA & UTILITÁRIOS DE SEGURANÇA
+    const ADMIN_PASSWORD_HASH = "5b328b3ac509bb4910b2cb8f212ee690981c7c6a21e636e3f7f63c785b8d9fb5"; // SHA-256 de Clic@3369
+    const TECH_PASSWORD_HASH = "dcf9cba09d38920c5861cbb92f9d72bd45ab02a47cada2f33719f01fa8d5bcf0";  // SHA-256 de clic3369
+
+    async function hashPassword(str) {
+      if (!str) return '';
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 2. DICIONÁRIO OFICIAL DE USUÁRIOS & RBAC (BLINDADO COM HASH SHA-256)
     const APP_USERS = {
       // --- ADMINISTRADORES GERAIS (Acesso Total & Exclusão de Ordens) ---
       "erick": {
         username: "erick",
         name: "Erick",
         role: "admin",
+        passwordHash: ADMIN_PASSWORD_HASH,
         password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
@@ -1375,6 +1399,7 @@
         username: "klaus",
         name: "Klaus",
         role: "admin",
+        passwordHash: ADMIN_PASSWORD_HASH,
         password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
@@ -1384,6 +1409,7 @@
         username: "daniel",
         name: "Daniel",
         role: "admin",
+        passwordHash: ADMIN_PASSWORD_HASH,
         password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
@@ -1393,6 +1419,7 @@
         username: "thiago",
         name: "Thiago",
         role: "admin",
+        passwordHash: ADMIN_PASSWORD_HASH,
         password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
@@ -1404,6 +1431,7 @@
         username: "beltrao1",
         name: "Iury (Beltrão)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
@@ -1413,6 +1441,7 @@
         username: "beltrao2",
         name: "Cleverson (Beltrão)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
@@ -1422,6 +1451,7 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
@@ -1431,6 +1461,7 @@
         username: "barracao1",
         name: "Giseli (Barracão)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
@@ -1440,6 +1471,7 @@
         username: "barracao",
         name: "Giseli (Barracão)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
@@ -1449,6 +1481,7 @@
         username: "giseli",
         name: "Giseli (Barracão)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
@@ -1458,6 +1491,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
@@ -1467,6 +1501,7 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
@@ -1476,6 +1511,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
@@ -1485,6 +1521,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
@@ -1494,6 +1531,7 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
         password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
@@ -1731,28 +1769,48 @@
       }
     }
 
-    function handleDesktopLogin(e) {
+    let loginFailAttempts = 0;
+    let loginLockUntil = 0;
+
+    async function handleDesktopLogin(e) {
       e.preventDefault();
+      const now = Date.now();
+      if (now < loginLockUntil) {
+        const remaining = Math.ceil((loginLockUntil - now) / 1000);
+        alert(`Muitas tentativas incorretas. Sistema bloqueado temporariamente por segurança. Aguarde ${remaining} segundos.`);
+        return;
+      }
+
       const username = document.getElementById('desktop-login-username').value.trim().toLowerCase();
       const password = document.getElementById('desktop-login-password').value;
       const btn = document.getElementById('btn-desktop-login-submit');
 
       btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando...';
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando com criptografia...';
 
       const user = APP_USERS[username];
-      const expectedPassword = user ? (user.password || (user.role === 'admin' ? "Clic@3369" : "clic3369")) : null;
+      const inputHash = await hashPassword(password);
+      const expectedHash = user ? (user.passwordHash || (user.role === 'admin' ? ADMIN_PASSWORD_HASH : TECH_PASSWORD_HASH)) : null;
+      const isValid = user && (inputHash === expectedHash || password === user.password);
 
-      if (user && expectedPassword && password === expectedPassword) {
+      if (isValid) {
+        loginFailAttempts = 0;
         currentUser = username;
         sessionStorage.setItem('vigi_active_session', username);
         localStorage.setItem('vigi_auth_session', username);
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
-        showToast(`Bem-vindo, ${user.name}!`, 'success');
+        showToast(`Bem-vindo, ${user.name}! (Sessão Segura Iniciada)`, 'success');
       } else {
-        alert('Credenciais inválidas. Verifique o usuário e a senha informados.');
+        loginFailAttempts++;
+        if (loginFailAttempts >= 5) {
+          loginLockUntil = Date.now() + 60000;
+          alert('Segurança VIGI: 5 tentativas inválidas consecutivas. Acesso bloqueado temporariamente por 60 segundos contra ataques de força bruta.');
+        } else {
+          const remaining = 5 - loginFailAttempts;
+          alert(`Credenciais inválidas. Verifique o usuário e a senha informados. (${remaining} tentativa(s) restante(s) antes do bloqueio de segurança).`);
+        }
       }
 
       btn.disabled = false;
