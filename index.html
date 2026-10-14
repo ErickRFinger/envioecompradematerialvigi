@@ -447,7 +447,7 @@
         </button>
 
         <!-- Botão Pedir Compra -->
-        <button onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/25 transition-all transform active:scale-95 cursor-pointer">
+        <button id="btn-header-new-compra" onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/25 transition-all transform active:scale-95 cursor-pointer">
           <i class="fa-solid fa-bag-shopping text-sm"></i>
           <span class="hidden sm:inline">Repor Estoque</span>
         </button>
@@ -815,50 +815,153 @@
 
     <!-- VIEW 2: COMPRAS & ESTOQUE CENTRAL DA MATRIZ -->
     <div id="view-compras" class="space-y-4" style="display: none;">
+      
+      <!-- HEADER DO MÓDULO DE COMPRAS -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
         <div>
           <h2 class="text-sm font-extrabold text-white flex items-center gap-2">
-            <span>Suprimentos & Aquisições para Reposição de Estoque</span>
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Suprimentos & Aquisições de Materiais</span>
             <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              Almoxarifado Central
+              Almoxarifado Central & Reposição
             </span>
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">
-            Controle de itens em falta ou com estoque baixo para compras junto aos fornecedores e distribuidoras.
+          <p class="text-xs text-slate-400 mt-0.5 flex items-center gap-2 flex-wrap">
+            <span>Controle de faltas, cotações junto a fornecedores e recebimento de insumos no estoque.</span>
+            <span class="text-[11px] font-semibold text-emerald-400/90 bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+              <i class="fa-solid fa-lock-open text-[10px] mr-1"></i> Acesso Restrito: Adilson (Palotina) & Administradores
+            </span>
           </p>
         </div>
-        <button onclick="openNewCompraModal()" class="self-start sm:self-auto flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all transform active:scale-95 cursor-pointer">
-          <i class="fa-solid fa-plus-circle text-sm"></i>
-          <span>Nova Solicitação de Compra</span>
-        </button>
+        <div class="flex items-center gap-2">
+          <button onclick="exportComprasToCSV()" title="Exportar pedidos de compra para Excel / CSV" class="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/10 bg-slate-900/80 hover:bg-emerald-500/15 text-slate-400 hover:text-emerald-300 font-bold text-xs transition cursor-pointer">
+            <i class="fa-solid fa-file-excel text-emerald-400"></i>
+            <span class="hidden md:inline">Exportar Planilha</span>
+          </button>
+          <button onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all transform active:scale-95 cursor-pointer">
+            <i class="fa-solid fa-plus-circle text-sm"></i>
+            <span>Nova Solicitação de Compra</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- LINHA 1 DE KPIS: STATUS METRIC CARDS DE COMPRAS (ALINHADO A ENVIOS) -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div class="glass-surface p-3.5 rounded-2xl flex items-center justify-between border border-white/10 hover:border-emerald-500/40 transition shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-slate-800 text-slate-300 flex items-center justify-center text-sm font-black border border-white/10 shrink-0">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Total Ativo</span>
+              <span class="text-xs font-semibold text-slate-300">Requisições</span>
+            </div>
+          </div>
+          <span id="stat-compra-total" class="font-mono font-black text-white text-xl">0</span>
+        </div>
+
+        <div class="glass-surface p-3.5 rounded-2xl flex items-center justify-between border border-amber-500/20 hover:border-amber-500/40 transition shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-sm font-black border border-amber-500/30 shrink-0">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-amber-400 tracking-wider block">1. Aberto</span>
+              <span class="text-xs font-semibold text-slate-300">Aguardando Cotação</span>
+            </div>
+          </div>
+          <span id="stat-compra-solicitado" class="font-mono font-black text-amber-400 text-xl">0</span>
+        </div>
+
+        <div class="glass-surface p-3.5 rounded-2xl flex items-center justify-between border border-blue-500/20 hover:border-blue-500/40 transition shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-sm font-black border border-blue-500/30 shrink-0">
+              <i class="fa-solid fa-cart-shopping"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-blue-400 tracking-wider block">2. Comprado</span>
+              <span class="text-xs font-semibold text-slate-300">Em Trânsito p/ Matriz</span>
+            </div>
+          </div>
+          <span id="stat-compra-comprado" class="font-mono font-black text-blue-400 text-xl">0</span>
+        </div>
+
+        <div class="glass-surface p-3.5 rounded-2xl flex items-center justify-between border border-emerald-500/20 hover:border-emerald-500/40 transition shadow-md">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-sm font-black border border-emerald-500/30 shrink-0">
+              <i class="fa-solid fa-boxes-stacked"></i>
+            </div>
+            <div>
+              <span class="text-[10px] uppercase font-bold text-emerald-400 tracking-wider block">3. Recebido</span>
+              <span class="text-xs font-semibold text-slate-300">No Estoque Matriz</span>
+            </div>
+          </div>
+          <span id="stat-compra-emestoque" class="font-mono font-black text-emerald-400 text-xl">0</span>
+        </div>
+      </div>
+
+      <!-- GUIA VISUAL DE ESTEIRA DE COMPRAS (3 FASES CLARAS) -->
+      <div class="glass-surface rounded-2xl p-3 border border-white/10 bg-slate-950/60 flex items-center justify-between text-xs overflow-x-auto gap-3">
+        <div class="flex items-center gap-2.5 shrink-0">
+          <span class="w-6 h-6 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-black text-xs border border-amber-500/30">1</span>
+          <div>
+            <span class="font-extrabold text-white block text-xs">1. Aberto / Necessidade</span>
+            <span class="text-[10px] text-slate-400">Apontamento de falta pela filial/matriz</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-arrow-right text-slate-600 text-xs shrink-0"></i>
+        <div class="flex items-center gap-2.5 shrink-0">
+          <span class="w-6 h-6 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center font-black text-xs border border-blue-500/30">2</span>
+          <div>
+            <span class="font-extrabold text-white block text-xs">2. Comprado / Transporte</span>
+            <span class="text-[10px] text-slate-400">Faturado junto ao distribuidor parceiro</span>
+          </div>
+        </div>
+        <i class="fa-solid fa-arrow-right text-slate-600 text-xs shrink-0"></i>
+        <div class="flex items-center gap-2.5 shrink-0">
+          <span class="w-6 h-6 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-xs border border-emerald-500/30">3</span>
+          <div>
+            <span class="font-extrabold text-white block text-xs">3. Disponível no Estoque</span>
+            <span class="text-[10px] text-slate-400">Conferido e armazenado no galpão</span>
+          </div>
+        </div>
       </div>
 
       <!-- KANBAN DE COMPRAS (3 COLUNAS) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         
         <!-- COL 1: SOLICITADO -->
-        <div class="glass-surface rounded-3xl p-4 space-y-3 border-amber-500/20">
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-amber-500/25">
           <div class="flex items-center justify-between pb-2 border-b border-white/5">
-            <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-300">1. Aberto / Necessário</h3>
-            <span id="col-count-solicitado" class="font-mono text-xs font-black bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full">0</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-amber-300">1. Aberto / Necessário</h3>
+            </div>
+            <span id="col-count-solicitado" class="font-mono text-xs font-black bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/30">0</span>
           </div>
           <div id="cards-compra-solicitado" class="space-y-3 min-h-[450px]"></div>
         </div>
 
         <!-- COL 2: COMPRADO -->
-        <div class="glass-surface rounded-3xl p-4 space-y-3 border-blue-500/20">
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-blue-500/25">
           <div class="flex items-center justify-between pb-2 border-b border-white/5">
-            <h3 class="font-extrabold text-xs uppercase tracking-wider text-blue-300">2. Comprado / Em Trânsito</h3>
-            <span id="col-count-comprado" class="font-mono text-xs font-black bg-blue-500/20 text-blue-400 px-2.5 py-0.5 rounded-full">0</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-blue-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-blue-300">2. Comprado / Trânsito</h3>
+            </div>
+            <span id="col-count-comprado" class="font-mono text-xs font-black bg-blue-500/20 text-blue-400 px-2.5 py-0.5 rounded-full border border-blue-500/30">0</span>
           </div>
           <div id="cards-compra-comprado" class="space-y-3 min-h-[450px]"></div>
         </div>
 
         <!-- COL 3: EM ESTOQUE -->
-        <div class="glass-surface rounded-3xl p-4 space-y-3 border-emerald-500/20">
+        <div class="glass-surface rounded-3xl p-4 space-y-3 border-emerald-500/25">
           <div class="flex items-center justify-between pb-2 border-b border-white/5">
-            <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-300">3. Recebido / Em Estoque</h3>
-            <span id="col-count-emestoque" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full">0</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+              <h3 class="font-extrabold text-xs uppercase tracking-wider text-emerald-300">3. Recebido no Estoque</h3>
+            </div>
+            <span id="col-count-emestoque" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full border border-emerald-500/30">0</span>
           </div>
           <div id="cards-compra-emestoque" class="space-y-3 min-h-[450px]"></div>
         </div>
@@ -1115,8 +1218,8 @@
             <i class="fa-solid fa-cart-shopping"></i>
           </div>
           <div>
-            <h2 class="text-base font-extrabold text-white">Solicitar Compra para Matriz</h2>
-            <p class="text-xs text-slate-400">Reposição de itens no Almoxarifado Central</p>
+            <h2 class="text-base font-extrabold text-white">Solicitar Compra de Materiais</h2>
+            <p class="text-xs text-slate-400">Reposição de itens no Almoxarifado Central & Filiais</p>
           </div>
         </div>
         <button onclick="closeNewCompraModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center cursor-pointer">
@@ -1127,44 +1230,53 @@
       <div class="p-6 space-y-3.5 text-xs">
         <div>
           <label class="block font-semibold text-slate-300 mb-1">Item / Descrição do Material *</label>
-          <input type="text" id="compra-item" list="compra-materiais-datalist" placeholder="Ex: Conector RJ45 blindado, Câmera UNV Color Hunter..." 
+          <input type="text" id="compra-item" list="compra-materiais-datalist" placeholder="Ex: Conector RJ45 blindado, Câmera Bullet UNV, Cabo de Rede..." 
                  class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
           <datalist id="compra-materiais-datalist"></datalist>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Quantidade Necessária *</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="font-semibold text-slate-300">Quantidade *</label>
+              <div class="flex items-center gap-1">
+                <button type="button" onclick="setCompraQtd(5)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+5</button>
+                <button type="button" onclick="setCompraQtd(10)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+10</button>
+                <button type="button" onclick="setCompraQtd(25)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+25</button>
+                <button type="button" onclick="setCompraQtd(50)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+50</button>
+              </div>
+            </div>
             <input type="number" id="compra-qtd" min="1" value="10" 
-                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-mono">
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-mono font-bold">
           </div>
           <div>
-            <label class="block font-semibold text-slate-300 mb-1">Urgência</label>
-            <select id="compra-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+            <label class="block font-semibold text-slate-300 mb-1">Nível de Urgência</label>
+            <select id="compra-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-medium">
               <option value="Normal">🟢 Normal (Estoque de segurança)</option>
-              <option value="Alta">🟡 Alta (Ruptura em menos de 5 dias)</option>
+              <option value="Alta">🟡 Alta (Ruptura iminente)</option>
               <option value="Urgente">🔴 Urgente (Estoque zerado)</option>
             </select>
           </div>
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Solicitante</label>
-          <input type="text" id="compra-solicitante" value="Roberto (Estoque Matriz)" 
+          <label class="block font-semibold text-slate-300 mb-1">Solicitante Responsável</label>
+          <input type="text" id="compra-solicitante" value="" placeholder="Nome e filial do solicitante..."
                  class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
         </div>
 
         <div>
-          <label class="block font-semibold text-slate-300 mb-1">Justificativa / Fornecedor Sugerido</label>
-          <textarea id="compra-obs" rows="3" placeholder="Ex: Demanda alta de câmeras em Beltrão e Palotina..." 
+          <label class="block font-semibold text-slate-300 mb-1">Justificativa / Observações (Opcional)</label>
+          <textarea id="compra-obs" rows="3" placeholder="Ex: Material necessário para atendimento emergencial de clientes na região..." 
                     class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
         </div>
       </div>
 
       <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
         <button onclick="closeNewCompraModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Cancelar</button>
-        <button onclick="submitNewCompra()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-emerald-600/30 cursor-pointer">
-          Lançar Requisição
+        <button onclick="submitNewCompra()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer active:scale-95 transition">
+          <i class="fa-solid fa-paper-plane text-xs"></i>
+          <span>Registrar Compra</span>
         </button>
       </div>
 
@@ -1463,49 +1575,16 @@
     let storedCompras = null;
     try {
       storedCompras = JSON.parse(localStorage.getItem('vigi_pedidos_compra_v2'));
-    } catch (e) {}
-    let pedidosCompra = (Array.isArray(storedCompras) && storedCompras.length > 0) ? storedCompras : [
-      {
-        id: "COM-201",
-        item: "Conector RJ45 Blindado Cat6",
-        qtd: 500,
-        solicitante: "Roberto (Almoxarifado Matriz)",
-        urgencia: "Alta",
-        data: "08/10/2026 08:30",
-        obs: "Consumo elevado em Beltrão e Palotina. Restam poucas unidades na matriz.",
-        status: "solicitado"
-      },
-      {
-        id: "COM-202",
-        item: "Câmera Bullet Hikvision ColorVu IP",
-        qtd: 25,
-        solicitante: "Roberto (Almoxarifado Matriz)",
-        urgencia: "Normal",
-        data: "07/10/2026 14:00",
-        obs: "Pedido faturado na distribuidora parceira.",
-        status: "comprado"
-      },
-      {
-        id: "COM-203",
-        item: "Bobina de Cabo de Fibra Drop 1KM",
-        qtd: 10,
-        solicitante: "Diretoria Suprimentos",
-        urgencia: "Normal",
-        data: "05/10/2026 11:20",
-        obs: "Concluído e armazenado no galpão.",
-        status: "emestoque"
-      },
-      {
-        id: "COM-204",
-        item: "Fonte Chaveada 12V 5A",
-        qtd: 80,
-        solicitante: "Thiago Graxaim",
-        urgencia: "Alta",
-        data: "09/10/2026 10:15",
-        obs: "Reposição emergencial para kits de CFTV.",
-        status: "solicitado"
+      // Purga dados fictícios de demonstração antigos (COM-201 a COM-204 / Roberto)
+      if (Array.isArray(storedCompras)) {
+        storedCompras = storedCompras.filter(c => c && c.id && !c.id.startsWith('COM-20') && !String(c.solicitante).includes('Roberto') && !String(c.solicitante).includes('Diretoria'));
+        localStorage.setItem('vigi_pedidos_compra_v2', JSON.stringify(storedCompras));
       }
-    ];
+    } catch (e) {
+      storedCompras = [];
+    }
+    // Inicia vazio por padrão (nenhuma solicitação anterior foi compras, foram todas de envio)
+    let pedidosCompra = Array.isArray(storedCompras) ? storedCompras : [];
 
     let currentCart = {};
     let activeBranchFilter = 'todas';
@@ -1516,6 +1595,13 @@
     function isAdmin() {
       const u = APP_USERS[currentUser];
       return u && u.role === 'admin';
+    }
+
+    // RBAC COMPRAS: Somente o Adilson (palotina1) das regiões e todos os administradores têm acesso
+    function canAccessCompras() {
+      if (!currentUser || !APP_USERS[currentUser]) return false;
+      const u = APP_USERS[currentUser];
+      return u.role === 'admin' || u.username === 'palotina1';
     }
 
     function saveState() {
@@ -1727,6 +1813,25 @@
 
       if (reqSolicitanteInput && !reqSolicitanteInput.value) {
         reqSolicitanteInput.value = u.name;
+      }
+
+      // Controle de visibilidade do módulo de Compras:
+      // "a parte do compras, somente o Adilson das regioes tera acesso, e todos os admins"
+      const comprasTabBtn = document.getElementById('tab-btn-compras');
+      const btnHeaderCompra = document.getElementById('btn-header-new-compra');
+      const hasComprasAccess = canAccessCompras();
+
+      if (comprasTabBtn) {
+        comprasTabBtn.style.display = hasComprasAccess ? 'flex' : 'none';
+      }
+      if (btnHeaderCompra) {
+        btnHeaderCompra.style.display = hasComprasAccess ? 'flex' : 'none';
+      }
+
+      // Se o usuário atual não tiver acesso a compras mas estiver na view de compras, redireciona para envios
+      const viewCompras = document.getElementById('view-compras');
+      if (!hasComprasAccess && viewCompras && viewCompras.style.display !== 'none' && !viewCompras.classList.contains('hidden')) {
+        switchMainTab('envios');
       }
 
       renderAll();
@@ -1979,6 +2084,11 @@
 
     // 9. TABS PRINCIPAIS
     function switchMainTab(tab) {
+      if (tab === 'compras' && !canAccessCompras()) {
+        showToast('Acesso Restrito: Apenas Administradores e Adilson (Palotina) têm permissão para acessar o módulo de compras.', 'warning');
+        return;
+      }
+
       const btnEnvios = document.getElementById('tab-btn-envios');
       const btnCompras = document.getElementById('tab-btn-compras');
       const viewEnvios = document.getElementById('view-envios');
@@ -2165,6 +2275,17 @@
       setEl('fcount-barracao', bCounts.barracao);
       setEl('fcount-pato', bCounts.pato);
       setEl('fcount-smo', bCounts.smo);
+
+      // Atualiza KPIs do Módulo de Compras
+      const comprasSolicitado = pedidosCompra.filter(c => c.status === 'solicitado').length;
+      const comprasComprado = pedidosCompra.filter(c => c.status === 'comprado').length;
+      const comprasEmEstoque = pedidosCompra.filter(c => c.status === 'emestoque').length;
+      const comprasAtivo = comprasSolicitado + comprasComprado;
+
+      setEl('stat-compra-total', comprasAtivo);
+      setEl('stat-compra-solicitado', comprasSolicitado);
+      setEl('stat-compra-comprado', comprasComprado);
+      setEl('stat-compra-emestoque', comprasEmEstoque);
     }
 
     function getFilialBadge(filial) {
@@ -2632,7 +2753,7 @@
       });
 
       const counts = { solicitado: 0, comprado: 0, emestoque: 0 };
-      const adminPerm = isAdmin();
+      const canManage = canAccessCompras();
       const searchTerm = (document.getElementById('filter-search')?.value || '').toLowerCase().trim();
 
       const filteredCompras = pedidosCompra.filter(compra => {
@@ -2655,54 +2776,140 @@
         const prevCol = colIndex > 0 ? COMPRAS_COLUNAS[colIndex - 1] : null;
         const nextCol = colIndex < COMPRAS_COLUNAS.length - 1 ? COMPRAS_COLUNAS[colIndex + 1] : null;
 
-        const card = document.createElement('div');
-        card.className = "glass-surface-card rounded-2xl p-4 space-y-3 hover:border-emerald-500/40 transition";
-        card.innerHTML = `
-          <div class="flex items-start justify-between">
-            <span class="font-mono text-xs font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg">${compra.id}</span>
-            ${getUrgenciaBadge(compra.urgencia)}
-          </div>
+        // Mini Pipeline Stepper (3 Fases)
+        let pipelineStepsHtml = '<div class="flex items-center gap-1.5 w-full py-1">';
+        for (let i = 0; i < 3; i++) {
+          const isDone = i <= colIndex;
+          const isCurrent = i === colIndex;
+          pipelineStepsHtml += `
+            <div class="flex-1 h-1.5 rounded-full transition-all duration-300 ${
+              isCurrent 
+                ? 'bg-gradient-to-r from-emerald-500 to-teal-400 shadow-glow-emerald' 
+                : isDone ? 'bg-emerald-500/80' : 'bg-slate-800'
+            }"></div>
+          `;
+        }
+        pipelineStepsHtml += '</div>';
 
-          <div>
-            <h4 class="font-extrabold text-white text-sm leading-snug">${compra.item}</h4>
-            <div class="text-xs text-orange-300 font-semibold mt-1 flex items-center gap-1.5">
-              <span>Qtd Necessária:</span>
-              <span class="font-mono text-base font-black text-white bg-slate-900 px-2 py-0.5 rounded-lg border border-white/5">${compra.qtd} un</span>
-            </div>
-          </div>
-
-          <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 text-[11px] text-slate-300 space-y-1">
-            <p class="text-slate-300 leading-relaxed"><i class="fa-solid fa-quote-left text-emerald-500/50 mr-1.5"></i>${compra.obs || 'Reposição de estoque para matriz e filiais'}</p>
-            <div class="pt-1.5 border-t border-white/5 flex justify-between text-slate-400 text-[10px]">
-              <span class="flex items-center gap-1"><i class="fa-regular fa-user text-slate-500"></i> ${compra.solicitante}</span>
-              <span class="font-mono text-slate-500">${compra.data}</span>
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between pt-1">
-            ${adminPerm ? `
-              <button onclick="deleteCompra('${compra.id}')" title="Excluir requisição de compra" class="text-slate-500 hover:text-rose-400 text-xs p-1 transition cursor-pointer">
-                <i class="fa-solid fa-trash-can"></i>
+        // Botão de Ação Principal em Destaque (1 Clique direto na esteira de compras)
+        let primaryActionBtnHtml = '';
+        if (canManage) {
+          if (compra.status === 'solicitado') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoCompra('${compra.id}', 'comprado')" 
+                      title="Clique para marcar como comprado / faturado pelo fornecedor"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-blue-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-cart-shopping text-[11px]"></i>
+                <span>1. MARCAR COMO COMPRADO ➔</span>
               </button>
-              <div class="flex items-center gap-1.5 ml-auto">
-                ${prevCol ? `
-                  <button onclick="movePedidoCompra('${compra.id}', '${prevCol.id}')" title="Voltar para ${prevCol.nome}" class="px-2.5 py-1 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-300 text-xs font-semibold transition cursor-pointer flex items-center gap-1">
-                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Voltar
-                  </button>
-                ` : ''}
-                ${nextCol ? `
-                  <button onclick="movePedidoCompra('${compra.id}', '${nextCol.id}')" title="Avançar para ${nextCol.nome}" class="px-3.5 py-1 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/30 transition cursor-pointer flex items-center gap-1">
-                    Avançar <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                  </button>
-                ` : '<span class="text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-circle-check mr-1"></i> No Estoque</span>'}
+            `;
+          } else if (compra.status === 'comprado') {
+            primaryActionBtnHtml = `
+              <button onclick="event.stopPropagation(); movePedidoCompra('${compra.id}', 'emestoque')" 
+                      title="Clique para confirmar a entrega no galpão e entrada no estoque central"
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/40 transition active:scale-95 cursor-pointer">
+                <i class="fa-solid fa-boxes-stacked text-[11px]"></i>
+                <span>2. CONFIRMAR NO ESTOQUE MATRIZ ✓</span>
+              </button>
+            `;
+          } else {
+            primaryActionBtnHtml = `
+              <div class="w-full py-2 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <span>✓ Material Disponível no Estoque</span>
               </div>
-            ` : `
-              <div class="ml-auto">
-                ${compra.status === 'emestoque' ? '<span class="text-emerald-400 text-xs font-bold bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-circle-check mr-1"></i> No Estoque</span>' : 
-                  compra.status === 'comprado' ? '<span class="text-blue-400 text-xs font-semibold bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-truck mr-1"></i> Em Trânsito</span>' :
-                  '<span class="text-amber-400 text-xs font-semibold bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-clock mr-1"></i> Solicitado à Matriz</span>'}
+            `;
+          }
+        } else {
+          primaryActionBtnHtml = `
+            <div class="w-full py-2 px-3 rounded-xl bg-slate-900 border border-white/5 text-slate-400 text-xs font-semibold flex items-center justify-center gap-2">
+              <i class="fa-solid fa-lock text-[10px]"></i>
+              <span>Somente Administradores e Adilson</span>
+            </div>
+          `;
+        }
+
+        const deleteBtnHtml = canManage ? `
+          <button onclick="event.stopPropagation(); deleteCompra('${compra.id}')" title="Excluir requisição de compra" 
+                  class="w-7 h-7 rounded-xl bg-slate-900 border border-white/10 hover:border-rose-500/40 text-slate-500 hover:text-rose-400 flex items-center justify-center text-[10px] transition cursor-pointer">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        ` : '';
+
+        const voltarBtnHtml = (canManage && prevCol) ? `
+          <button onclick="event.stopPropagation(); movePedidoCompra('${compra.id}', '${prevCol.id}')" 
+                  title="Voltar etapa para: ${prevCol.nome}" 
+                  class="px-2.5 py-1.5 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-800 text-slate-400 hover:text-white text-[11px] font-semibold flex items-center gap-1 transition cursor-pointer">
+            <i class="fa-solid fa-chevron-left text-[10px]"></i>
+            <span class="text-[10px]">Voltar</span>
+          </button>
+        ` : '';
+
+        const zapBtnHtml = `
+          <button onclick="event.stopPropagation(); sendCompraToWhatsApp('${compra.id}')" 
+                  title="Copiar resumo para o WhatsApp" 
+                  class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1 bg-emerald-500/15 hover:bg-emerald-500/30 px-2.5 py-1.5 rounded-xl border border-emerald-500/30 transition cursor-pointer">
+            <i class="fa-brands fa-whatsapp text-sm"></i> Zap
+          </button>
+        `;
+
+        const isUrg = compra.urgencia === 'Urgente' || compra.urgencia === 'Alta';
+
+        const card = document.createElement('div');
+        card.className = `glass-surface-card rounded-2xl p-4 space-y-3 relative group transition hover:border-emerald-500/40 ${isUrg ? 'border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-slate-900/40 to-slate-950/80 shadow-glow-amber ring-1 ring-amber-500/30' : ''}`;
+        card.innerHTML = `
+          <!-- Card Header & Badges -->
+          <div class="flex items-start justify-between gap-1">
+            <div class="space-y-1">
+              <span class="font-mono text-xs font-black text-emerald-400 bg-emerald-500/15 px-2.5 py-0.5 rounded-lg border border-emerald-500/30">${compra.id}</span>
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-white/5 flex items-center gap-1 inline-flex">
+                  <i class="fa-solid fa-warehouse text-emerald-400 text-[10px]"></i> Almoxarifado Central
+                </span>
               </div>
-            `}
+            </div>
+            <div>${getUrgenciaBadge(compra.urgencia)}</div>
+          </div>
+
+          <!-- Mini Pipeline Stepper -->
+          ${pipelineStepsHtml}
+
+          <!-- Solicitante & Data -->
+          <div class="text-[11px] text-slate-400 flex items-center justify-between border-b border-white/5 pb-2">
+            <span class="truncate flex items-center gap-1.5 font-medium text-slate-300">
+              <i class="fa-regular fa-user text-emerald-400 text-xs"></i> 
+              <span class="truncate">${compra.solicitante}</span>
+            </span>
+            <span class="font-mono text-[10px] text-slate-500 shrink-0">${compra.data.split(' ')[0]}</span>
+          </div>
+
+          <!-- Material & Quantidade -->
+          <div class="bg-slate-950/80 p-3 rounded-xl border border-white/5 space-y-2">
+            <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex justify-between items-center">
+              <span>Item Requisitado</span>
+              <span class="text-emerald-300 font-mono font-bold bg-emerald-500/15 px-2 py-0.5 rounded-md text-[11px] border border-emerald-500/20">${compra.qtd} un</span>
+            </div>
+            <h4 class="font-extrabold text-white text-sm leading-snug">${compra.item}</h4>
+            ${compra.obs ? `
+              <p class="text-slate-300 text-[11px] leading-relaxed pt-1.5 border-t border-white/5">
+                <i class="fa-solid fa-quote-left text-emerald-500/50 mr-1"></i>${compra.obs}
+              </p>
+            ` : ''}
+          </div>
+
+          <!-- Botão Principal de Ação em 1 Clique (Ultra Simples e Destacado) -->
+          ${primaryActionBtnHtml}
+
+          <!-- Barra Secundária de Ferramentas (Zap, Voltar e Excluir) -->
+          <div class="flex items-center justify-between pt-1 gap-1 border-t border-white/5">
+            <div class="flex items-center gap-1.5">
+              ${zapBtnHtml}
+            </div>
+
+            <div class="flex items-center gap-1 ml-auto">
+              ${voltarBtnHtml}
+              ${deleteBtnHtml}
+            </div>
           </div>
         `;
         colContainer.appendChild(card);
@@ -2714,8 +2921,9 @@
         if (colContainer && colContainer.children.length === 0) {
           colContainer.innerHTML = `
             <div class="h-44 flex flex-col items-center justify-center text-slate-500 border border-dashed border-white/10 rounded-2xl p-4 text-center">
-              <i class="fa-solid fa-box-open text-2xl mb-2 opacity-30 text-slate-400"></i>
-              <span class="text-xs font-medium">Nenhum item nesta etapa</span>
+              <i class="fa-solid fa-box-open text-2xl mb-2 opacity-30 text-emerald-400"></i>
+              <span class="text-xs font-semibold text-slate-400">Nenhuma requisição nesta etapa</span>
+              <span class="text-[10px] text-slate-500 mt-0.5">Itens adicionados aparecem aqui</span>
             </div>
           `;
         }
@@ -2792,23 +3000,32 @@
     }
 
     function movePedidoCompra(id, newStatus) {
-      if (!isAdmin()) return;
+      if (!canAccessCompras()) {
+        showToast('Acesso negado: Somente administradores e Adilson podem gerenciar compras.', 'warning');
+        return;
+      }
       const compra = pedidosCompra.find(c => c.id === id);
       if (compra) {
         compra.status = newStatus;
         saveState();
         renderAll();
-        showToast(`Compra ${id} atualizada!`, 'success');
+        const label = newStatus === 'comprado' ? 'Comprado / Em Trânsito' : newStatus === 'emestoque' ? 'Disponível no Estoque Matriz' : 'Solicitado / Cotação';
+        showToast(`Compra ${id} atualizada para: ${label}!`, 'success');
       }
     }
 
     function deleteCompra(id) {
-      if (!isAdmin()) return;
-      if (confirm(`Excluir solicitação de compra ${id}?`)) {
+      if (!canAccessCompras()) {
+        showToast('Acesso negado: Somente administradores e Adilson podem excluir compras.', 'warning');
+        return;
+      }
+      const compra = pedidosCompra.find(c => c.id === id);
+      if (!compra) return;
+      if (confirm(`Deseja realmente excluir a requisição de compra ${id} (${compra.item})?\nEsta exclusão é definitiva.`)) {
         pedidosCompra = pedidosCompra.filter(c => c.id !== id);
         saveState();
         renderAll();
-        showToast(`Solicitação ${id} removida.`);
+        showToast(`Solicitação ${id} removida com sucesso.`, 'info');
       }
     }
 
@@ -3096,8 +3313,12 @@
       }
     }
 
-    // Modal Compras
+    // Modal Compras & Ações
     function openNewCompraModal() {
+      if (!canAccessCompras()) {
+        showToast('Acesso Restrito: Apenas Administradores e Adilson (Palotina) têm acesso ao módulo de compras.', 'warning');
+        return;
+      }
       const el = document.getElementById('modal-new-compra');
       if (!el) return;
       el.style.display = 'flex';
@@ -3109,9 +3330,11 @@
           const u = APP_USERS[currentUser];
           solicitanteInput.value = `${u.name} (${u.filial})`;
         } else {
-          solicitanteInput.value = 'Roberto (Almoxarifado Matriz)';
+          solicitanteInput.value = 'Adilson (Palotina)';
         }
       }
+
+      populateCompraDatalist();
 
       setTimeout(() => {
         const itemInput = document.getElementById('compra-item');
@@ -3126,7 +3349,46 @@
       el.classList.add('hidden');
     }
 
+    function setCompraQtd(val) {
+      const input = document.getElementById('compra-qtd');
+      if (input) {
+        const current = parseInt(input.value) || 0;
+        input.value = Math.max(1, current + val);
+      }
+    }
+
+    function populateCompraDatalist() {
+      let datalist = document.getElementById('compra-materiais-list');
+      if (!datalist) {
+        datalist = document.createElement('datalist');
+        datalist.id = 'compra-materiais-list';
+        document.body.appendChild(datalist);
+      }
+      datalist.innerHTML = '';
+      const todosItens = [];
+      if (Array.isArray(CATALOGO_MATERIAIS)) {
+        CATALOGO_MATERIAIS.forEach(cat => {
+          if (Array.isArray(cat.itens)) {
+            cat.itens.forEach(it => todosItens.push(it.nome));
+          }
+        });
+      }
+      Array.from(new Set(todosItens)).sort().forEach(nome => {
+        const opt = document.createElement('option');
+        opt.value = nome;
+        datalist.appendChild(opt);
+      });
+      const input = document.getElementById('compra-item');
+      if (input) {
+        input.setAttribute('list', 'compra-materiais-list');
+      }
+    }
+
     function submitNewCompra() {
+      if (!canAccessCompras()) {
+        showToast('Acesso Restrito: Apenas Administradores e Adilson podem registrar compras.', 'warning');
+        return;
+      }
       const itemInput = document.getElementById('compra-item');
       const item = itemInput ? itemInput.value.trim() : '';
       const qtd = parseInt(document.getElementById('compra-qtd').value) || 1;
@@ -3140,12 +3402,12 @@
         return;
       }
 
-      const newId = `COM-${Math.floor(200 + Math.random() * 800)}`;
+      const newId = `COM-${Math.floor(1000 + Math.random() * 9000)}`;
       const novaCompra = {
         id: newId,
         item: item,
         qtd: qtd,
-        solicitante: solicitante || (currentUser ? APP_USERS[currentUser]?.name : 'Almoxarifado Matriz'),
+        solicitante: solicitante || (currentUser ? `${APP_USERS[currentUser]?.name} (${APP_USERS[currentUser]?.filial})` : 'Adilson (Palotina)'),
         urgencia: urgencia,
         data: new Date().toLocaleString('pt-BR'),
         obs: obs,
@@ -3164,7 +3426,53 @@
       const qtdInput = document.getElementById('compra-qtd');
       if (qtdInput) qtdInput.value = '10';
 
+      renderAll();
       showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
+    }
+
+    function sendCompraToWhatsApp(id) {
+      const c = pedidosCompra.find(x => x.id === id);
+      if (!c) return;
+      const statusLabel = c.status === 'solicitado' ? '🟡 SOLICITADO / COTAÇÃO' : c.status === 'comprado' ? '🔵 COMPRADO / TRÂNSITO' : '🟢 NO ESTOQUE MATRIZ';
+      const text = `📦 *REQUISIÇÃO DE COMPRA - VIGI MATERIAIS*\n` +
+        `🔖 *Código:* ${c.id}\n` +
+        `🛠️ *Material:* ${c.item}\n` +
+        `🔢 *Quantidade:* ${c.qtd} un\n` +
+        `⚡ *Urgência:* ${c.urgencia}\n` +
+        `👤 *Solicitante:* ${c.solicitante}\n` +
+        `📍 *Status Atual:* ${statusLabel}\n` +
+        (c.obs ? `📝 *Observação:* ${c.obs}\n` : '') +
+        `📅 *Data:* ${c.data}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(`Dados da compra ${c.id} copiados! Cole no WhatsApp.`, 'success');
+        }).catch(() => {
+          prompt('Copie o texto para o WhatsApp:', text);
+        });
+      } else {
+        prompt('Copie o texto para o WhatsApp:', text);
+      }
+    }
+
+    function exportComprasToCSV() {
+      if (!pedidosCompra || pedidosCompra.length === 0) {
+        showToast('Não há registros de compra para exportar.', 'info');
+        return;
+      }
+      let csv = 'ID;Material;Quantidade;Solicitante;Urgência;Status;Data;Observação\n';
+      pedidosCompra.forEach(c => {
+        const st = c.status === 'solicitado' ? 'Aberto / Cotação' : c.status === 'comprado' ? 'Comprado / Em Trânsito' : 'No Estoque Matriz';
+        csv += `"${c.id}";"${c.item}";"${c.qtd}";"${c.solicitante}";"${c.urgencia}";"${st}";"${c.data}";"${(c.obs||'').replace(/"/g, '""')}"\n`;
+      });
+      const blob = new Blob(["\ufeff" + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `compras_vigi_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('Planilha de compras exportada com sucesso!', 'success');
     }
 
     // 18. ROMANEIO, CONFERÊNCIA FÍSICA & AJUSTE DE QUANTIDADES
