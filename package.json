@@ -1,7 +1,7 @@
 {
-  "name": "vigi-gestao-materiais",
+  "name": "sistem-envio-vigi",
   "version": "1.0.0",
-  "description": "Sistema de Gestão de Materiais e Logística VIGI",
+  "description": "SISTEM ENVIO VIGI - Sistema de Gestão de Envios e Materiais VIGI",
   "scripts": {
     "deploy": "vercel --prod --yes"
   }
