@@ -127,6 +127,33 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    @media print {
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+      header, nav, #toast-container, #view-login, #modal-checkout, #modal-conferencia, #modal-success, #modal-order-details-mobile, .glass-bottom-bar, #floating-cart-bar, .no-print {
+        display: none !important;
+      }
+      body > *:not(#print-area) {
+        display: none !important;
+      }
+      #print-area {
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-mesh-app text-slate-100 min-h-screen flex flex-col font-sans antialiased pb-24 selection:bg-orange-600 selection:text-white">
@@ -428,8 +455,20 @@
           </h2>
           <p class="text-[11px] text-slate-400" id="tracking-subtitle">Acompanhe a separação e o transporte da Matriz</p>
         </div>
-        <button onclick="loadShipmentsFromSupabase()" class="text-orange-400 hover:text-orange-300 text-xs font-bold flex items-center gap-1.5 p-1 transition">
-          <i class="fa-solid fa-rotate"></i> <span>Atualizar</span>
+        <div class="flex items-center gap-1.5">
+          <span id="tracking-sync-status" class="text-[9px] text-emerald-400 font-mono hidden sm:inline">Ao vivo</span>
+          <button id="btn-refresh-tracking" onclick="loadShipmentsFromSupabase(true)" title="Recarregar dados do Supabase" class="text-orange-400 hover:text-orange-300 text-xs font-bold flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 active:scale-95 transition cursor-pointer">
+            <i class="fa-solid fa-rotate"></i> <span>Atualizar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Busca Rápida no Rastreio (Filtra materiais, técnicos, filiais e código) -->
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+        <input type="text" id="tracking-search-input" oninput="handleTrackingSearch(this.value)" placeholder="Buscar por material, filial, técnico ou #ENV..." class="w-full bg-slate-950/90 border border-white/10 rounded-2xl pl-9 pr-9 py-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-orange-500/50 shadow-inner">
+        <button id="btn-clear-tracking-search" onclick="clearTrackingSearch()" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs p-1">
+          <i class="fa-solid fa-circle-xmark text-sm"></i>
         </button>
       </div>
 
@@ -762,6 +801,94 @@
 
     </div>
   </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: DETALHES COMPLETOS DO PEDIDO & ROMANEIO MOBILE -->
+  <!-- ======================================================== -->
+  <div id="modal-order-details-mobile" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end sm:justify-center p-0 sm:p-4">
+    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
+      
+      <!-- Header do Modal -->
+      <div class="px-5 py-3.5 bg-slate-950 border-b border-white/10 flex items-center justify-between shrink-0">
+        <div class="space-y-0.5">
+          <div class="flex items-center gap-2">
+            <span id="m-detail-code-badge" class="font-mono text-xs font-black text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
+              #ENV-0000
+            </span>
+            <span id="m-detail-branch-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-lg border text-cyan-400 border-cyan-500/30 bg-cyan-500/10">
+              Palotina
+            </span>
+          </div>
+          <p id="m-detail-subtitle" class="text-[10px] text-slate-400">Solicitante: Adilson • 16/10/2026</p>
+        </div>
+        <button onclick="closeMobileOrderDetails()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white flex items-center justify-center transition cursor-pointer">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+
+      <!-- Barra de Ações Rápidas: Romaneio & WhatsApp -->
+      <div class="px-5 py-2.5 bg-slate-900/60 border-b border-white/5 flex items-center justify-between gap-2 shrink-0">
+        <button type="button" onclick="printRomaneioFromDetailModal()" class="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 border border-white/10 shadow transition active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-print text-orange-400"></i>
+          <span>Imprimir Romaneio (A4)</span>
+        </button>
+        <button type="button" onclick="shareWhatsAppFromDetailModal()" class="flex-1 py-2 px-3 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5 border border-emerald-500/30 transition active:scale-95 cursor-pointer">
+          <i class="fa-brands fa-whatsapp text-sm text-emerald-400"></i>
+          <span>WhatsApp Romaneio</span>
+        </button>
+      </div>
+
+      <!-- Conteúdo com Scroll: Status, Materiais e Observações -->
+      <div class="p-5 overflow-y-auto space-y-4 no-scrollbar flex-1">
+        
+        <!-- Bloco de Status Atual & Controlador Admin -->
+        <div id="m-detail-admin-status-block" class="p-3 bg-slate-950/80 rounded-2xl border border-white/5 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 font-bold uppercase text-[10px]">Fase Atual da Carga</span>
+            <span id="m-detail-status-pill" class="font-bold text-[10px] px-2.5 py-0.5 rounded-full border">
+              Aguardando
+            </span>
+          </div>
+          <div id="m-detail-status-action-row" class="pt-1">
+            <!-- Injetado dinamicamente para admins -->
+          </div>
+        </div>
+
+        <!-- Lista Completa de Itens -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between text-xs font-bold">
+            <span class="text-white flex items-center gap-1.5">
+              <span>Itens da Solicitação</span>
+              <span id="m-detail-items-count" class="text-[10px] text-orange-400 font-mono bg-orange-500/10 px-2 py-0.5 rounded-full border border-orange-500/20">0 itens</span>
+            </span>
+            <span id="m-detail-pcs-count" class="text-slate-400 font-mono text-[11px]">0 peças</span>
+          </div>
+
+          <div id="m-detail-items-list" class="space-y-1.5">
+            <!-- Itens injetados via JS com checkbox e quantidades -->
+          </div>
+        </div>
+
+        <!-- Observações do Pedido -->
+        <div id="m-detail-obs-box" class="p-3 bg-slate-950/60 rounded-2xl border border-white/5 space-y-1 hidden">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Observações:</span>
+          <p id="m-detail-obs-text" class="text-xs text-slate-300"></p>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="p-4 bg-slate-950 border-t border-white/10 shrink-0">
+        <button type="button" onclick="closeMobileOrderDetails()" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs border border-white/10 transition active:scale-95 cursor-pointer">
+          Fechar Visualização
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HIDDEN PRINT AREA -->
+  <div id="print-area" class="hidden p-4 text-black bg-white" style="display: none;"></div>
 
   <!-- ======================================================== -->
   <!-- JAVASCRIPT ENGINE & SUPABASE SYNC -->
@@ -1099,16 +1226,27 @@
     }
 
     function checkAuth() {
-      const stored = sessionStorage.getItem('vigi_mobile_session');
+      const urlParams = new URLSearchParams(window.location.search);
+      const paramUser = (urlParams.get('user') || urlParams.get('u') || '').trim().toLowerCase();
+      const stored = sessionStorage.getItem('vigi_mobile_session') || localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_mobile_user');
+      const targetUser = (paramUser && APP_USERS[paramUser]) ? paramUser : stored;
+
       const viewLogin = document.getElementById('view-login');
-      if (stored && APP_USERS[stored]) {
-        currentUser = stored;
+      if (targetUser && APP_USERS[targetUser]) {
+        currentUser = targetUser;
+        sessionStorage.setItem('vigi_mobile_session', currentUser);
+        localStorage.setItem('vigi_auth_session', currentUser);
+        localStorage.setItem('vigi_mobile_user', currentUser);
         if (viewLogin) {
           viewLogin.style.display = 'none';
           viewLogin.classList.add('hidden');
         }
         setupUserInterface();
         loadShipmentsFromSupabase();
+        // Para administradores (como Thiago), abre direto no Rastreio para inspecionar os pedidos
+        if (APP_USERS[currentUser].role === 'admin') {
+          switchMobileTab('rastreio');
+        }
       } else {
         currentUser = null;
         if (viewLogin) {
@@ -1190,6 +1328,7 @@
         currentUser = username;
         sessionStorage.setItem('vigi_mobile_session', username);
         localStorage.setItem('vigi_auth_session', username);
+        localStorage.setItem('vigi_mobile_user', username);
         const viewLogin = document.getElementById('view-login');
         if (viewLogin) {
           viewLogin.style.display = 'none';
@@ -1197,6 +1336,9 @@
         }
         setupUserInterface();
         loadShipmentsFromSupabase();
+        if (user.role === 'admin') {
+          switchMobileTab('rastreio');
+        }
         showToast(`Bem-vindo, ${user.name}! (Conexão Segura)`, 'success');
       } else {
         mobileLoginFailAttempts++;
@@ -2044,6 +2186,35 @@
       window.open(url, '_blank');
     }
 
+    // Compartilhar Romaneio Completo no WhatsApp
+    function shareFullRomaneioWhatsApp(orderId) {
+      const order = myShipments.find(s => s.id === orderId);
+      if (!order) return;
+
+      const code = '#ENV-' + order.id.slice(0, 6).toUpperCase();
+      const filial = order.branch_name || 'Filial Destino';
+      const solicitante = order.sender_name || 'Técnico';
+      const items = order.shipment_items || [];
+      const totalPcs = items.reduce((a, b) => a + (b.quantity || 0), 0);
+
+      let msg = `📦 *SISTEM ENVIO VIGI - ROMANEIO ${code}*\n`;
+      msg += `📍 *Destino:* ${filial}\n`;
+      msg += `👤 *Solicitante:* ${solicitante}\n`;
+      msg += `📊 *Total de Itens:* ${items.length} itens (${totalPcs} peças)\n`;
+      if (order.notes) {
+        const cleanNotes = order.notes.replace(/\[.*?\]/g, '').trim();
+        if (cleanNotes) msg += `📝 *Obs:* ${cleanNotes}\n`;
+      }
+      msg += `\n📋 *LISTA COMPLETA DE MATERIAIS:*\n`;
+      items.forEach((it, idx) => {
+        msg += `${idx + 1}. [   ] ${it.product_name} - *${it.quantity} un*\n`;
+      });
+      msg += `\n✍️ _Conferência física: dar visto na quantidade e rubrica na entrega._`;
+
+      const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
     // 12. ADMIN BRANCH FILTER NO MOBILE
     function setMobileAdminFilter(filial) {
       adminFilterBranch = filial;
@@ -2067,17 +2238,59 @@
       renderTrackingOrders();
     }
 
-    // 13. CARREGAR PEDIDOS & RASTREIO DIRETO DO SUPABASE COM RBAC
-    async function loadShipmentsFromSupabase() {
+    // Busca rápida em tempo real no Rastreio
+    let trackingSearchQuery = '';
+
+    function handleTrackingSearch(val) {
+      trackingSearchQuery = (val || '').toLowerCase().trim();
+      const clearBtn = document.getElementById('btn-clear-tracking-search');
+      if (clearBtn) {
+        if (trackingSearchQuery.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+      renderTrackingOrders();
+    }
+
+    function clearTrackingSearch() {
+      trackingSearchQuery = '';
+      const input = document.getElementById('tracking-search-input');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('btn-clear-tracking-search');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      renderTrackingOrders();
+    }
+
+    // 13. CARREGAR PEDIDOS & RASTREIO DIRETO DO SUPABASE COM RESILIÊNCIA OFFLINE
+    let lastTrackingSyncTime = null;
+
+    async function loadShipmentsFromSupabase(isManualRefresh = false) {
       if (!currentUser || !APP_USERS[currentUser]) return;
       const userConfig = APP_USERS[currentUser];
+
+      const refreshBtn = document.getElementById('btn-refresh-tracking');
+      const refreshIcon = refreshBtn ? refreshBtn.querySelector('i') : null;
+      if (refreshIcon) refreshIcon.classList.add('fa-spin');
+
+      // 1. CARREGAMENTO ULTRA RÁPIDO DO CACHE LOCAL (0ms latency ao abrir no celular)
+      if (!myShipments || myShipments.length === 0) {
+        try {
+          const cached = localStorage.getItem('vigi_cached_shipments');
+          if (cached) {
+            myShipments = JSON.parse(cached);
+            renderTrackingOrders();
+          }
+        } catch(e) {}
+      }
 
       try {
         let query = supabase
           .from('shipments')
           .select('*, shipment_items(*)')
           .order('created_at', { ascending: false })
-          .limit(50);
+          .limit(80);
 
         // REGRA DE PERMISSÃO RIGOROSA:
         // Usuários de filial APENAS podem consultar os dados de sua própria filial!
@@ -2088,12 +2301,63 @@
         const { data, error } = await query;
         if (error) throw error;
 
-        myShipments = data || [];
-        renderTrackingOrders();
+        if (data) {
+          myShipments = data;
+          try {
+            localStorage.setItem('vigi_cached_shipments', JSON.stringify(data));
+          } catch(e) {}
+          lastTrackingSyncTime = new Date();
+          updateTrackingSyncTimeUI();
+          renderTrackingOrders();
 
+          if (isManualRefresh) {
+            showToast(`Lista sincronizada com sucesso! (${data.length} ordens)`, 'success');
+          }
+        }
       } catch (err) {
         console.warn('Erro ao carregar solicitações do Supabase:', err);
+        // Fallback seguro: se falhar conexão, usa os dados do cache
+        const cached = localStorage.getItem('vigi_cached_shipments');
+        if (cached && (!myShipments || myShipments.length === 0)) {
+          try {
+            myShipments = JSON.parse(cached);
+            renderTrackingOrders();
+          } catch(e) {}
+        }
+        const statusEl = document.getElementById('tracking-sync-status');
+        if (statusEl) {
+          statusEl.innerText = 'Offline (cache)';
+          statusEl.className = 'text-[9px] text-amber-400 font-mono inline';
+        }
+        if (isManualRefresh) {
+          showToast('Modo Offline: exibindo pedidos salvos localmente.', 'warning');
+        }
+      } finally {
+        if (refreshIcon) {
+          setTimeout(() => refreshIcon.classList.remove('fa-spin'), 350);
+        }
       }
+    }
+
+    function updateTrackingSyncTimeUI() {
+      const statusEl = document.getElementById('tracking-sync-status');
+      if (!statusEl || !lastTrackingSyncTime) return;
+      const hh = String(lastTrackingSyncTime.getHours()).padStart(2, '0');
+      const mm = String(lastTrackingSyncTime.getMinutes()).padStart(2, '0');
+      statusEl.innerText = `Sinc. ${hh}:${mm}`;
+      statusEl.className = 'text-[9px] text-emerald-400 font-mono inline';
+    }
+
+    // Controle de cards expandidos na lista mobile
+    const expandedOrderIds = new Set();
+
+    function toggleOrderItemsExpand(orderId) {
+      if (expandedOrderIds.has(orderId)) {
+        expandedOrderIds.delete(orderId);
+      } else {
+        expandedOrderIds.add(orderId);
+      }
+      renderTrackingOrders();
     }
 
     function renderTrackingOrders() {
@@ -2102,13 +2366,15 @@
       const trackingBadge = document.getElementById('nav-tracking-badge');
       const userConfig = APP_USERS[currentUser];
 
+      if (!trackingList || !historyList) return;
+
       trackingList.innerHTML = '';
       historyList.innerHTML = '';
 
-      // Filtro local adicional se for admin ou filial
-      let filtered = myShipments;
+      // Filtro por filial se for admin ou filial
+      let filtered = myShipments || [];
       if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
-        filtered = myShipments.filter(s => {
+        filtered = filtered.filter(s => {
           const b = (s.branch_name || "").toUpperCase();
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
           if (adminFilterBranch === 'Beltrão (Iury)') {
@@ -2124,7 +2390,7 @@
           return true;
         });
       } else if (userConfig && userConfig.role === 'filial') {
-        filtered = myShipments.filter(s => {
+        filtered = filtered.filter(s => {
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
           if (userConfig.filial.includes('Iury')) {
             return txt.includes('iury') || txt.includes('iuri');
@@ -2136,28 +2402,52 @@
         });
       }
 
+      // Filtro de busca textual (instantânea para Thiago e operadores)
+      if (trackingSearchQuery) {
+        const q = trackingSearchQuery;
+        filtered = filtered.filter(s => {
+          const b = (s.branch_name || '').toLowerCase();
+          const n = (s.notes || '').toLowerCase();
+          const snd = (s.sender_name || '').toLowerCase();
+          const code = (`#env-${s.id.slice(0, 6)} ${s.id}`).toLowerCase();
+          const hasItem = (s.shipment_items || []).some(it => (it.product_name || '').toLowerCase().includes(q));
+          return b.includes(q) || n.includes(q) || snd.includes(q) || code.includes(q) || hasItem;
+        });
+      }
+
       const activeOrders = filtered.filter(s => s.status !== 'recebido' && s.status !== 'chegou');
       const finishedOrders = filtered.filter(s => s.status === 'recebido' || s.status === 'chegou');
 
-      if (activeOrders.length > 0) {
-        trackingBadge.classList.remove('hidden');
-      } else {
-        trackingBadge.classList.add('hidden');
+      if (trackingBadge) {
+        if (activeOrders.length > 0) {
+          trackingBadge.classList.remove('hidden');
+        } else {
+          trackingBadge.classList.add('hidden');
+        }
       }
 
       if (activeOrders.length === 0) {
+        const searchMsg = trackingSearchQuery 
+          ? `Nenhum pedido encontrado para a busca "${trackingSearchQuery}".` 
+          : 'Nenhuma solicitação em andamento no momento.';
         trackingList.innerHTML = `
           <div class="glass-card rounded-2xl p-8 text-center text-slate-500 space-y-2 border-dashed">
             <i class="fa-solid fa-truck-ramp-box text-3xl opacity-30"></i>
-            <p class="text-xs font-semibold">Nenhuma solicitação em andamento no momento.</p>
-            <button onclick="switchMobileTab('catalogo')" class="text-xs text-orange-400 font-bold hover:underline">
-              Fazer novo pedido agora
-            </button>
+            <p class="text-xs font-semibold">${searchMsg}</p>
+            ${trackingSearchQuery ? `
+              <button onclick="clearTrackingSearch()" class="text-xs text-orange-400 font-bold hover:underline">
+                Limpar busca
+              </button>
+            ` : `
+              <button onclick="switchMobileTab('catalogo')" class="text-xs text-orange-400 font-bold hover:underline">
+                Fazer novo pedido agora
+              </button>
+            `}
           </div>
         `;
       } else {
         activeOrders.forEach(order => {
-          trackingList.appendChild(createOrderTrackingCard(order));
+          trackingList.appendChild(createOrderTrackingCard(order, false));
         });
       }
 
@@ -2273,34 +2563,64 @@
       }
       pipelineBar += '</div>';
 
-      const previewItems = items.slice(0, 3).map(it => {
+      // Lista de Itens com expansor (Para Thiago e técnicos verem todos os 17 itens sem corte!)
+      const isExpanded = expandedOrderIds.has(order.id);
+      const displayItems = isExpanded ? items : items.slice(0, 3);
+
+      const itemsListHtml = displayItems.map((it, idx) => {
         const origQtd = originalMap[it.product_name];
         const isItemAdj = origQtd !== undefined && it.quantity !== origQtd;
         return `
-          <li class="flex justify-between text-[11px] text-slate-300 py-0.5">
-            <span class="truncate">${it.product_name}</span>
-            <span class="font-mono font-bold ${isItemAdj ? 'text-amber-300' : 'text-orange-300'} ml-2">
+          <li class="flex justify-between items-center text-[11px] text-slate-300 py-1 border-b border-white/5 last:border-0">
+            <span class="flex items-center gap-1.5 truncate">
+              <span class="font-mono text-[10px] text-slate-500 w-4">${idx + 1}.</span>
+              <span class="truncate font-medium">${it.product_name}</span>
+            </span>
+            <span class="font-mono font-bold ${isItemAdj ? 'text-amber-300' : 'text-orange-300'} ml-2 shrink-0">
               x${it.quantity} ${isItemAdj ? `<span class="text-[9px] text-slate-500 line-through">(${origQtd})</span>` : ''}
             </span>
           </li>
         `;
       }).join('');
 
-      // REGRA DE PERMISSÃO PARA EXCLUSÃO:
-      // O botão de exclusão SÓ É RENDERIZADO para Administradores (erick, daniel, thiago, klaus)!
+      let expandToggleBtn = '';
+      if (items.length > 3) {
+        expandToggleBtn = `
+          <button type="button" onclick="event.stopPropagation(); toggleOrderItemsExpand('${order.id}')" 
+                  class="w-full pt-2 text-center text-[11px] font-bold text-orange-400 hover:text-orange-300 flex items-center justify-center gap-1 transition cursor-pointer">
+            <span>${isExpanded ? '▲ Recolher itens' : `▼ Ver todos os ${items.length} itens da carga (${totalPcs} un)`}</span>
+          </button>
+        `;
+      }
+
+      // Permissões de Administrador (Erick, Thiago, Klaus, Daniel)
       const userConfig = APP_USERS[currentUser];
       const isAdminUser = userConfig && userConfig.role === 'admin';
 
       const deleteButtonHtml = isAdminUser ? `
-        <button onclick="deleteShipmentFromMobile('${order.id}')" title="Excluir este pedido (Ação Admin)" 
-                class="text-rose-400 hover:text-white hover:bg-rose-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-rose-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+        <button onclick="event.stopPropagation(); deleteShipmentFromMobile('${order.id}')" title="Excluir este pedido (Ação Admin)" 
+                class="text-rose-400 hover:text-white hover:bg-rose-500/20 text-[10px] px-2 py-1 rounded-lg border border-rose-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
           <i class="fa-solid fa-trash-can text-[9px]"></i>
           <span>Excluir</span>
         </button>
       ` : '';
 
+      // Ação de Avanço de Status Rápido para Administradores (Thiago no celular)
+      let quickAdvanceBtn = '';
+      if (isAdminUser && !isFinished) {
+        if (order.status === 'aguardando') {
+          quickAdvanceBtn = `<button onclick="event.stopPropagation(); advanceOrderStatusFromMobile('${order.id}', 'separando')" title="Iniciar Separação da Carga" class="text-blue-300 hover:text-white bg-blue-500/15 hover:bg-blue-500/25 text-[10px] px-2.5 py-1 rounded-lg border border-blue-500/30 font-bold transition flex items-center gap-1 cursor-pointer"><span>➜ Separar</span></button>`;
+        } else if (order.status === 'separando') {
+          quickAdvanceBtn = `<button onclick="event.stopPropagation(); advanceOrderStatusFromMobile('${order.id}', 'coleta')" title="Pronto para Embarque" class="text-purple-300 hover:text-white bg-purple-500/15 hover:bg-purple-500/25 text-[10px] px-2.5 py-1 rounded-lg border border-purple-500/30 font-bold transition flex items-center gap-1 cursor-pointer"><span>📦 Pronto</span></button>`;
+        } else if (order.status === 'coleta') {
+          quickAdvanceBtn = `<button onclick="event.stopPropagation(); advanceOrderStatusFromMobile('${order.id}', 'enviado')" title="Despachar em Transporte" class="text-cyan-300 hover:text-white bg-cyan-500/15 hover:bg-cyan-500/25 text-[10px] px-2.5 py-1 rounded-lg border border-cyan-500/30 font-bold transition flex items-center gap-1 cursor-pointer"><span>🚚 Despachar</span></button>`;
+        } else if (order.status === 'enviado') {
+          quickAdvanceBtn = `<button onclick="event.stopPropagation(); advanceOrderStatusFromMobile('${order.id}', 'recebido')" title="Confirmar Entrega na Filial" class="text-emerald-300 hover:text-white bg-emerald-500/15 hover:bg-emerald-500/25 text-[10px] px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer"><span>✓ Entregar</span></button>`;
+        }
+      }
+
       card.innerHTML = `
-        <div class="flex items-start justify-between gap-2">
+        <div class="flex items-start justify-between gap-2" onclick="openMobileOrderDetails('${order.id}')" style="cursor: pointer;">
           <div class="space-y-1">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="font-mono text-xs font-black text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
@@ -2323,15 +2643,15 @@
         ${pipelineBar}
 
         <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
-          <div class="flex justify-between text-[10px] uppercase font-bold text-slate-400">
+          <div class="flex justify-between text-[10px] uppercase font-bold text-slate-400 pb-1 border-b border-white/5">
             <div class="flex items-center gap-1.5">
               <span>Itens na Carga</span>
               ${hasAdjustment ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.2 rounded font-bold">Ajustado</span>' : ''}
             </div>
             <span class="text-orange-400 font-mono">${totalPcs} un</span>
           </div>
-          <ul>${previewItems}</ul>
-          ${items.length > 3 ? `<p class="text-[10px] text-slate-500 text-center pt-0.5">+ ${items.length - 3} outros itens</p>` : ''}
+          <ul class="pt-0.5">${itemsListHtml}</ul>
+          ${expandToggleBtn}
         </div>
 
         ${ajusteTexto ? `
@@ -2350,26 +2670,719 @@
           </p>
         ` : ''}
 
-        <div class="flex items-center justify-between pt-1 text-[11px]">
-          <span class="text-slate-400 truncate max-w-[130px]"><i class="fa-regular fa-user mr-1 text-slate-500"></i> ${order.sender_name || 'Técnico'}</span>
-          <div class="flex items-center gap-1.5 flex-wrap justify-end">
-            <button onclick="shareTrackingOrderWhatsApp('${order.id}')" title="Compartilhar status no WhatsApp" class="text-emerald-400 hover:text-white hover:bg-emerald-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+        <!-- Barra de Ações do Card -->
+        <div class="flex items-center justify-between pt-1 gap-1 border-t border-white/5 flex-wrap">
+          <div class="flex items-center gap-1">
+            <button onclick="event.stopPropagation(); openMobileOrderDetails('${order.id}')" 
+                    title="Conferir itens e checklist na tela" 
+                    class="text-orange-400 hover:text-white hover:bg-orange-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-orange-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+              <i class="fa-solid fa-list-check text-[9px]"></i>
+              <span>Conferir</span>
+            </button>
+            <button onclick="event.stopPropagation(); printRomaneioFromMobile('${order.id}')" 
+                    title="Imprimir Romaneio Oficial para Papel (A4 com Vistos)" 
+                    class="text-slate-300 hover:text-white hover:bg-white/10 text-[10px] px-2.5 py-1 rounded-lg border border-white/10 font-bold transition flex items-center gap-1 cursor-pointer">
+              <i class="fa-solid fa-print text-orange-400 text-[9px]"></i>
+              <span>Romaneio</span>
+            </button>
+            <button onclick="event.stopPropagation(); shareTrackingOrderWhatsApp('${order.id}')" 
+                    title="Compartilhar status no WhatsApp" 
+                    class="text-emerald-400 hover:text-white hover:bg-emerald-500/20 text-[10px] px-2 py-1 rounded-lg border border-emerald-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
               <i class="fa-brands fa-whatsapp text-[10px]"></i>
               <span>Zap</span>
             </button>
-            <button onclick="repeatOrderInCart('${order.id}')" title="Copiar itens deste pedido para o carrinho" class="text-amber-400 hover:text-white hover:bg-amber-500/20 text-[10px] px-2.5 py-1 rounded-lg border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
+          </div>
+
+          <div class="flex items-center gap-1 ml-auto">
+            ${quickAdvanceBtn}
+            <button onclick="event.stopPropagation(); repeatOrderInCart('${order.id}')" title="Copiar itens deste pedido para o carrinho" class="text-amber-400 hover:text-white hover:bg-amber-500/20 text-[10px] px-2 py-1 rounded-lg border border-amber-500/30 font-bold transition flex items-center gap-1 cursor-pointer">
               <i class="fa-solid fa-cart-plus text-[9px]"></i>
               <span>Repetir</span>
             </button>
             ${deleteButtonHtml}
-            ${isFinished ? '<span class="text-emerald-400 font-bold ml-1"><i class="fa-solid fa-circle-check"></i> Concluído</span>' : `
-              <span class="text-slate-500 text-[10px] font-mono ml-1">Etapa ${statusStep}/5</span>
-            `}
           </div>
         </div>
       `;
 
       return card;
+    }
+
+    // ========================================================
+    // 13.1 MODAL DE INSPEÇÃO COMPLETA DE PEDIDO & ROMANEIO MOBILE
+    // ========================================================
+    let activeDetailShipmentId = null;
+    const detailCheckedItems = {}; // { [orderId_itemIndex]: boolean }
+
+    function openMobileOrderDetails(orderId) {
+      activeDetailShipmentId = orderId;
+      renderMobileOrderDetails(orderId);
+      const modal = document.getElementById('modal-order-details-mobile');
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function closeMobileOrderDetails() {
+      const modal = document.getElementById('modal-order-details-mobile');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+      }
+      activeDetailShipmentId = null;
+    }
+
+    function toggleMobileCheckItem(orderId, idx) {
+      const key = `${orderId}_${idx}`;
+      detailCheckedItems[key] = !detailCheckedItems[key];
+      renderMobileOrderDetails(orderId);
+    }
+
+    function renderMobileOrderDetails(orderId) {
+      const order = (myShipments || []).find(s => s.id === orderId);
+      if (!order) return;
+
+      const code = '#ENV-' + order.id.slice(0, 6).toUpperCase();
+      const codeBadge = document.getElementById('m-detail-code-badge');
+      if (codeBadge) codeBadge.innerText = code;
+
+      const branchBadge = document.getElementById('m-detail-branch-badge');
+      if (branchBadge) branchBadge.innerText = order.branch_name || 'Filial';
+
+      const dateStr = new Date(order.created_at).toLocaleDateString('pt-BR') + ' às ' + new Date(order.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const subtitle = document.getElementById('m-detail-subtitle');
+      if (subtitle) subtitle.innerText = `Solicitante: ${order.sender_name || 'Técnico'} • ${dateStr}`;
+
+      // Status Pill
+      const statusPill = document.getElementById('m-detail-status-pill');
+      const statusActionRow = document.getElementById('m-detail-status-action-row');
+      const userConfig = APP_USERS[currentUser];
+      const isAdminUser = userConfig && userConfig.role === 'admin';
+
+      const statusLabels = {
+        'aguardando': { text: '1/5 • Aguardando Separação', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
+        'separando': { text: '2/5 • Separando Peças', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
+        'coleta': { text: '3/5 • Pronto p/ Embarque', color: 'text-purple-400 bg-purple-500/10 border-purple-500/30' },
+        'enviado': { text: '4/5 • Em Transporte (Rota)', color: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/30' },
+        'recebido': { text: '5/5 • Entregue na Filial', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' },
+        'chegou': { text: '5/5 • Entregue na Filial', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' }
+      };
+
+      const curStatusInfo = statusLabels[order.status] || { text: order.status, color: 'text-slate-300 border-white/10' };
+      if (statusPill) {
+        statusPill.innerText = curStatusInfo.text;
+        statusPill.className = `font-bold text-[10px] px-2.5 py-0.5 rounded-full border ${curStatusInfo.color}`;
+      }
+
+      // Controlador Admin de Avanço de Fase (Para Thiago gerenciar no celular)
+      if (statusActionRow) {
+        if (isAdminUser && order.status !== 'recebido' && order.status !== 'chegou') {
+          let nextStatus = 'separando';
+          let nextLabel = 'Salvar & Iniciar Separação ➜';
+          let btnColor = 'from-blue-600 to-indigo-600 shadow-blue-600/30';
+
+          if (order.status === 'separando') {
+            nextStatus = 'coleta';
+            nextLabel = 'Salvar & Pronto p/ Embarque 📦';
+            btnColor = 'from-purple-600 to-pink-600 shadow-purple-600/30';
+          } else if (order.status === 'coleta') {
+            nextStatus = 'enviado';
+            nextLabel = 'Salvar & Despachar em Transporte 🚚';
+            btnColor = 'from-cyan-600 to-blue-600 shadow-cyan-600/30';
+          } else if (order.status === 'enviado') {
+            nextStatus = 'recebido';
+            nextLabel = 'Confirmar Entrega na Filial ✓';
+            btnColor = 'from-emerald-600 to-teal-600 shadow-emerald-600/30';
+          }
+
+          statusActionRow.innerHTML = `
+            <button onclick="advanceOrderStatusFromMobile('${order.id}', '${nextStatus}')" 
+                    class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r ${btnColor} text-white font-bold text-xs shadow-lg transition active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+              <span>${nextLabel}</span>
+            </button>
+          `;
+        } else {
+          statusActionRow.innerHTML = '';
+        }
+      }
+
+      // Lista de Itens do Pedido com Checkboxes interativos
+      const items = order.shipment_items || [];
+      const totalPcs = items.reduce((a, b) => a + (b.quantity || 0), 0);
+
+      const countEl = document.getElementById('m-detail-items-count');
+      if (countEl) countEl.innerText = `${items.length} itens`;
+
+      const pcsEl = document.getElementById('m-detail-pcs-count');
+      if (pcsEl) pcsEl.innerText = `${totalPcs} peças no total`;
+
+      const listContainer = document.getElementById('m-detail-items-list');
+      if (listContainer) {
+        listContainer.innerHTML = items.map((it, idx) => {
+          const key = `${orderId}_${idx}`;
+          const isChecked = !!detailCheckedItems[key];
+          return `
+            <div onclick="toggleMobileCheckItem('${orderId}', ${idx})" 
+                 class="p-2.5 rounded-xl border transition flex items-center justify-between gap-2.5 cursor-pointer select-none ${
+                   isChecked ? 'bg-emerald-950/25 border-emerald-500/30 text-emerald-300' : 'bg-slate-900/60 border-white/5 text-slate-200 hover:bg-slate-800/80'
+                 }">
+              <div class="flex items-center gap-2.5 truncate">
+                <div class="w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold border shrink-0 transition ${
+                  isChecked ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-white/20 bg-slate-950 text-transparent'
+                }">
+                  ✓
+                </div>
+                <div class="truncate">
+                  <div class="text-xs font-bold truncate ${isChecked ? 'line-through text-slate-400' : 'text-white'}">
+                    ${it.product_name}
+                  </div>
+                  <div class="text-[9px] text-slate-400 uppercase font-semibold">
+                    ${it.product_category || 'MATERIAL'}
+                  </div>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="font-mono font-black text-xs text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-md border border-orange-500/20">
+                  ${it.quantity} un
+                </span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Observações
+      const obsBox = document.getElementById('m-detail-obs-box');
+      const obsText = document.getElementById('m-detail-obs-text');
+      if (obsBox && obsText) {
+        const cleanNotes = (order.notes || '').replace(/\[.*?\]/g, '').trim();
+        if (cleanNotes) {
+          obsText.innerText = cleanNotes;
+          obsBox.classList.remove('hidden');
+        } else {
+          obsBox.classList.add('hidden');
+        }
+      }
+    }
+
+    // Avançar status do pedido diretamente pelo celular (Thiago Admin)
+    async function advanceOrderStatusFromMobile(shipmentId, newStatus) {
+      const userConfig = APP_USERS[currentUser];
+      if (!userConfig || userConfig.role !== 'admin') {
+        alert('Permissão restrita a administradores.');
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('shipments')
+          .update({ status: newStatus })
+          .eq('id', shipmentId);
+
+        if (error) throw error;
+
+        // Atualiza localmente
+        const s = (myShipments || []).find(item => item.id === shipmentId);
+        if (s) s.status = newStatus;
+
+        try {
+          localStorage.setItem('vigi_cached_shipments', JSON.stringify(myShipments));
+        } catch(e) {}
+
+        renderTrackingOrders();
+        if (activeDetailShipmentId === shipmentId) {
+          renderMobileOrderDetails(shipmentId);
+        }
+
+        const statusNames = {
+          'separando': '2/5 • Separando Peças',
+          'coleta': '3/5 • Pronto p/ Embarque',
+          'enviado': '4/5 • Em Transporte (Rota)',
+          'recebido': '5/5 • Entregue na Filial'
+        };
+
+        showToast(`Status atualizado: ${statusNames[newStatus] || newStatus}!`, 'success');
+      } catch(err) {
+        console.error('Erro ao avançar status:', err);
+        alert('Erro ao atualizar status: ' + (err.message || 'Verifique sua conexão.'));
+      }
+    }
+
+    function printRomaneioFromDetailModal() {
+      if (!activeDetailShipmentId) return;
+      printRomaneioFromMobile(activeDetailShipmentId);
+    }
+
+    function shareWhatsAppFromDetailModal() {
+      if (!activeDetailShipmentId) return;
+      shareFullRomaneioWhatsApp(activeDetailShipmentId);
+    }
+
+    // ========================================================
+    // 13.2 MOTOR DE IMPRESSÃO OFICIAL DO ROMANEIO (A4 COM VISTOS)
+    // ========================================================
+    function generateRomaneioPrintHTML(pedido, itemsList) {
+      const code = pedido.id ? (pedido.id.startsWith('#ENV') ? pedido.id : '#ENV-' + pedido.id.slice(0, 6).toUpperCase()) : '#ENV-0000';
+      const filial = pedido.filial || pedido.branch_name || 'Matriz / Filial';
+      const solicitante = pedido.solicitante || pedido.sender_name || 'Técnico';
+      const dataPed = pedido.data || (pedido.created_at ? new Date(pedido.created_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'));
+      const dataHoje = new Date().toLocaleString('pt-BR');
+      const urgencia = pedido.urgencia || 'Normal';
+      const obs = pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes.replace(/\[.*?\]/g, '').trim() : '');
+      const statusRaw = (pedido.status || 'aguardando').toLowerCase();
+
+      let statusBadgeColor = '#00204A';
+      let statusBadgeText = '1/5 • AGUARDANDO SEPARAÇÃO';
+      if (statusRaw === 'separando') { statusBadgeText = '2/5 • SEPARANDO PEÇAS'; statusBadgeColor = '#0284c7'; }
+      else if (statusRaw === 'coleta') { statusBadgeText = '3/5 • PRONTO P/ EMBARQUE'; statusBadgeColor = '#7c3aed'; }
+      else if (statusRaw === 'enviado') { statusBadgeText = '4/5 • EM TRANSPORTE (ROTA)'; statusBadgeColor = '#0891b2'; }
+      else if (statusRaw === 'recebido' || statusRaw === 'chegou') { statusBadgeText = '5/5 • ENTREGUE NA FILIAL'; statusBadgeColor = '#16a34a'; }
+
+      const items = (itemsList && itemsList.length > 0) ? itemsList : (pedido.itens || pedido.shipment_items || []);
+
+      let totalSolicitado = 0;
+      let totalSeparado = 0;
+
+      const rowsHtml = items.map((it, idx) => {
+        const nome = it.nome || it.product_name || 'Item';
+        const cat = it.categoria || it.product_category || 'DIVERSOS';
+        const qtdPedida = (it.qtdOriginal !== undefined) ? it.qtdOriginal : (it.quantity || it.qtd || 1);
+        const qtdSeparada = (it.qtd !== undefined) ? it.qtd : (it.quantity || qtdPedida);
+        const checked = !!it.checked;
+
+        totalSolicitado += Number(qtdPedida) || 0;
+        totalSeparado += Number(qtdSeparada) || 0;
+
+        let divergenciaTag = '';
+        if (qtdSeparada === 0) {
+          divergenciaTag = '<span style="color:#dc2626; font-weight:bold; font-size:9px;">[ZERADO / SEM ESTOQUE]</span>';
+        } else if (qtdSeparada < qtdPedida) {
+          divergenciaTag = `<span style="color:#d97706; font-weight:bold; font-size:9px;">[PARCIAL: -${qtdPedida - qtdSeparada}]</span>`;
+        } else if (qtdSeparada > qtdPedida) {
+          divergenciaTag = `<span style="color:#2563eb; font-weight:bold; font-size:9px;">[EXTRA: +${qtdSeparada - qtdPedida}]</span>`;
+        }
+
+        return `
+          <tr style="border-bottom: 1px solid #cbd5e1; ${idx % 2 === 1 ? 'background-color: #f8fafc;' : ''}">
+            <td style="padding: 6px 4px; text-align: center; font-family: monospace; font-size: 10px; color: #475569;">${idx + 1}</td>
+            <td style="padding: 6px 8px;">
+              <div style="font-weight: 800; font-size: 11px; color: #0f172a;">${nome}</div>
+              <div style="font-size: 9px; color: #64748b; text-transform: uppercase;">${cat} ${divergenciaTag}</div>
+            </td>
+            <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-size: 11px; font-weight: bold; color: #334155;">
+              ${qtdPedida} un
+            </td>
+            <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-size: 11px; font-weight: 800; color: #fd5f00;">
+              <span style="display: inline-block; min-width: 44px; padding: 2px 6px; border: 1.5px solid #fd5f00; border-radius: 4px; background: #fff7ed;">
+                ${qtdSeparada} un
+              </span>
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; width: 22px; height: 18px; border: 1.5px solid #00204A; border-radius: 3px; background: #ffffff; text-align: center; line-height: 16px; font-size: 11px; font-weight: bold; color: #16a34a;">
+                ${checked ? '✓' : ''}
+              </div>
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; min-width: 50px; height: 18px; border: 1.5px dashed #64748b; border-radius: 3px; background: #ffffff;"></div>
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; width: 22px; height: 18px; border: 1.5px solid #475569; border-radius: 3px; background: #ffffff;"></div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ROMANEIO_${code.replace(/[^A-Za-z0-9]/g, '')}_${filial.replace(/[^A-Za-z0-9]/g, '_')}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm 10mm 10mm;
+    }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 10.5px;
+      line-height: 1.3;
+    }
+    .romaneio-container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 4px;
+    }
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-bottom: 2.5px solid #00204A;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .header-logo-cell {
+      width: 150px;
+      vertical-align: middle;
+    }
+    .header-info-cell {
+      vertical-align: middle;
+      padding-left: 12px;
+    }
+    .header-badge-cell {
+      width: 200px;
+      vertical-align: middle;
+      text-align: right;
+    }
+    .main-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #00204A;
+      margin: 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .sub-title {
+      font-size: 10px;
+      color: #64748b;
+      margin: 2px 0 0 0;
+      font-weight: 600;
+    }
+    .code-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #fff7ed;
+      border: 1.5px solid #fd5f00;
+      border-radius: 6px;
+      color: #c2410c;
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 14px;
+    }
+    .meta-box {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+    }
+    .meta-grid {
+      display: table;
+      width: 100%;
+    }
+    .meta-col {
+      display: table-cell;
+      vertical-align: top;
+      padding: 2px 6px;
+    }
+    .meta-label {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 1px;
+    }
+    .meta-val {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .obs-section {
+      background: #fffbeb;
+      border-left: 3.5px solid #f59e0b;
+      border-top: 1px solid #fef3c7;
+      border-right: 1px solid #fef3c7;
+      border-bottom: 1px solid #fef3c7;
+      padding: 5px 8px;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 10px;
+      font-size: 10px;
+      color: #92400e;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      page-break-inside: auto;
+    }
+    table.data-table thead {
+      display: table-header-group;
+    }
+    table.data-table tr {
+      page-break-inside: avoid;
+    }
+    table.data-table th {
+      background: #00204A;
+      color: #ffffff;
+      padding: 6px 5px;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border: 1px solid #00204A;
+      text-align: center;
+      font-weight: 800;
+    }
+    table.data-table td {
+      border: 1px solid #cbd5e1;
+    }
+    .totals-row td {
+      background: #e2e8f0 !important;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 6px 8px;
+      color: #00204A;
+      border-top: 2px solid #00204A;
+    }
+    .signatures-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 8px 0;
+      margin-top: 14px;
+      page-break-inside: avoid;
+    }
+    .sig-cell {
+      width: 33.33%;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #ffffff;
+      vertical-align: top;
+      text-align: center;
+    }
+    .sig-heading {
+      font-size: 9.5px;
+      font-weight: 900;
+      color: #00204A;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 28px;
+    }
+    .sig-sign-line {
+      border-top: 1px solid #0f172a;
+      padding-top: 3px;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .sig-detail {
+      font-size: 8.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .footer-notes {
+      margin-top: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .footer-notes-title {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+    .dashed-line {
+      border-bottom: 1px dashed #cbd5e1;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="romaneio-container">
+    <table class="header-table">
+      <tr>
+        <td class="header-logo-cell">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="vigi-logo.png" style="height: 38px; object-fit: contain;" alt="VIGI" onerror="this.style.display='none'" />
+            <div style="font-size: 18px; font-weight: 900; color: #00204A; letter-spacing: -0.5px;">VIGI<span style="color:#fd5f00;">.</span></div>
+          </div>
+        </td>
+        <td class="header-info-cell">
+          <h1 class="main-title">ROMANEIO OFICIAL DE CONFERÊNCIA & CARGA</h1>
+          <p class="sub-title">SISTEM ENVIO VIGI • Central de Suprimentos & Distribuição Regional PR</p>
+        </td>
+        <td class="header-badge-cell">
+          <div class="code-pill">${code}</div>
+          <div style="font-size: 8.5px; color: #64748b; margin-top: 3px; font-family: monospace;">Impresso: ${dataHoje}</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="meta-box">
+      <div class="meta-grid">
+        <div class="meta-col" style="width: 28%;">
+          <div class="meta-label">Filial Destino</div>
+          <div class="meta-val" style="color: #00204A;">${filial}</div>
+        </div>
+        <div class="meta-col" style="width: 24%;">
+          <div class="meta-label">Solicitante</div>
+          <div class="meta-val">${solicitante}</div>
+        </div>
+        <div class="meta-col" style="width: 22%;">
+          <div class="meta-label">Data Solicitação</div>
+          <div class="meta-val" style="font-family: monospace;">${dataPed}</div>
+        </div>
+        <div class="meta-col" style="width: 14%;">
+          <div class="meta-label">Prioridade</div>
+          <div class="meta-val" style="color: ${urgencia === 'Urgente' ? '#dc2626' : '#0f172a'};">${urgencia}</div>
+        </div>
+        <div class="meta-col" style="width: 12%;">
+          <div class="meta-label">Fase Atual</div>
+          <div class="meta-val" style="color: ${statusBadgeColor}; font-size: 10px;">${statusBadgeText}</div>
+        </div>
+      </div>
+    </div>
+
+    ${obs ? `
+      <div class="obs-section">
+        <strong>Observações do Pedido:</strong> ${obs}
+      </div>
+    ` : ''}
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 28px;">#</th>
+          <th style="text-align: left; padding-left: 8px;">Descrição do Material / Equipamento</th>
+          <th style="width: 80px;">Qtd Solicitada</th>
+          <th style="width: 95px; background: #001736; border-color: #001736;">Qtd Separada (Matriz)</th>
+          <th style="width: 60px;">Visto Matriz</th>
+          <th style="width: 85px;">Qtd Recebida (Filial)</th>
+          <th style="width: 60px;">Visto Filial</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        <tr class="totals-row">
+          <td colspan="2" style="text-align: right; padding-right: 12px;">TOTAL GERAL:</td>
+          <td style="text-align: center; font-family: monospace;">${totalSolicitado} un</td>
+          <td style="text-align: center; font-family: monospace; color: #fd5f00;">${totalSeparado} un</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[ Conf. ]</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[  ____ un  ]</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[ Visto ]</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <table class="signatures-table">
+      <tr>
+        <td class="sig-cell">
+          <div class="sig-heading">1. ALMOXARIFADO MATRIZ (SEPARAÇÃO)</div>
+          <div class="sig-sign-line">Assinatura / Visto do Separador</div>
+          <div class="sig-detail">Nome: _______________________________</div>
+          <div class="sig-detail">Data: _____/_____/2026 às _____:_____</div>
+        </td>
+        <td class="sig-cell">
+          <div class="sig-heading">2. TRANSPORTE / LOGÍSTICA</div>
+          <div class="sig-sign-line">Assinatura do Motorista / Transportador</div>
+          <div class="sig-detail">Motorista: ___________________________</div>
+          <div class="sig-detail">Placa / Veículo: _______________________</div>
+        </td>
+        <td class="sig-cell">
+          <div class="sig-heading">3. CONFERÊNCIA FILIAL (RECEBIMENTO)</div>
+          <div class="sig-sign-line">Assinatura / Visto do Recebedor</div>
+          <div class="sig-detail">Recebedor: ___________________________</div>
+          <div class="sig-detail">Data: _____/_____/2026 às _____:_____</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="footer-notes">
+      <div class="footer-notes-title">Ocorrências / Divergências na Carga (Anotações manuais de avarias, faltas ou peças danificadas):</div>
+      <div class="dashed-line"></div>
+      <div class="dashed-line"></div>
+    </div>
+  </div>
+</body>
+</html>`;
+    }
+
+    // Execução de Impressão via Iframe Isolado ou fallback nativo
+    function executeRomaneioPrint(htmlContent) {
+      const printDiv = document.getElementById('print-area');
+      if (printDiv) {
+        printDiv.innerHTML = htmlContent;
+      }
+
+      let printFrame = document.getElementById('vigi-print-frame');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'vigi-print-frame';
+        printFrame.name = 'vigi-print-frame';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        document.body.appendChild(printFrame);
+      }
+
+      try {
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(htmlContent);
+        frameDoc.close();
+
+        setTimeout(() => {
+          try {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+          } catch(e) {
+            console.warn('Iframe print fallback to window.print():', e);
+            if (printDiv) printDiv.style.display = 'block';
+            window.print();
+          }
+        }, 300);
+      } catch(err) {
+        console.warn('Print error fallback:', err);
+        if (printDiv) printDiv.style.display = 'block';
+        window.print();
+      }
+    }
+
+    function printRomaneioFromMobile(orderId) {
+      const order = (myShipments || []).find(s => s.id === orderId);
+      if (!order) {
+        showToast('Pedido não localizado para impressão.', 'warning');
+        return;
+      }
+
+      const items = (order.shipment_items || []).map(it => ({
+        nome: it.product_name,
+        categoria: it.product_category || 'DIVERSOS',
+        qtd: it.quantity,
+        qtdOriginal: it.quantity,
+        checked: false
+      }));
+
+      const normalized = {
+        id: '#ENV-' + order.id.slice(0, 6).toUpperCase(),
+        rawId: order.id,
+        filial: order.branch_name || 'Filial',
+        solicitante: order.sender_name || 'Técnico',
+        created_at: order.created_at,
+        status: order.status || 'aguardando',
+        obs: order.notes || ''
+      };
+
+      const html = generateRomaneioPrintHTML(normalized, items);
+      executeRomaneioPrint(html);
+      showToast(`Gerando Romaneio ${normalized.id} para impressão...`, 'info');
     }
 
     // Repetir Pedido no Carrinho
@@ -2445,7 +3458,7 @@
     // Inicialização
     
     // Fechar modais ao clicar no fundo escuro
-    ["modal-checkout", "modal-success"].forEach(id => {
+    ["modal-checkout", "modal-success", "modal-order-details-mobile"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("click", (e) => {

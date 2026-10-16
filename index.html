@@ -152,11 +152,29 @@
     }
 
     @media print {
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+      header, nav, aside, #sidebar, #mobile-sidebar, #toast-container, #view-login, #modal-new-envio, #modal-new-compra, #modal-user-switch, #modal-card-details, .kanban-board, .no-print {
+        display: none !important;
+      }
+      body > *:not(#print-area) {
+        display: none !important;
+      }
       #print-area {
-        position: absolute; left: 0; top: 0; width: 100%;
-        background: #fff !important; color: #000 !important;
+        display: block !important;
+        position: static !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
       }
     }
   </style>
@@ -4190,87 +4208,470 @@
       showToast(`Abrindo WhatsApp para ${pedido.filial}...`, 'whatsapp');
     }
 
-    // Impressão Romaneio Formal
-    function printSeparacao() {
-      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
-      if (!pedido) return;
+    // ========================================================
+    // 18.1 GERADOR OFICIAL DE ROMANEIO PARA IMPRESSÃO (A4 COM VISTOS)
+    // ========================================================
+    function generateRomaneioPrintHTML(pedido, itemsList) {
+      const code = pedido.id || ('#ENV-' + (pedido.rawId || '').slice(0, 6).toUpperCase());
+      const filial = pedido.filial || pedido.branch_name || 'Matriz / Filial';
+      const solicitante = pedido.solicitante || pedido.sender_name || 'Técnico';
+      const dataPed = pedido.data || (pedido.created_at ? new Date(pedido.created_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'));
+      const dataHoje = new Date().toLocaleString('pt-BR');
+      const urgencia = pedido.urgencia || 'Normal';
+      const obs = pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes.replace(/\[.*?\]/g, '').trim() : '');
+      const statusRaw = (pedido.status || 'aguardando').toLowerCase();
 
-      const printDiv = document.getElementById('print-area');
-      const title = document.getElementById('detail-title').innerText;
-      const subtitle = document.getElementById('detail-subtitle').innerText;
+      let statusBadgeColor = '#00204A';
+      let statusBadgeText = '1/5 • AGUARDANDO SEPARAÇÃO';
+      if (statusRaw === 'separando') { statusBadgeText = '2/5 • SEPARANDO PEÇAS'; statusBadgeColor = '#0284c7'; }
+      else if (statusRaw === 'coleta') { statusBadgeText = '3/5 • PRONTO P/ EMBARQUE'; statusBadgeColor = '#7c3aed'; }
+      else if (statusRaw === 'enviado') { statusBadgeText = '4/5 • EM TRANSPORTE (ROTA)'; statusBadgeColor = '#0891b2'; }
+      else if (statusRaw === 'recebido' || statusRaw === 'chegou') { statusBadgeText = '5/5 • ENTREGUE NA FILIAL'; statusBadgeColor = '#16a34a'; }
 
-      let itemsRowsPrint = pedido.itens.map((it, idx) => `
-        <tr style="border-bottom: 1px solid #ddd;">
-          <td style="padding: 6px 8px; text-align: center; font-family: monospace;">${idx + 1}</td>
-          <td style="padding: 6px 8px; font-weight: bold;">${it.nome}</td>
-          <td style="padding: 6px 8px; text-align: center; color: #666;">${it.categoria || 'OUTROS'}</td>
-          <td style="padding: 6px 8px; text-align: center; font-family: monospace;">${it.qtdOriginal || it.qtd} un</td>
-          <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-weight: bold; color: #fd5f00;">${it.qtd} un</td>
-          <td style="padding: 6px 8px; text-align: center; font-size: 11px;">
-            ${it.qtd === it.qtdOriginal ? '100% Atendido' : (it.qtd === 0 ? 'Zerado (Sem Estoque)' : (it.qtd < it.qtdOriginal ? `Parcial (-${it.qtdOriginal - it.qtd})` : `Adicional (+${it.qtd - it.qtdOriginal})`))}
-          </td>
-          <td style="padding: 6px 8px; text-align: center;">[  ]</td>
-        </tr>
-      `).join('');
+      const items = (itemsList && itemsList.length > 0) ? itemsList : (pedido.itens || pedido.shipment_items || []);
 
-      const totalPcs = pedido.itens.reduce((acc, cur) => acc + (cur.qtd || 0), 0);
+      let totalSolicitado = 0;
+      let totalSeparado = 0;
 
-      printDiv.innerHTML = `
-        <div style="font-family: sans-serif; padding: 25px; color: #111;">
-          <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid #00204A; padding-bottom: 12px; margin-bottom: 16px;">
-            <div style="display: flex; align-items: center; gap: 15px;">
-              <img src="vigi-logo.png" style="height: 48px; object-fit: contain;" alt="VIGI Câmeras" />
-              <div>
-                <h1 style="font-size: 18px; font-weight: 800; color: #00204A; margin: 0; text-transform: uppercase;">
-                  ROMANEIO OFICIAL DE CONFERÊNCIA & SEPARAÇÃO DE CARGA
-                </h1>
-                <p style="font-size: 11px; color: #555; margin: 2px 0 0 0;">VIGI Câmeras • Gestão Central de Suprimentos & Filiais PR</p>
+      const rowsHtml = items.map((it, idx) => {
+        const nome = it.nome || it.product_name || 'Item';
+        const cat = it.categoria || it.product_category || 'DIVERSOS';
+        const qtdPedida = (it.qtdOriginal !== undefined) ? it.qtdOriginal : (it.quantity || it.qtd || 1);
+        const qtdSeparada = (it.qtd !== undefined) ? it.qtd : (it.quantity || qtdPedida);
+        const checked = !!it.checked;
+
+        totalSolicitado += Number(qtdPedida) || 0;
+        totalSeparado += Number(qtdSeparada) || 0;
+
+        let divergenciaTag = '';
+        if (qtdSeparada === 0) {
+          divergenciaTag = '<span style="color:#dc2626; font-weight:bold; font-size:9px;">[ZERADO / SEM ESTOQUE]</span>';
+        } else if (qtdSeparada < qtdPedida) {
+          divergenciaTag = `<span style="color:#d97706; font-weight:bold; font-size:9px;">[PARCIAL: -${qtdPedida - qtdSeparada}]</span>`;
+        } else if (qtdSeparada > qtdPedida) {
+          divergenciaTag = `<span style="color:#2563eb; font-weight:bold; font-size:9px;">[EXTRA: +${qtdSeparada - qtdPedida}]</span>`;
+        }
+
+        return `
+          <tr style="border-bottom: 1px solid #cbd5e1; ${idx % 2 === 1 ? 'background-color: #f8fafc;' : ''}">
+            <td style="padding: 6px 4px; text-align: center; font-family: monospace; font-size: 10px; color: #475569;">${idx + 1}</td>
+            <td style="padding: 6px 8px;">
+              <div style="font-weight: 800; font-size: 11px; color: #0f172a;">${nome}</div>
+              <div style="font-size: 9px; color: #64748b; text-transform: uppercase;">${cat} ${divergenciaTag}</div>
+            </td>
+            <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-size: 11px; font-weight: bold; color: #334155;">
+              ${qtdPedida} un
+            </td>
+            <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-size: 11px; font-weight: 800; color: #fd5f00;">
+              <span style="display: inline-block; min-width: 44px; padding: 2px 6px; border: 1.5px solid #fd5f00; border-radius: 4px; background: #fff7ed;">
+                ${qtdSeparada} un
+              </span>
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; width: 22px; height: 18px; border: 1.5px solid #00204A; border-radius: 3px; background: #ffffff; text-align: center; line-height: 16px; font-size: 11px; font-weight: bold; color: #16a34a;">
+                ${checked ? '✓' : ''}
               </div>
-            </div>
-            <div style="text-align: right; font-size: 11px;">
-              <span style="display: inline-block; padding: 4px 10px; background: #fff3eb; border: 1px solid #fd5f00; border-radius: 6px; color: #fd5f00; font-weight: 800; font-family: monospace;">ALMOXARIFADO MATRIZ</span>
-            </div>
-          </div>
-          <p style="font-size: 13px; margin-bottom: 12px;"><strong>${title}</strong> | ${subtitle}</p>
-          ${pedido.obs ? `<div style="background: #f4f4f4; padding: 8px 12px; border-radius: 6px; margin-bottom: 15px; font-size: 12px;"><strong>Observação:</strong> ${pedido.obs}</div>` : ''}
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; min-width: 50px; height: 18px; border: 1.5px dashed #64748b; border-radius: 3px; background: #ffffff;"></div>
+            </td>
+            <td style="padding: 6px 8px; text-align: center;">
+              <div style="display: inline-block; width: 22px; height: 18px; border: 1.5px solid #475569; border-radius: 3px; background: #ffffff;"></div>
+            </td>
+          </tr>
+        `;
+      }).join('');
 
-          <table style="width: 100%; border-collapse: collapse; font-size: 11px; margin-bottom: 20px;">
-            <thead>
-              <tr style="background: #00204A; color: white;">
-                <th style="padding: 6px 8px; text-align: center;">#</th>
-                <th style="padding: 6px 8px; text-align: left;">Descrição do Material</th>
-                <th style="padding: 6px 8px; text-align: center;">Categoria</th>
-                <th style="padding: 6px 8px; text-align: center;">Solicitado</th>
-                <th style="padding: 6px 8px; text-align: center;">A Enviar (Separado)</th>
-                <th style="padding: 6px 8px; text-align: center;">Status Atendimento</th>
-                <th style="padding: 6px 8px; text-align: center;">Conferido Filial</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemsRowsPrint}
-            </tbody>
-            <tfoot>
-              <tr style="background: #f0f0f0; font-weight: bold;">
-                <td colspan="4" style="padding: 8px; text-align: right;">Total de Peças na Carga:</td>
-                <td style="padding: 8px; text-align: center; color: #fd5f00;">${totalPcs} un</td>
-                <td colspan="2"></td>
-              </tr>
-            </tfoot>
-          </table>
-
-          <div style="margin-top: 50px; display: flex; justify-content: space-between; font-size: 12px;">
-            <div style="border-top: 1px solid #000; width: 42%; text-align: center; padding-top: 6px;">
-              Assinatura do Almoxarife (Separação Matriz)
-            </div>
-            <div style="border-top: 1px solid #000; width: 42%; text-align: center; padding-top: 6px;">
-              Assinatura do Recebedor (Conferência Filial)
-            </div>
+      return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>ROMANEIO_${code.replace(/[^A-Za-z0-9]/g, '')}_${filial.replace(/[^A-Za-z0-9]/g, '_')}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 8mm 10mm 10mm 10mm;
+    }
+    @media print {
+      body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #0f172a;
+      background: #ffffff;
+      margin: 0;
+      padding: 0;
+      font-size: 10.5px;
+      line-height: 1.3;
+    }
+    .romaneio-container {
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 4px;
+    }
+    .header-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-bottom: 2.5px solid #00204A;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    .header-logo-cell {
+      width: 150px;
+      vertical-align: middle;
+    }
+    .header-info-cell {
+      vertical-align: middle;
+      padding-left: 12px;
+    }
+    .header-badge-cell {
+      width: 200px;
+      vertical-align: middle;
+      text-align: right;
+    }
+    .main-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #00204A;
+      margin: 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .sub-title {
+      font-size: 10px;
+      color: #64748b;
+      margin: 2px 0 0 0;
+      font-weight: 600;
+    }
+    .code-pill {
+      display: inline-block;
+      padding: 4px 10px;
+      background: #fff7ed;
+      border: 1.5px solid #fd5f00;
+      border-radius: 6px;
+      color: #c2410c;
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 14px;
+    }
+    .meta-box {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+    }
+    .meta-grid {
+      display: table;
+      width: 100%;
+    }
+    .meta-col {
+      display: table-cell;
+      vertical-align: top;
+      padding: 2px 6px;
+    }
+    .meta-label {
+      font-size: 8.5px;
+      text-transform: uppercase;
+      font-weight: 800;
+      color: #64748b;
+      margin-bottom: 1px;
+    }
+    .meta-val {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .obs-section {
+      background: #fffbeb;
+      border-left: 3.5px solid #f59e0b;
+      border-top: 1px solid #fef3c7;
+      border-right: 1px solid #fef3c7;
+      border-bottom: 1px solid #fef3c7;
+      padding: 5px 8px;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 10px;
+      font-size: 10px;
+      color: #92400e;
+    }
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 12px;
+      page-break-inside: auto;
+    }
+    table.data-table thead {
+      display: table-header-group;
+    }
+    table.data-table tr {
+      page-break-inside: avoid;
+    }
+    table.data-table th {
+      background: #00204A;
+      color: #ffffff;
+      padding: 6px 5px;
+      font-size: 9.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      border: 1px solid #00204A;
+      text-align: center;
+      font-weight: 800;
+    }
+    table.data-table td {
+      border: 1px solid #cbd5e1;
+    }
+    .totals-row td {
+      background: #e2e8f0 !important;
+      font-weight: 900;
+      font-size: 11px;
+      padding: 6px 8px;
+      color: #00204A;
+      border-top: 2px solid #00204A;
+    }
+    .signatures-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 8px 0;
+      margin-top: 14px;
+      page-break-inside: avoid;
+    }
+    .sig-cell {
+      width: 33.33%;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #ffffff;
+      vertical-align: top;
+      text-align: center;
+    }
+    .sig-heading {
+      font-size: 9.5px;
+      font-weight: 900;
+      color: #00204A;
+      text-transform: uppercase;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+      margin-bottom: 28px;
+    }
+    .sig-sign-line {
+      border-top: 1px solid #0f172a;
+      padding-top: 3px;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #0f172a;
+    }
+    .sig-detail {
+      font-size: 8.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    .footer-notes {
+      margin-top: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 6px 8px;
+      background: #ffffff;
+      page-break-inside: avoid;
+    }
+    .footer-notes-title {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: #475569;
+      margin-bottom: 2px;
+    }
+    .dashed-line {
+      border-bottom: 1px dashed #cbd5e1;
+      height: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="romaneio-container">
+    <table class="header-table">
+      <tr>
+        <td class="header-logo-cell">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <img src="vigi-logo.png" style="height: 38px; object-fit: contain;" alt="VIGI" onerror="this.style.display='none'" />
+            <div style="font-size: 18px; font-weight: 900; color: #00204A; letter-spacing: -0.5px;">VIGI<span style="color:#fd5f00;">.</span></div>
           </div>
+        </td>
+        <td class="header-info-cell">
+          <h1 class="main-title">ROMANEIO OFICIAL DE CONFERÊNCIA & CARGA</h1>
+          <p class="sub-title">SISTEM ENVIO VIGI • Central de Suprimentos & Distribuição Regional PR</p>
+        </td>
+        <td class="header-badge-cell">
+          <div class="code-pill">${code}</div>
+          <div style="font-size: 8.5px; color: #64748b; margin-top: 3px; font-family: monospace;">Impresso: ${dataHoje}</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="meta-box">
+      <div class="meta-grid">
+        <div class="meta-col" style="width: 28%;">
+          <div class="meta-label">Filial Destino</div>
+          <div class="meta-val" style="color: #00204A;">${filial}</div>
         </div>
-      `;
-      printDiv.style.display = 'block';
-      window.print();
-      printDiv.style.display = 'none';
+        <div class="meta-col" style="width: 24%;">
+          <div class="meta-label">Solicitante</div>
+          <div class="meta-val">${solicitante}</div>
+        </div>
+        <div class="meta-col" style="width: 22%;">
+          <div class="meta-label">Data Solicitação</div>
+          <div class="meta-val" style="font-family: monospace;">${dataPed}</div>
+        </div>
+        <div class="meta-col" style="width: 14%;">
+          <div class="meta-label">Prioridade</div>
+          <div class="meta-val" style="color: ${urgencia === 'Urgente' ? '#dc2626' : '#0f172a'};">${urgencia}</div>
+        </div>
+        <div class="meta-col" style="width: 12%;">
+          <div class="meta-label">Fase Atual</div>
+          <div class="meta-val" style="color: ${statusBadgeColor}; font-size: 10px;">${statusBadgeText}</div>
+        </div>
+      </div>
+    </div>
+
+    ${obs ? `
+      <div class="obs-section">
+        <strong>Observações do Pedido:</strong> ${obs}
+      </div>
+    ` : ''}
+
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th style="width: 28px;">#</th>
+          <th style="text-align: left; padding-left: 8px;">Descrição do Material / Equipamento</th>
+          <th style="width: 80px;">Qtd Solicitada</th>
+          <th style="width: 95px; background: #001736; border-color: #001736;">Qtd Separada (Matriz)</th>
+          <th style="width: 60px;">Visto Matriz</th>
+          <th style="width: 85px;">Qtd Recebida (Filial)</th>
+          <th style="width: 60px;">Visto Filial</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+      <tfoot>
+        <tr class="totals-row">
+          <td colspan="2" style="text-align: right; padding-right: 12px;">TOTAL GERAL:</td>
+          <td style="text-align: center; font-family: monospace;">${totalSolicitado} un</td>
+          <td style="text-align: center; font-family: monospace; color: #fd5f00;">${totalSeparado} un</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[ Conf. ]</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[  ____ un  ]</td>
+          <td style="text-align: center; font-size: 9px; color: #64748b;">[ Visto ]</td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <table class="signatures-table">
+      <tr>
+        <td class="sig-cell">
+          <div class="sig-heading">1. ALMOXARIFADO MATRIZ (SEPARAÇÃO)</div>
+          <div class="sig-sign-line">Assinatura / Visto do Separador</div>
+          <div class="sig-detail">Nome: _______________________________</div>
+          <div class="sig-detail">Data: _____/_____/2026 às _____:_____</div>
+        </td>
+        <td class="sig-cell">
+          <div class="sig-heading">2. TRANSPORTE / LOGÍSTICA</div>
+          <div class="sig-sign-line">Assinatura do Motorista / Transportador</div>
+          <div class="sig-detail">Motorista: ___________________________</div>
+          <div class="sig-detail">Placa / Veículo: _______________________</div>
+        </td>
+        <td class="sig-cell">
+          <div class="sig-heading">3. CONFERÊNCIA FILIAL (RECEBIMENTO)</div>
+          <div class="sig-sign-line">Assinatura / Visto do Recebedor</div>
+          <div class="sig-detail">Recebedor: ___________________________</div>
+          <div class="sig-detail">Data: _____/_____/2026 às _____:_____</div>
+        </td>
+      </tr>
+    </table>
+
+    <div class="footer-notes">
+      <div class="footer-notes-title">Ocorrências / Divergências na Carga (Anotações manuais de avarias, faltas ou peças danificadas):</div>
+      <div class="dashed-line"></div>
+      <div class="dashed-line"></div>
+    </div>
+  </div>
+</body>
+</html>`;
+    }
+
+    // Execução Segura de Impressão via Iframe Isolado (Zero bug de CSS/fundo escuro)
+    function executeRomaneioPrint(htmlContent) {
+      // 1. Atualiza também a área de impressão de backup no DOM
+      const printDiv = document.getElementById('print-area');
+      if (printDiv) {
+        printDiv.innerHTML = htmlContent;
+      }
+
+      // 2. Cria ou reutiliza iframe invisível
+      let printFrame = document.getElementById('vigi-print-frame');
+      if (!printFrame) {
+        printFrame = document.createElement('iframe');
+        printFrame.id = 'vigi-print-frame';
+        printFrame.name = 'vigi-print-frame';
+        printFrame.style.position = 'fixed';
+        printFrame.style.right = '0';
+        printFrame.style.bottom = '0';
+        printFrame.style.width = '0';
+        printFrame.style.height = '0';
+        printFrame.style.border = '0';
+        printFrame.style.visibility = 'hidden';
+        document.body.appendChild(printFrame);
+      }
+
+      try {
+        const frameDoc = printFrame.contentWindow.document;
+        frameDoc.open();
+        frameDoc.write(htmlContent);
+        frameDoc.close();
+
+        setTimeout(() => {
+          try {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+          } catch(e) {
+            console.warn('Iframe print failed, falling back to window.print():', e);
+            if (printDiv) printDiv.style.display = 'block';
+            window.print();
+          }
+        }, 300);
+      } catch(err) {
+        console.warn('Fallback print:', err);
+        if (printDiv) printDiv.style.display = 'block';
+        window.print();
+      }
+    }
+
+    // Impressão Romaneio Formal disparada pelo Modal
+    function printSeparacao() {
+      const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId || p.rawId === currentDetailPedidoId);
+      if (!pedido) {
+        showToast('Nenhum pedido selecionado para impressão.', 'warning');
+        return;
+      }
+
+      // Utiliza os itens ativos da conferência (com ajustes e visto) ou itens originais
+      const itemsToPrint = (currentDetailItems && currentDetailItems.length > 0) ? currentDetailItems : pedido.itens;
+      const htmlContent = generateRomaneioPrintHTML(pedido, itemsToPrint);
+      executeRomaneioPrint(htmlContent);
+      showToast(`Imprimindo Romaneio ${pedido.id}...`, 'info');
+    }
+
+    // Impressão Direta sem abrir o modal
+    function printRomaneioDirect(id) {
+      const pedido = pedidosEnvio.find(p => p.id === id || p.rawId === id);
+      if (!pedido) {
+        showToast('Pedido não localizado.', 'warning');
+        return;
+      }
+      const htmlContent = generateRomaneioPrintHTML(pedido, pedido.itens);
+      executeRomaneioPrint(htmlContent);
+      showToast(`Imprimindo Romaneio ${pedido.id}...`, 'info');
     }
 
     // 19. ATALHOS & EVENTOS
