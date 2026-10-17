@@ -503,6 +503,45 @@
       </div>
     </section>
 
+    <!-- ========================================== -->
+    <!-- TAB 4: COMPRAS & REPOSIÇÃO CENTRAL (MOBILE) -->
+    <!-- ========================================== -->
+    <section id="tab-content-compras" class="space-y-3.5 hidden">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-xs font-black text-white flex items-center gap-1.5 uppercase tracking-wider">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Pedidos de Compras</span>
+          </h2>
+          <p class="text-[10px] text-slate-400">Reposição e suprimentos para almoxarifado</p>
+        </div>
+        <button onclick="openMobileNewCompraModal()" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/30 active:scale-95 transition cursor-pointer">
+          <i class="fa-solid fa-plus-circle text-xs"></i>
+          <span>Nova Compra</span>
+        </button>
+      </div>
+
+      <!-- Search & Filters -->
+      <div class="space-y-2">
+        <div class="relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+          <input type="text" id="mobile-compra-search" oninput="renderMobileCompras()" placeholder="Buscar material, código ou solicitante..." 
+                 class="w-full bg-slate-950/90 border border-white/10 rounded-2xl pl-10 pr-9 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+        </div>
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+          <button onclick="setMobileCompraFilter('todas')" id="compra-pill-todas" class="px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0">Todas (<span id="m-compra-count-todas">0</span>)</button>
+          <button onclick="setMobileCompraFilter('solicitado')" id="compra-pill-solicitado" class="px-3 py-1 rounded-xl text-[11px] font-semibold text-slate-400 bg-slate-900 border border-white/5 shrink-0">1. Aberto (<span id="m-compra-count-solicitado">0</span>)</button>
+          <button onclick="setMobileCompraFilter('comprado')" id="compra-pill-comprado" class="px-3 py-1 rounded-xl text-[11px] font-semibold text-slate-400 bg-slate-900 border border-white/5 shrink-0">2. Comprado (<span id="m-compra-count-comprado">0</span>)</button>
+          <button onclick="setMobileCompraFilter('emestoque')" id="compra-pill-emestoque" class="px-3 py-1 rounded-xl text-[11px] font-semibold text-slate-400 bg-slate-900 border border-white/5 shrink-0">3. Estoque (<span id="m-compra-count-emestoque">0</span>)</button>
+        </div>
+      </div>
+
+      <!-- List of Compras -->
+      <div id="mobile-compras-list" class="space-y-3">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
   </main>
 
   <!-- ======================================================== -->
@@ -529,10 +568,10 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- BOTTOM APP NAVIGATION BAR (TAB BAR COM BOTÃO DE ENCERRAR) -->
+  <!-- BOTTOM APP NAVIGATION BAR (TAB BAR COM BOTÃO DE ENCERRAR & COMPRAS) -->
   <!-- ======================================================== -->
   <nav class="glass-bottom-bar fixed bottom-0 left-0 right-0 z-40 px-3 py-2">
-    <div class="max-w-lg mx-auto grid grid-cols-4 items-center text-center">
+    <div id="mobile-nav-grid" class="max-w-lg mx-auto grid grid-cols-4 items-center text-center">
       
       <button onclick="switchMobileTab('catalogo')" id="nav-btn-catalogo" class="flex flex-col items-center gap-1 text-orange-400 font-bold transition">
         <i class="fa-solid fa-boxes-stacked text-base"></i>
@@ -561,8 +600,80 @@
         <span class="text-[10px]">Histórico</span>
       </button>
 
+      <!-- Botão Compras para Administradores e Adilson -->
+      <button onclick="switchMobileTab('compras')" id="nav-btn-compras" class="hidden flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition relative cursor-pointer">
+        <div class="relative">
+          <i class="fa-solid fa-cart-shopping text-base"></i>
+          <span id="nav-compras-badge" class="absolute -top-1 -right-2.5 px-1.5 py-0.2 rounded-full bg-emerald-500 text-white font-black text-[9px] shadow-sm hidden">0</span>
+        </div>
+        <span class="text-[10px]">Compras</span>
+      </button>
+
     </div>
   </nav>
+
+  <!-- ======================================================== -->
+  <!-- MODAL / BOTTOM SHEET: NOVA COMPRA (MOBILE) -->
+  <!-- ======================================================== -->
+  <div id="modal-mobile-new-compra" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end p-0 sm:p-4">
+    <div class="glass-surface-card bg-[#001433] rounded-t-3xl sm:rounded-3xl border border-white/15 w-full max-w-lg mx-auto p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-2 border-b border-white/10">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-sm border border-emerald-500/30">
+            <i class="fa-solid fa-cart-plus"></i>
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-white">Nova Requisição de Compra</h3>
+            <p class="text-[10px] text-slate-400">Almoxarifado Central & Aquisições</p>
+          </div>
+        </div>
+        <button onclick="closeMobileNewCompraModal()" class="w-7 h-7 rounded-full bg-slate-900 text-slate-400 hover:text-white flex items-center justify-center text-xs cursor-pointer">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">Material / Item Requisitado *</label>
+          <input type="text" id="m-compra-item" list="m-compra-materiais-list" placeholder="Ex: Eletroduto (Barra de 3m), Conector BNC..." 
+                 class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          <datalist id="m-compra-materiais-list"></datalist>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Quantidade *</label>
+            <input type="number" id="m-compra-qtd" value="10" min="1" 
+                   class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white font-mono font-bold focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold text-slate-300 mb-1">Urgência</label>
+            <select id="m-compra-urgencia" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500 font-bold">
+              <option value="Normal">Normal</option>
+              <option value="Alta" selected>Alta</option>
+              <option value="Urgente">Urgente</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">Solicitante</label>
+          <input type="text" id="m-compra-solicitante" class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-300 mb-1">Motivo / Observação</label>
+          <textarea id="m-compra-obs" rows="2" placeholder="Ex: Falta no galpão, reposição para envio de filiais..." 
+                    class="w-full bg-slate-950 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"></textarea>
+        </div>
+
+        <button onclick="submitMobileNewCompra()" id="btn-submit-m-compra" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/40 flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>Registrar Compra na Nuvem</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ======================================================== -->
   <!-- MODAL / BOTTOM SHEET: REVISÃO & CHECKOUT DO PEDIDO -->
@@ -1439,19 +1550,48 @@
       if (solicitanteInput && !solicitanteInput.value) {
         solicitanteInput.value = u.name;
       }
+
+      // Permissão para aba de Compras (Administradores e Adilson)
+      const navBtnCompras = document.getElementById('nav-btn-compras');
+      const navGrid = document.getElementById('mobile-nav-grid');
+      const canAccessCompras = u.role === 'admin' || u.username === 'palotina1';
+
+      if (canAccessCompras) {
+        if (navBtnCompras) navBtnCompras.classList.remove('hidden');
+        if (navGrid) {
+          navGrid.classList.remove('grid-cols-4');
+          navGrid.classList.add('grid-cols-5');
+        }
+        loadComprasFromSupabase();
+      } else {
+        if (navBtnCompras) navBtnCompras.classList.add('hidden');
+        if (navGrid) {
+          navGrid.classList.remove('grid-cols-5');
+          navGrid.classList.add('grid-cols-4');
+        }
+      }
     }
 
     // 6. NAVEGAÇÃO DE ABAS MOBILE
     function switchMobileTab(tab) {
       activeTab = tab;
-      ['catalogo', 'rastreio', 'historico'].forEach(t => {
-        document.getElementById(`tab-content-${t}`).classList.add('hidden');
+      ['catalogo', 'rastreio', 'historico', 'compras'].forEach(t => {
+        const sec = document.getElementById(`tab-content-${t}`);
+        if (sec) sec.classList.add('hidden');
         const btn = document.getElementById(`nav-btn-${t}`);
-        btn.className = "flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition";
+        if (btn) btn.className = "flex flex-col items-center gap-1 text-slate-500 hover:text-slate-300 font-semibold transition relative";
       });
 
-      document.getElementById(`tab-content-${tab}`).classList.remove('hidden');
-      document.getElementById(`nav-btn-${tab}`).className = "flex flex-col items-center gap-1 text-orange-400 font-bold transition";
+      const activeSec = document.getElementById(`tab-content-${tab}`);
+      if (activeSec) activeSec.classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-btn-${tab}`);
+      if (activeBtn) {
+        if (tab === 'compras') {
+          activeBtn.className = "flex flex-col items-center gap-1 text-emerald-400 font-bold transition relative";
+        } else {
+          activeBtn.className = "flex flex-col items-center gap-1 text-orange-400 font-bold transition relative";
+        }
+      }
 
       // Floating cart visibility
       const totalItens = Object.values(mobileCart).reduce((a, b) => a + b, 0);
@@ -1464,6 +1604,8 @@
 
       if (tab === 'rastreio' || tab === 'historico') {
         loadShipmentsFromSupabase();
+      } else if (tab === 'compras') {
+        loadComprasFromSupabase();
       }
     }
 
@@ -3433,7 +3575,375 @@
       }
     }
 
-    // 15. REALTIME LISTENER (ATUALIZAÇÃO INSTANTÂNEA)
+    // ========================================================
+    // 15. GESTÃO MOBILE DE COMPRAS & REPOSIÇÃO (SUPABASE)
+    // ========================================================
+    let mobileCompras = [];
+    let mobileCompraFilter = 'todas';
+
+    function getMaterialCategory(itemName) {
+      if (!itemName) return 'GERAL';
+      for (const cat of CATALOGO_MATERIAIS) {
+        if (cat.itens && cat.itens.some(it => it.toLowerCase() === itemName.toLowerCase())) {
+          return cat.categoria;
+        }
+      }
+      return 'INFRAESTRUTURA E FIXAÇÃO';
+    }
+
+    async function loadComprasFromSupabase() {
+      if (!supabase) return;
+      try {
+        const { data, error } = await supabase
+          .from('compras')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+
+        if (data) {
+          mobileCompras = data.map(row => {
+            let meta = {};
+            const metaMatch = (row.observacoes || '').match(/\[META:(.*?)\]/);
+            if (metaMatch) {
+              try { meta = JSON.parse(metaMatch[1]); } catch(e) {}
+            }
+            const codeMatch = (row.observacoes || '').match(/\[CODE:(COM-\d+)\]/);
+            const qtdMatch = (row.observacoes || '').match(/\[QTD:(\d+)\]/);
+            const urgMatch = (row.observacoes || '').match(/\[URGENCIA:(.*?)\]/);
+
+            let cleanObs = (row.observacoes || '')
+              .replace(/\[META:.*?\]/g, '')
+              .replace(/\[CODE:.*?\]/g, '')
+              .replace(/\[QTD:.*?\]/g, '')
+              .replace(/\[URGENCIA:.*?\]/g, '')
+              .trim();
+
+            const code = meta.code || (codeMatch ? codeMatch[1] : ('COM-' + row.id.slice(0, 4).toUpperCase()));
+            const qtd = meta.qtd !== undefined ? meta.qtd : (qtdMatch ? parseInt(qtdMatch[1]) : (row.valor_total > 0 ? row.valor_total : 1));
+            const urgencia = meta.urgencia || (urgMatch ? urgMatch[1] : 'Normal');
+            const obs = meta.obs !== undefined ? meta.obs : cleanObs;
+            const item = meta.item || row.descricao;
+            const solicitante = meta.solicitante || row.fornecedor_nome || 'Thiago (Matriz)';
+            let status = (row.status || 'solicitado').toLowerCase();
+            if (status === 'aberto' || status === 'pendente') status = 'solicitado';
+            if (status === 'paga' || status === 'concluido' || status === 'em_estoque') status = 'emestoque';
+
+            const dateObj = new Date(row.created_at);
+            const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            return {
+              id: code,
+              rawId: row.id,
+              item: item,
+              qtd: qtd,
+              solicitante: solicitante,
+              urgencia: urgencia,
+              data: dataStr,
+              obs: obs,
+              status: status,
+              categoria: row.categoria || 'Geral'
+            };
+          });
+
+          // Atualiza badge de compras
+          const activeComprasCount = mobileCompras.filter(c => c.status !== 'emestoque').length;
+          const badge = document.getElementById('nav-compras-badge');
+          if (badge) {
+            badge.innerText = activeComprasCount;
+            if (activeComprasCount > 0) badge.classList.remove('hidden');
+            else badge.classList.add('hidden');
+          }
+
+          renderMobileCompras();
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar compras no mobile:', err);
+      }
+    }
+
+    function setMobileCompraFilter(filter) {
+      mobileCompraFilter = filter;
+      ['todas', 'solicitado', 'comprado', 'emestoque'].forEach(f => {
+        const btn = document.getElementById(`compra-pill-${f}`);
+        if (!btn) return;
+        if (f === filter) {
+          btn.className = "px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shrink-0";
+        } else {
+          btn.className = "px-3 py-1 rounded-xl text-[11px] font-semibold text-slate-400 bg-slate-900 border border-white/5 shrink-0";
+        }
+      });
+      renderMobileCompras();
+    }
+
+    function renderMobileCompras() {
+      const container = document.getElementById('mobile-compras-list');
+      if (!container) return;
+
+      const searchTerm = (document.getElementById('mobile-compra-search')?.value || '').toLowerCase().trim();
+      const counts = { todas: mobileCompras.length, solicitado: 0, comprado: 0, emestoque: 0 };
+
+      mobileCompras.forEach(c => {
+        if (counts[c.status] !== undefined) counts[c.status]++;
+      });
+
+      const setEl = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+      setEl('m-compra-count-todas', counts.todas);
+      setEl('m-compra-count-solicitado', counts.solicitado);
+      setEl('m-compra-count-comprado', counts.comprado);
+      setEl('m-compra-count-emestoque', counts.emestoque);
+
+      const filtered = mobileCompras.filter(c => {
+        if (mobileCompraFilter !== 'todas' && c.status !== mobileCompraFilter) return false;
+        if (searchTerm) {
+          const match = c.id.toLowerCase().includes(searchTerm) ||
+                        c.item.toLowerCase().includes(searchTerm) ||
+                        c.solicitante.toLowerCase().includes(searchTerm) ||
+                        (c.obs && c.obs.toLowerCase().includes(searchTerm));
+          if (!match) return false;
+        }
+        return true;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="p-8 text-center bg-slate-950/60 rounded-2xl border border-white/5 text-slate-500">
+            <i class="fa-solid fa-cart-shopping text-3xl mb-2 opacity-30 text-emerald-400"></i>
+            <p class="text-xs font-semibold text-slate-400">Nenhum pedido de compra encontrado</p>
+            <p class="text-[10px] text-slate-500 mt-1">Toque em "+ Nova Compra" para registrar itens necessários.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const userConfig = APP_USERS[currentUser];
+      const canManage = userConfig && (userConfig.role === 'admin' || userConfig.username === 'palotina1');
+
+      container.innerHTML = filtered.map(c => {
+        const isUrg = c.urgencia === 'Alta' || c.urgencia === 'Urgente';
+        const urgBadge = isUrg
+          ? `<span class="px-2 py-0.5 rounded-full text-[9px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase"><i class="fa-solid fa-bolt mr-0.5"></i> ${c.urgencia}</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-800 text-slate-300 border border-white/5">Normal</span>`;
+
+        let actionBtnHtml = '';
+        if (canManage) {
+          if (c.status === 'solicitado') {
+            actionBtnHtml = `
+              <button onclick="advanceCompraStatusFromMobile('${c.rawId}', 'comprado')" 
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-blue-900/30 active:scale-95 transition cursor-pointer">
+                <i class="fa-solid fa-cart-shopping text-[11px]"></i>
+                <span>1. MARCAR COMO COMPRADO ➔</span>
+              </button>
+            `;
+          } else if (c.status === 'comprado') {
+            actionBtnHtml = `
+              <button onclick="advanceCompraStatusFromMobile('${c.rawId}', 'emestoque')" 
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-emerald-900/30 active:scale-95 transition cursor-pointer">
+                <i class="fa-solid fa-boxes-stacked text-[11px]"></i>
+                <span>2. CONFIRMAR NO ESTOQUE MATRIZ ✓</span>
+              </button>
+            `;
+          } else {
+            actionBtnHtml = `
+              <div class="w-full py-2 px-3 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold text-xs flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-circle-check text-emerald-400"></i>
+                <span>✓ Material Disponível no Estoque</span>
+              </div>
+            `;
+          }
+        }
+
+        const deleteBtnHtml = (canManage && userConfig.role === 'admin') ? `
+          <button onclick="deleteCompraFromMobile('${c.rawId}', '${c.id}')" title="Excluir requisição" 
+                  class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 hover:border-rose-500/40 text-slate-500 hover:text-rose-400 flex items-center justify-center text-xs transition cursor-pointer">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        ` : '';
+
+        const statusLabels = {
+          solicitado: { text: '1/3 • Aberto (Cotação)', color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
+          comprado: { text: '2/3 • Comprado (Trânsito)', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
+          emestoque: { text: '3/3 • No Estoque Matriz', color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' }
+        };
+        const stInfo = statusLabels[c.status] || statusLabels.solicitado;
+
+        return `
+          <div class="glass-surface-card rounded-2xl p-3.5 space-y-2.5 border border-white/10 ${isUrg ? 'ring-1 ring-amber-500/40' : ''}">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-xs font-black text-emerald-400 bg-emerald-500/15 px-2 py-0.5 rounded-lg border border-emerald-500/30">${c.id}</span>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md border ${stInfo.color}">${stInfo.text}</span>
+              </div>
+              ${urgBadge}
+            </div>
+
+            <div class="bg-slate-950/80 p-2.5 rounded-xl border border-white/5 space-y-1">
+              <div class="flex items-center justify-between">
+                <h4 class="font-extrabold text-white text-xs leading-snug">${c.item}</h4>
+                <span class="font-mono font-bold text-emerald-300 text-xs bg-emerald-500/15 px-2 py-0.5 rounded-md border border-emerald-500/20 shrink-0 ml-2">${c.qtd} un</span>
+              </div>
+              ${c.obs ? `<p class="text-[10px] text-slate-400 pt-1 border-t border-white/5"><i class="fa-solid fa-quote-left text-emerald-500/40 mr-1"></i>${c.obs}</p>` : ''}
+            </div>
+
+            <div class="flex items-center justify-between text-[10px] text-slate-400">
+              <span class="flex items-center gap-1"><i class="fa-regular fa-user text-emerald-400"></i> ${c.solicitante}</span>
+              <span class="font-mono text-slate-500">${c.data}</span>
+            </div>
+
+            ${actionBtnHtml}
+
+            <div class="flex items-center justify-between pt-1 border-t border-white/5">
+              <button onclick="shareCompraMobileWhatsApp('${c.id}')" class="text-[11px] font-bold text-emerald-300 hover:text-white flex items-center gap-1 bg-emerald-500/15 px-2.5 py-1 rounded-xl border border-emerald-500/30 transition cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-xs"></i> Compartilhar
+              </button>
+              ${deleteBtnHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function shareCompraMobileWhatsApp(code) {
+      const c = mobileCompras.find(x => x.id === code || x.rawId === code);
+      if (!c) return;
+      const text = `📦 *REQUISIÇÃO DE COMPRA - VIGI*\n` +
+                   `🔖 *Código:* ${c.id}\n` +
+                   `🛠️ *Material:* ${c.item}\n` +
+                   `🔢 *Quantidade:* ${c.qtd} un\n` +
+                   `⚡ *Urgência:* ${c.urgencia}\n` +
+                   `👤 *Solicitante:* ${c.solicitante}\n` +
+                   (c.obs ? `📝 *Observação:* ${c.obs}\n` : '') +
+                   `📅 *Data:* ${c.data}`;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => showToast('Dados copiados para o WhatsApp!', 'success'));
+      } else {
+        prompt('Copie o texto para o WhatsApp:', text);
+      }
+    }
+
+    function openMobileNewCompraModal() {
+      const el = document.getElementById('modal-mobile-new-compra');
+      if (!el) return;
+      el.style.display = 'flex';
+      el.classList.remove('hidden');
+
+      const u = currentUser ? APP_USERS[currentUser] : null;
+      const solicitanteInput = document.getElementById('m-compra-solicitante');
+      if (solicitanteInput) {
+        solicitanteInput.value = u ? `${u.name} (${u.filial})` : 'Thiago (Matriz)';
+      }
+
+      // Popula datalist de materiais
+      const dl = document.getElementById('m-compra-materiais-list');
+      if (dl && dl.children.length === 0) {
+        const all = new Set();
+        CATALOGO_MATERIAIS.forEach(c => c.itens.forEach(it => all.add(it)));
+        Array.from(all).sort().forEach(it => {
+          const opt = document.createElement('option');
+          opt.value = it;
+          dl.appendChild(opt);
+        });
+      }
+    }
+
+    function closeMobileNewCompraModal() {
+      const el = document.getElementById('modal-mobile-new-compra');
+      if (!el) return;
+      el.style.display = 'none';
+      el.classList.add('hidden');
+    }
+
+    async function submitMobileNewCompra() {
+      const itemInput = document.getElementById('m-compra-item');
+      const item = itemInput ? itemInput.value.trim() : '';
+      const qtd = parseInt(document.getElementById('m-compra-qtd').value) || 1;
+      const urgencia = document.getElementById('m-compra-urgencia').value;
+      const solicitante = document.getElementById('m-compra-solicitante').value.trim() || 'Thiago (Matriz)';
+      const obs = document.getElementById('m-compra-obs').value.trim();
+      const btn = document.getElementById('btn-submit-m-compra');
+
+      if (!item) {
+        alert('Por favor, informe a descrição do material necessário.');
+        if (itemInput) itemInput.focus();
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando no Supabase...';
+
+      const catNome = getMaterialCategory(item);
+      const newId = `COM-${Math.floor(1000 + Math.random() * 9000)}`;
+      const metaJson = JSON.stringify({
+        code: newId,
+        item: item,
+        qtd: qtd,
+        solicitante: solicitante,
+        urgencia: urgencia,
+        obs: obs
+      });
+      const obsFormatted = `[CODE:${newId}] [QTD:${qtd}] [URGENCIA:${urgencia}] ${obs} [META:${metaJson}]`;
+
+      const payload = {
+        fornecedor_nome: solicitante,
+        descricao: item,
+        valor_total: 0,
+        status: 'solicitado',
+        categoria: catNome,
+        observacoes: obsFormatted
+      };
+
+      try {
+        if (supabase) {
+          const { error } = await supabase.from('compras').insert([payload]);
+          if (error) throw error;
+        }
+
+        closeMobileNewCompraModal();
+        if (itemInput) itemInput.value = '';
+        const obsEl = document.getElementById('m-compra-obs');
+        if (obsEl) obsEl.value = '';
+        showToast(`Requisição ${newId} criada e salva na nuvem!`, 'success');
+        await loadComprasFromSupabase();
+      } catch (err) {
+        console.error('Erro ao salvar compra:', err);
+        alert('Erro ao salvar compra: ' + (err.message || 'Verifique sua conexão.'));
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> <span>Registrar Compra na Nuvem</span>';
+      }
+    }
+
+    async function advanceCompraStatusFromMobile(rawId, newStatus) {
+      if (!supabase || !rawId) return;
+      try {
+        const { error } = await supabase.from('compras').update({ status: newStatus }).eq('id', rawId);
+        if (error) throw error;
+        const label = newStatus === 'comprado' ? 'Marcado como Comprado' : 'Confirmado no Estoque';
+        showToast(`Status atualizado: ${label}!`, 'success');
+        await loadComprasFromSupabase();
+      } catch (err) {
+        console.error('Erro ao atualizar status:', err);
+        showToast('Erro ao atualizar status no banco.', 'error');
+      }
+    }
+
+    async function deleteCompraFromMobile(rawId, code) {
+      if (!confirm(`Deseja realmente excluir permanentemente a requisição ${code} do banco de dados?`)) return;
+      try {
+        if (supabase && rawId) {
+          const { error } = await supabase.from('compras').delete().eq('id', rawId);
+          if (error) throw error;
+        }
+        showToast(`Requisição ${code} excluída com sucesso!`, 'info');
+        await loadComprasFromSupabase();
+      } catch (err) {
+        console.error('Erro ao excluir requisição:', err);
+        showToast('Erro ao excluir requisição do banco.', 'error');
+      }
+    }
+
+    // 16. REALTIME LISTENER (ATUALIZAÇÃO INSTANTÂNEA DE ENVIOS E COMPRAS)
     function initRealtime() {
       if (!supabase) return;
       try {
@@ -3441,6 +3951,9 @@
           .channel('vigi-mobile-realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
             loadShipmentsFromSupabase();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'compras' }, () => {
+            loadComprasFromSupabase();
           })
           .subscribe();
       } catch (err) {
@@ -3450,15 +3963,19 @@
 
     // Polling a cada 20s
     setInterval(() => {
-      if (currentUser && (activeTab === 'rastreio' || activeTab === 'historico')) {
-        loadShipmentsFromSupabase();
+      if (currentUser) {
+        if (activeTab === 'rastreio' || activeTab === 'historico') {
+          loadShipmentsFromSupabase();
+        } else if (activeTab === 'compras') {
+          loadComprasFromSupabase();
+        }
       }
-    }, 20000);
+    }, 15000);
 
     // Inicialização
     
     // Fechar modais ao clicar no fundo escuro
-    ["modal-checkout", "modal-success", "modal-order-details-mobile"].forEach(id => {
+    ["modal-checkout", "modal-success", "modal-order-details-mobile", "modal-mobile-new-compra"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("click", (e) => {

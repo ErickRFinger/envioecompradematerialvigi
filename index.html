@@ -1739,6 +1739,7 @@
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
+        loadSupabaseCompras();
       } else {
         currentUser = null;
         document.getElementById('view-login').style.display = 'flex';
@@ -1853,6 +1854,7 @@
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
+        loadSupabaseCompras();
         showToast(`Bem-vindo, ${user.name}! (Sessão Segura Iniciada)`, 'success');
       } else {
         loginFailAttempts++;
@@ -1980,6 +1982,7 @@
         closeUserSwitchModal();
         applyUserRoleSettings();
         loadSupabaseShipments();
+        loadSupabaseCompras();
         showToast(`Perfil alterado para: ${APP_USERS[username].name}`, 'success');
       }
     }
@@ -1988,6 +1991,8 @@
     let soundNotificationsEnabled = localStorage.getItem('vigi_sound_enabled') !== 'false';
     let knownShipmentIds = new Set();
     let isInitialShipmentLoad = true;
+    let knownCompraIds = new Set();
+    let isInitialCompraLoad = true;
 
     function playNotificationChime(type = 'new_order') {
       if (!soundNotificationsEnabled) return;
@@ -2189,6 +2194,92 @@
         }
       } catch (err) {
         console.warn('Erro ao sincronizar com Supabase:', err);
+      }
+    }
+
+    function getMaterialCategory(itemName) {
+      if (!itemName) return 'GERAL';
+      for (const cat of CATALOGO_MATERIAIS) {
+        if (cat.itens && cat.itens.some(it => it.toLowerCase() === itemName.toLowerCase())) {
+          return cat.categoria;
+        }
+      }
+      return 'INFRAESTRUTURA E FIXAÇÃO';
+    }
+
+    // 8.1 CARREGAMENTO EM TEMPO REAL DE PEDIDOS DE COMPRA (SUPABASE)
+    async function loadSupabaseCompras() {
+      if (!supabase) return;
+      try {
+        const { data, error } = await supabase
+          .from('compras')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(100);
+
+        if (error) throw error;
+
+        if (data) {
+          if (!isInitialCompraLoad) {
+            const newOrders = data.filter(c => !knownCompraIds.has(c.id));
+            if (newOrders.length > 0) {
+              playNotificationChime('new_order');
+              const firstNew = newOrders[0];
+              showToast(`🛒 Nova compra lançada! ${firstNew.descricao} (${firstNew.fornecedor_nome || 'Thiago'})`, 'warning');
+            }
+          }
+          isInitialCompraLoad = false;
+          knownCompraIds = new Set(data.map(c => c.id));
+
+          pedidosCompra = data.map(row => {
+            let meta = {};
+            const metaMatch = (row.observacoes || '').match(/\[META:(.*?)\]/);
+            if (metaMatch) {
+              try { meta = JSON.parse(metaMatch[1]); } catch(e) {}
+            }
+            const codeMatch = (row.observacoes || '').match(/\[CODE:(COM-\d+)\]/);
+            const qtdMatch = (row.observacoes || '').match(/\[QTD:(\d+)\]/);
+            const urgMatch = (row.observacoes || '').match(/\[URGENCIA:(.*?)\]/);
+
+            let cleanObs = (row.observacoes || '')
+              .replace(/\[META:.*?\]/g, '')
+              .replace(/\[CODE:.*?\]/g, '')
+              .replace(/\[QTD:.*?\]/g, '')
+              .replace(/\[URGENCIA:.*?\]/g, '')
+              .trim();
+
+            const code = meta.code || (codeMatch ? codeMatch[1] : ('COM-' + row.id.slice(0, 4).toUpperCase()));
+            const qtd = meta.qtd !== undefined ? meta.qtd : (qtdMatch ? parseInt(qtdMatch[1]) : (row.valor_total > 0 ? row.valor_total : 1));
+            const urgencia = meta.urgencia || (urgMatch ? urgMatch[1] : 'Normal');
+            const obs = meta.obs !== undefined ? meta.obs : cleanObs;
+            const item = meta.item || row.descricao;
+            const solicitante = meta.solicitante || row.fornecedor_nome || 'Thiago (Matriz)';
+            let status = (row.status || 'solicitado').toLowerCase();
+            if (status === 'aberto' || status === 'pendente') status = 'solicitado';
+            if (status === 'paga' || status === 'concluido' || status === 'em_estoque') status = 'emestoque';
+
+            const dateObj = new Date(row.created_at);
+            const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            return {
+              id: code,
+              rawId: row.id,
+              item: item,
+              qtd: qtd,
+              solicitante: solicitante,
+              urgencia: urgencia,
+              data: dataStr,
+              obs: obs,
+              status: status,
+              categoria: row.categoria || 'Geral'
+            };
+          });
+
+          saveState();
+          renderAll();
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar compras do Supabase:', err);
       }
     }
 
@@ -3159,33 +3250,52 @@
       }
     }
 
-    function movePedidoCompra(id, newStatus) {
+    async function movePedidoCompra(id, newStatus) {
       if (!canAccessCompras()) {
         showToast('Acesso negado: Somente administradores e Adilson podem gerenciar compras.', 'warning');
         return;
       }
-      const compra = pedidosCompra.find(c => c.id === id);
+      const compra = pedidosCompra.find(c => c.id === id || c.rawId === id);
       if (compra) {
         compra.status = newStatus;
         saveState();
         renderAll();
         const label = newStatus === 'comprado' ? 'Comprado / Em Trânsito' : newStatus === 'emestoque' ? 'Disponível no Estoque Matriz' : 'Solicitado / Cotação';
-        showToast(`Compra ${id} atualizada para: ${label}!`, 'success');
+        showToast(`Compra ${compra.id} atualizada para: ${label}!`, 'success');
+
+        if (supabase && compra.rawId) {
+          try {
+            const { error } = await supabase.from('compras').update({ status: newStatus }).eq('id', compra.rawId);
+            if (error) console.warn('Erro ao atualizar compra no Supabase:', error);
+          } catch (err) {
+            console.warn('Erro ao atualizar compra no Supabase:', err);
+          }
+        }
       }
     }
 
-    function deleteCompra(id) {
+    async function deleteCompra(id) {
       if (!canAccessCompras()) {
         showToast('Acesso negado: Somente administradores e Adilson podem excluir compras.', 'warning');
         return;
       }
-      const compra = pedidosCompra.find(c => c.id === id);
+      const compra = pedidosCompra.find(c => c.id === id || c.rawId === id);
       if (!compra) return;
-      if (confirm(`Deseja realmente excluir a requisição de compra ${id} (${compra.item})?\nEsta exclusão é definitiva.`)) {
-        pedidosCompra = pedidosCompra.filter(c => c.id !== id);
+      if (confirm(`Deseja realmente excluir a requisição de compra ${compra.id} (${compra.item})?\nEsta exclusão é definitiva no banco de dados.`)) {
+        const rawId = compra.rawId;
+        pedidosCompra = pedidosCompra.filter(c => c.id !== compra.id && (!rawId || c.rawId !== rawId));
         saveState();
         renderAll();
-        showToast(`Solicitação ${id} removida com sucesso.`, 'info');
+        showToast(`Solicitação ${compra.id} removida com sucesso.`, 'info');
+
+        if (supabase && rawId) {
+          try {
+            const { error } = await supabase.from('compras').delete().eq('id', rawId);
+            if (error) console.warn('Erro ao excluir compra no Supabase:', error);
+          } catch (err) {
+            console.warn('Erro ao excluir compra no Supabase:', err);
+          }
+        }
       }
     }
 
@@ -3544,7 +3654,7 @@
       }
     }
 
-    function submitNewCompra() {
+    async function submitNewCompra() {
       if (!canAccessCompras()) {
         showToast('Acesso Restrito: Apenas Administradores e Adilson podem registrar compras.', 'warning');
         return;
@@ -3553,7 +3663,8 @@
       const item = itemInput ? itemInput.value.trim() : '';
       const qtd = parseInt(document.getElementById('compra-qtd').value) || 1;
       const urgencia = document.getElementById('compra-urgencia').value;
-      const solicitante = document.getElementById('compra-solicitante').value.trim();
+      const solicitanteInput = document.getElementById('compra-solicitante');
+      const solicitante = (solicitanteInput ? solicitanteInput.value.trim() : '') || (currentUser ? `${APP_USERS[currentUser]?.name} (${APP_USERS[currentUser]?.filial})` : 'Thiago (Matriz)');
       const obs = document.getElementById('compra-obs').value.trim();
 
       if (!item) {
@@ -3562,19 +3673,41 @@
         return;
       }
 
+      const catNome = getMaterialCategory(item);
       const newId = `COM-${Math.floor(1000 + Math.random() * 9000)}`;
-      const novaCompra = {
-        id: newId,
+      const metaJson = JSON.stringify({
+        code: newId,
         item: item,
         qtd: qtd,
-        solicitante: solicitante || (currentUser ? `${APP_USERS[currentUser]?.name} (${APP_USERS[currentUser]?.filial})` : 'Adilson (Palotina)'),
+        solicitante: solicitante,
+        urgencia: urgencia,
+        obs: obs
+      });
+      const obsFormatted = `[CODE:${newId}] [QTD:${qtd}] [URGENCIA:${urgencia}] ${obs} [META:${metaJson}]`;
+
+      const payload = {
+        fornecedor_nome: solicitante,
+        descricao: item,
+        valor_total: 0,
+        status: 'solicitado',
+        categoria: catNome,
+        observacoes: obsFormatted
+      };
+
+      const novaCompraLocal = {
+        id: newId,
+        rawId: null,
+        item: item,
+        qtd: qtd,
+        solicitante: solicitante,
         urgencia: urgencia,
         data: new Date().toLocaleString('pt-BR'),
         obs: obs,
-        status: 'solicitado'
+        status: 'solicitado',
+        categoria: catNome
       };
 
-      pedidosCompra.unshift(novaCompra);
+      pedidosCompra.unshift(novaCompraLocal);
       saveState();
       switchMainTab('compras');
       closeNewCompraModal();
@@ -3587,11 +3720,28 @@
       if (qtdInput) qtdInput.value = '10';
 
       renderAll();
-      showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
+
+      if (supabase) {
+        try {
+          const { data, error } = await supabase.from('compras').insert([payload]).select();
+          if (error) throw error;
+          if (data && data[0]) {
+            novaCompraLocal.rawId = data[0].id;
+            knownCompraIds.add(data[0].id);
+          }
+          showToast(`Requisição ${newId} sincronizada com sucesso na nuvem!`, 'success');
+          loadSupabaseCompras();
+        } catch (err) {
+          console.error('Erro ao registrar compra no Supabase:', err);
+          showToast(`Salvo localmente (offline): ${err.message || ''}`, 'warning');
+        }
+      } else {
+        showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
+      }
     }
 
     function sendCompraToWhatsApp(id) {
-      const c = pedidosCompra.find(x => x.id === id);
+      const c = pedidosCompra.find(x => x.id === id || x.rawId === id);
       if (!c) return;
       const statusLabel = c.status === 'solicitado' ? '🟡 SOLICITADO / COTAÇÃO' : c.status === 'comprado' ? '🔵 COMPRADO / TRÂNSITO' : '🟢 NO ESTOQUE MATRIZ';
       const text = `📦 *REQUISIÇÃO DE COMPRA - VIGI MATERIAIS*\n` +
@@ -4711,10 +4861,10 @@
       const icon = document.getElementById('icon-manual-sync');
       if (icon) icon.classList.add('fa-spin');
       try {
-        await loadSupabaseShipments();
+        await Promise.all([loadSupabaseShipments(), loadSupabaseCompras()]);
         lastSyncTimestamp = new Date();
         updateSyncTimeUI();
-        showToast('Dados sincronizados com o Supabase!', 'success');
+        showToast('Dados de envios e compras sincronizados com a nuvem!', 'success');
       } catch (err) {
         showToast('Erro ao atualizar dados.', 'error');
       } finally {
@@ -4737,7 +4887,7 @@
       });
     }
 
-    // Supabase Realtime Listener
+    // Supabase Realtime Listener (Shipments & Compras)
     function initRealtime() {
       if (!supabase) return;
       try {
@@ -4745,6 +4895,11 @@
           .channel('vigi-matriz-realtime')
           .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
             loadSupabaseShipments();
+            lastSyncTimestamp = new Date();
+            updateSyncTimeUI();
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'compras' }, () => {
+            loadSupabaseCompras();
             lastSyncTimestamp = new Date();
             updateSyncTimeUI();
           })
@@ -4757,10 +4912,11 @@
     setInterval(() => {
       if (currentUser) {
         loadSupabaseShipments();
+        loadSupabaseCompras();
         lastSyncTimestamp = new Date();
         updateSyncTimeUI();
       }
-    }, 20000);
+    }, 15000);
 
     // Inicialização Obrigatória com Login Check
     
