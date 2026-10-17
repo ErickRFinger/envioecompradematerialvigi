@@ -1250,19 +1250,23 @@
   </div>
 
   <!-- ======================================================== -->
-  <!-- MODAL: NOVA SOLICITAÇÃO DE COMPRA / MATRIZ -->
+  <!-- MODAL: NOVA SOLICITAÇÃO DE COMPRA / MATRIZ (SUPORTE A MÚLTIPLOS ITENS) -->
   <!-- ======================================================== -->
-  <div id="modal-new-compra" style="display: none;" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-4">
-    <div class="glass-surface w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden flex flex-col border border-white/10 animate-in zoom-in-95 duration-200">
+  <div id="modal-new-compra" style="display: none;" class="fixed inset-0 bg-black/85 backdrop-blur-xl z-50 flex items-center justify-center p-3 sm:p-4">
+    <div class="glass-surface w-full max-w-3xl rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-white/10 animate-in zoom-in-95 duration-200">
       
-      <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+      <!-- HEADER -->
+      <div class="px-6 py-4 bg-slate-950/90 border-b border-white/10 flex items-center justify-between shrink-0">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-base font-bold shadow-glow-emerald">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-lg font-bold shadow-glow-emerald">
             <i class="fa-solid fa-cart-shopping"></i>
           </div>
           <div>
-            <h2 class="text-base font-extrabold text-white">Solicitar Compra de Materiais</h2>
-            <p class="text-xs text-slate-400">Reposição de itens no Almoxarifado Central & Filiais</p>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-extrabold text-white">Solicitar Pedidos de Compras</h2>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Múltiplos Itens</span>
+            </div>
+            <p class="text-xs text-slate-400">Adicione um ou vários materiais para solicitar a compra de uma só vez</p>
           </div>
         </div>
         <button onclick="closeNewCompraModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center cursor-pointer">
@@ -1270,56 +1274,137 @@
         </button>
       </div>
 
-      <div class="p-6 space-y-3.5 text-xs">
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Item / Descrição do Material *</label>
-          <input type="text" id="compra-item" list="compra-materiais-datalist" placeholder="Ex: Conector RJ45 blindado, Câmera Bullet UNV, Cabo de Rede..." 
-                 class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500">
-          <datalist id="compra-materiais-datalist"></datalist>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <div class="flex items-center justify-between mb-1">
-              <label class="font-semibold text-slate-300">Quantidade *</label>
-              <div class="flex items-center gap-1">
-                <button type="button" onclick="setCompraQtd(5)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+5</button>
-                <button type="button" onclick="setCompraQtd(10)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+10</button>
-                <button type="button" onclick="setCompraQtd(25)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+25</button>
-                <button type="button" onclick="setCompraQtd(50)" class="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 font-mono cursor-pointer">+50</button>
-              </div>
-            </div>
-            <input type="number" id="compra-qtd" min="1" value="10" 
-                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-mono font-bold">
+      <!-- BODY COM SCROLL -->
+      <div class="p-5 sm:p-6 space-y-4 text-xs overflow-y-auto flex-1">
+        
+        <!-- PARTE 1: DADOS GERAIS DO LOTE / SOLICITANTE -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-950/60 p-3.5 rounded-2xl border border-white/5">
+          <div class="sm:col-span-1">
+            <label class="block font-semibold text-slate-300 mb-1">Solicitante Responsável *</label>
+            <input type="text" id="compra-solicitante" value="" placeholder="Nome do solicitante..."
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-medium">
           </div>
-          <div>
-            <label class="block font-semibold text-slate-300 mb-1">Nível de Urgência</label>
-            <select id="compra-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500 font-medium">
+          <div class="sm:col-span-1">
+            <label class="block font-semibold text-slate-300 mb-1">Nível de Urgência Geral</label>
+            <select id="compra-urgencia" class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-medium">
               <option value="Normal">🟢 Normal (Estoque de segurança)</option>
-              <option value="Alta">🟡 Alta (Ruptura iminente)</option>
+              <option value="Alta" selected>🟡 Alta (Ruptura iminente)</option>
               <option value="Urgente">🔴 Urgente (Estoque zerado)</option>
             </select>
           </div>
+          <div class="sm:col-span-1">
+            <label class="block font-semibold text-slate-300 mb-1">Observações / Motivo (Geral)</label>
+            <input type="text" id="compra-obs" placeholder="Ex: Falta para atendimento filiais..." 
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+          </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Solicitante Responsável</label>
-          <input type="text" id="compra-solicitante" value="" placeholder="Nome e filial do solicitante..."
-                 class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2.5 text-white focus:outline-none focus:border-emerald-500">
+        <!-- PARTE 2: SELETOR DE MODALIDADE DE ENTRADA (ITEM A ITEM OU COLAR LISTA) -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between border-b border-white/10 pb-2">
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="switchCompraInputMode('manual')" id="btn-compra-mode-manual" 
+                      class="px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer">
+                <i class="fa-solid fa-plus-circle"></i>
+                <span>Adicionar Item a Item</span>
+              </button>
+              <button type="button" onclick="switchCompraInputMode('paste')" id="btn-compra-mode-paste" 
+                      class="px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition text-slate-400 hover:text-white bg-slate-900 border border-white/5 cursor-pointer">
+                <i class="fa-regular fa-clipboard"></i>
+                <span>Colar Lista Pronta (WhatsApp / Bloco)</span>
+              </button>
+            </div>
+            <span class="text-[11px] text-slate-400 font-medium hidden sm:inline">Adicione quantos itens precisar</span>
+          </div>
+
+          <!-- MODO 1: ITEM A ITEM -->
+          <div id="compra-section-manual" class="space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end bg-slate-950/80 p-3.5 rounded-2xl border border-white/10">
+              <div class="sm:col-span-7">
+                <label class="block font-semibold text-slate-300 mb-1">Material / Item Requisitado *</label>
+                <div class="relative">
+                  <input type="text" id="compra-item" list="compra-materiais-list" placeholder="Digite ou selecione o material..." 
+                         onkeydown="if(event.key==='Enter'){event.preventDefault();addPendingCompraItem();}"
+                         class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-xs placeholder-slate-500 focus:outline-none focus:border-emerald-500">
+                  <datalist id="compra-materiais-list"></datalist>
+                </div>
+              </div>
+              <div class="sm:col-span-3">
+                <div class="flex items-center justify-between mb-1">
+                  <label class="font-semibold text-slate-300">Quantidade</label>
+                  <div class="flex items-center gap-1">
+                    <button type="button" onclick="setCompraQtd(10)" class="px-1 py-0.2 rounded bg-slate-800 hover:bg-slate-700 text-[9px] text-slate-300 font-mono">+10</button>
+                    <button type="button" onclick="setCompraQtd(50)" class="px-1 py-0.2 rounded bg-slate-800 hover:bg-slate-700 text-[9px] text-slate-300 font-mono">+50</button>
+                    <button type="button" onclick="setCompraQtd(100)" class="px-1 py-0.2 rounded bg-slate-800 hover:bg-slate-700 text-[9px] text-slate-300 font-mono">+100</button>
+                  </div>
+                </div>
+                <input type="number" id="compra-qtd" min="1" value="10" 
+                       onkeydown="if(event.key==='Enter'){event.preventDefault();addPendingCompraItem();}"
+                       class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white text-xs focus:outline-none focus:border-emerald-500 font-mono font-bold text-center">
+              </div>
+              <div class="sm:col-span-2">
+                <button type="button" onclick="addPendingCompraItem()" 
+                        class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md shadow-emerald-600/30 flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer">
+                  <i class="fa-solid fa-plus text-[11px]"></i>
+                  <span>Adicionar</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODO 2: COLAR LISTA PRONTA -->
+          <div id="compra-section-paste" class="space-y-3 hidden">
+            <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-white/10 space-y-2">
+              <div class="flex items-center justify-between text-[11px]">
+                <label class="font-semibold text-emerald-300 flex items-center gap-1.5">
+                  <i class="fa-solid fa-paste"></i>
+                  <span>Cole a lista de materiais aqui (1 por linha)</span>
+                </label>
+                <span class="text-slate-500">Ex: CONECTOR BNC - 400 ou Cabo: 10</span>
+              </div>
+              <textarea id="compra-paste-area" rows="4" 
+                        placeholder="CONECTOR BNC - 400&#10;CONECTOR P4 - 400&#10;BALUN - 10 PARES&#10;TOMADA MACHO - 20&#10;ELETRO DUTO - 40 BARRAS DE 3M&#10;DVR 4 CANAIS - 10" 
+                        class="w-full bg-slate-900 border border-white/10 rounded-xl p-3 text-white text-xs font-mono placeholder-slate-600 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+              <div class="flex items-center justify-between">
+                <p class="text-[10px] text-slate-400">O sistema detecta automaticamente o nome e a quantidade de cada linha.</p>
+                <button type="button" onclick="processPastedCompras()" 
+                        class="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-600/30 cursor-pointer active:scale-95 transition">
+                  <i class="fa-solid fa-bolt text-xs"></i>
+                  <span>Processar e Incluir Todos</span>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div>
-          <label class="block font-semibold text-slate-300 mb-1">Justificativa / Observações (Opcional)</label>
-          <textarea id="compra-obs" rows="3" placeholder="Ex: Material necessário para atendimento emergencial de clientes na região..." 
-                    class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"></textarea>
+        <!-- PARTE 3: LISTA DOS ITENS PRONTOS PARA SOLICITAR -->
+        <div class="space-y-2 pt-1">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold text-white text-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-boxes-stacked text-emerald-400"></i>
+                <span>Itens a Solicitar nesta Compra:</span>
+              </span>
+              <span id="compra-pending-count" class="font-mono text-xs font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.2 rounded-full">0 itens</span>
+            </div>
+            <button type="button" id="btn-clear-pending-compras" onclick="clearPendingCompraItems()" class="text-[11px] text-rose-400 hover:text-white hover:underline transition hidden cursor-pointer">
+              <i class="fa-solid fa-trash-can mr-1"></i> Limpar Lista
+            </button>
+          </div>
+
+          <div id="compra-pending-items-list" class="space-y-2 max-h-52 overflow-y-auto pr-1">
+            <!-- Injected by JS -->
+          </div>
         </div>
+
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
-        <button onclick="closeNewCompraModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Cancelar</button>
-        <button onclick="submitNewCompra()" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer active:scale-95 transition">
+      <!-- FOOTER -->
+      <div class="px-6 py-4 bg-slate-950/90 border-t border-white/10 flex items-center justify-between shrink-0">
+        <button onclick="closeNewCompraModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer text-xs">Cancelar</button>
+        <button onclick="submitNewCompra()" id="btn-submit-compras-batch" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-2.5 rounded-xl font-extrabold text-xs shadow-lg shadow-emerald-600/30 flex items-center gap-2 cursor-pointer active:scale-95 transition">
           <i class="fa-solid fa-paper-plane text-xs"></i>
-          <span>Registrar Compra</span>
+          <span id="btn-submit-compras-label">Solicitar Itens de Compra</span>
         </button>
       </div>
 
@@ -3583,6 +3668,291 @@
       }
     }
 
+    // ========================================================
+    // 17. REQUISIÇÕES DE COMPRA EM LOTE (MÚLTIPLOS ITENS)
+    // ========================================================
+    let pendingCompraItems = [];
+    let currentCompraInputMode = 'manual';
+
+    const COMPRA_SYNONYMS = [
+      { match: ["eletro duto", "eletroduto"], target: "Eletroduto (Barra de 3m)" },
+      { match: ["caixinha externa", "caixinha vedada", "passagem vedada"], target: "Caixinha de Passagem Vedada" },
+      { match: ["caixinha", "caixinha branca", "passagem branca"], target: "Caixinha de Passagem Branca" },
+      { match: ["presilha grande", "nylon 40cm", "presilha 40cm"], target: "Presilha de Nylon 40cm" },
+      { match: ["presilha pequena", "nylon 20cm", "presilha 20cm"], target: "Presilha de Nylon 20cm" },
+      { match: ["coaxial", "cabo coaxial"], target: "Bobina de Cabo Coaxial" },
+      { match: ["blindado", "cabo blindado"], target: "Bobina de Cabo Blindado" },
+      { match: ["balun", "par balun"], target: "Par de Balun" },
+      { match: ["plaquinha"], target: "Plaquinha VIGI" },
+      { match: ["caixa metalica grande", "caixa metálica grande"], target: "Caixa Metálica Grande" },
+      { match: ["caixa de emenda de canaleta", "caixa de emenda", "emenda de canaleta"], target: "Caixa de Emenda de Canaleta" },
+      { match: ["miguelao concreto", "miguelão concreto"], target: "Miguelão de Concreto" },
+      { match: ["miguelao madeira", "miguelão madeira"], target: "Miguelão de Madeira" },
+      { match: ["dvr 4 canais", "dvr 4ch"], target: "DVR 4 Canais" },
+      { match: ["dvr 8 canais", "dvr 8ch"], target: "DVR 8 Canais" },
+      { match: ["dvr 16 canais", "dvr 16ch"], target: "DVR 16 Canais" }
+    ];
+
+    function normalizeMaterialName(name) {
+      if (!name) return "";
+      const clean = name.trim();
+      const lower = clean.toLowerCase();
+
+      for (const s of COMPRA_SYNONYMS) {
+        if (s.match.some(m => lower === m || lower.includes(m))) {
+          return s.target;
+        }
+      }
+
+      let catalogFound = null;
+      if (Array.isArray(CATALOGO_MATERIAIS)) {
+        CATALOGO_MATERIAIS.forEach(c => {
+          if (Array.isArray(c.itens)) {
+            c.itens.forEach(it => {
+              const str = typeof it === 'object' ? (it.nome || '') : String(it);
+              if (str.toLowerCase() === lower) catalogFound = str;
+            });
+          }
+        });
+        if (catalogFound) return catalogFound;
+
+        CATALOGO_MATERIAIS.forEach(c => {
+          if (Array.isArray(c.itens)) {
+            c.itens.forEach(it => {
+              const str = typeof it === 'object' ? (it.nome || '') : String(it);
+              if (!catalogFound && (str.toLowerCase().includes(lower) || lower.includes(str.toLowerCase()))) {
+                catalogFound = str;
+              }
+            });
+          }
+        });
+      }
+      if (catalogFound) return catalogFound;
+
+      return clean.charAt(0).toUpperCase() + clean.slice(1);
+    }
+
+    function parsePastedItemList(text) {
+      const lines = text.split("\n");
+      const items = [];
+
+      for (let rawLine of lines) {
+        let line = rawLine.trim();
+        if (!line) continue;
+        line = line.replace(/^[\*\-•\d\.\)\s]+/, "").trim();
+        if (!line) continue;
+
+        let item = "";
+        let qtd = 1;
+
+        const matchSep = line.match(/^(.+?)\s*[\-:=–—]\s*(\d+)(.*)$/i);
+        const matchPrefix = line.match(/^(\d+)\s*x?\s*[\-:=–—]?\s*(.+)$/i);
+        const matchSuffix = line.match(/^(.+?)\s+(\d+)\s*(un|unid|unidades|barras|pares|caixas|cx|rolos|bobinas|m|metros)?$/i);
+
+        if (matchSep) {
+          item = matchSep[1].trim();
+          qtd = parseInt(matchSep[2]) || 1;
+        } else if (matchPrefix && isNaN(matchPrefix[2])) {
+          qtd = parseInt(matchPrefix[1]) || 1;
+          item = matchPrefix[2].trim();
+        } else if (matchSuffix) {
+          item = matchSuffix[1].trim();
+          qtd = parseInt(matchSuffix[2]) || 1;
+        } else {
+          item = line;
+          qtd = 1;
+        }
+
+        if (item) {
+          items.push({ item: normalizeMaterialName(item), qtd: qtd });
+        }
+      }
+      return items;
+    }
+
+    function switchCompraInputMode(mode) {
+      currentCompraInputMode = mode;
+      const secManual = document.getElementById('compra-section-manual');
+      const secPaste = document.getElementById('compra-section-paste');
+      const btnManual = document.getElementById('btn-compra-mode-manual');
+      const btnPaste = document.getElementById('btn-compra-mode-paste');
+
+      if (mode === 'manual') {
+        if (secManual) secManual.classList.remove('hidden');
+        if (secPaste) secPaste.classList.add('hidden');
+        if (btnManual) btnManual.className = "px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer";
+        if (btnPaste) btnPaste.className = "px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition text-slate-400 hover:text-white bg-slate-900 border border-white/5 cursor-pointer";
+        setTimeout(() => document.getElementById('compra-item')?.focus(), 50);
+      } else {
+        if (secManual) secManual.classList.add('hidden');
+        if (secPaste) secPaste.classList.remove('hidden');
+        if (btnPaste) btnPaste.className = "px-3 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 cursor-pointer";
+        if (btnManual) btnManual.className = "px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 transition text-slate-400 hover:text-white bg-slate-900 border border-white/5 cursor-pointer";
+        setTimeout(() => document.getElementById('compra-paste-area')?.focus(), 50);
+      }
+    }
+
+    function addPendingCompraItem() {
+      const itemInput = document.getElementById('compra-item');
+      const rawItem = itemInput ? itemInput.value.trim() : '';
+      const qtdInput = document.getElementById('compra-qtd');
+      const qtd = parseInt(qtdInput ? qtdInput.value : 10) || 1;
+
+      if (!rawItem) {
+        showToast('Digite ou selecione o material para adicionar.', 'warning');
+        if (itemInput) itemInput.focus();
+        return;
+      }
+
+      const item = normalizeMaterialName(rawItem);
+      const existing = pendingCompraItems.find(it => it.item.toLowerCase() === item.toLowerCase());
+      if (existing) {
+        existing.qtd += qtd;
+        showToast(`Quantidade de "${item}" somada para ${existing.qtd}!`, 'info');
+      } else {
+        pendingCompraItems.push({
+          id: 'TMP-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+          item: item,
+          qtd: qtd,
+          categoria: getMaterialCategory(item)
+        });
+        showToast(`"${item}" (+${qtd} un) adicionado à lista!`, 'success');
+      }
+
+      if (itemInput) {
+        itemInput.value = '';
+        itemInput.focus();
+      }
+      if (qtdInput) qtdInput.value = '10';
+
+      renderPendingCompraItems();
+    }
+
+    function updatePendingCompraQtd(id, delta) {
+      const found = pendingCompraItems.find(it => it.id === id);
+      if (!found) return;
+      found.qtd = Math.max(1, (found.qtd || 1) + delta);
+      renderPendingCompraItems();
+    }
+
+    function setPendingCompraQtd(id, val) {
+      const found = pendingCompraItems.find(it => it.id === id);
+      if (!found) return;
+      found.qtd = Math.max(1, parseInt(val) || 1);
+      renderPendingCompraItems();
+    }
+
+    function removePendingCompraItem(id) {
+      pendingCompraItems = pendingCompraItems.filter(it => it.id !== id);
+      renderPendingCompraItems();
+    }
+
+    function clearPendingCompraItems() {
+      if (pendingCompraItems.length === 0) return;
+      pendingCompraItems = [];
+      renderPendingCompraItems();
+      showToast('Lista de compras limpa.', 'info');
+    }
+
+    function processPastedCompras() {
+      const area = document.getElementById('compra-paste-area');
+      const text = area ? area.value.trim() : '';
+      if (!text) {
+        showToast('Cole o texto com os itens antes de processar.', 'warning');
+        return;
+      }
+
+      const parsed = parsePastedItemList(text);
+      if (parsed.length === 0) {
+        showToast('Nenhum item reconhecido no texto informado.', 'warning');
+        return;
+      }
+
+      let addedCount = 0;
+      parsed.forEach(p => {
+        const normalizedName = normalizeMaterialName(p.item);
+        const existing = pendingCompraItems.find(it => it.item.toLowerCase() === normalizedName.toLowerCase());
+        if (existing) {
+          existing.qtd += p.qtd;
+        } else {
+          pendingCompraItems.push({
+            id: 'TMP-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+            item: normalizedName,
+            qtd: p.qtd,
+            categoria: getMaterialCategory(normalizedName)
+          });
+          addedCount++;
+        }
+      });
+
+      if (area) area.value = '';
+      switchCompraInputMode('manual');
+      renderPendingCompraItems();
+      showToast(`${parsed.length} materiais incluídos na lista de compra!`, 'success');
+    }
+
+    function renderPendingCompraItems() {
+      const container = document.getElementById('compra-pending-items-list');
+      const countEl = document.getElementById('compra-pending-count');
+      const btnCountLabel = document.getElementById('btn-submit-compras-label');
+      const btnClear = document.getElementById('btn-clear-pending-compras');
+
+      const totalItems = pendingCompraItems.length;
+      if (countEl) countEl.innerText = `${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
+      if (btnCountLabel) {
+        btnCountLabel.innerText = totalItems > 0 
+          ? `Solicitar Todos (${totalItems} ${totalItems === 1 ? 'item' : 'itens'}) ➔`
+          : 'Solicitar Itens de Compra';
+      }
+
+      if (btnClear) {
+        if (totalItems > 0) btnClear.classList.remove('hidden');
+        else btnClear.classList.add('hidden');
+      }
+
+      if (!container) return;
+
+      if (totalItems === 0) {
+        container.innerHTML = `
+          <div class="p-4 rounded-2xl border border-dashed border-white/10 text-center text-slate-500 bg-slate-950/40">
+            <i class="fa-solid fa-cart-arrow-down text-xl mb-1 text-emerald-400 opacity-40"></i>
+            <p class="text-[11px] font-semibold text-slate-400">Nenhum material adicionado na lista ainda</p>
+            <p class="text-[10px] text-slate-500 mt-0.5">Adicione os itens que estão faltando acima ou cole uma lista completa para enviar tudo junto.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = pendingCompraItems.map((it, idx) => {
+        return `
+          <div class="flex items-center justify-between gap-3 bg-slate-900/90 p-2.5 px-3 rounded-2xl border border-white/10 hover:border-emerald-500/30 transition">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="w-5 h-5 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-emerald-500/30">${idx + 1}</span>
+              <div class="min-w-0">
+                <span class="font-extrabold text-white text-xs block truncate">${it.item}</span>
+                <span class="text-[9px] text-slate-400 uppercase font-semibold tracking-wider">${it.categoria || getMaterialCategory(it.item)}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 shrink-0">
+              <div class="flex items-center bg-slate-950 rounded-xl border border-white/10 p-0.5">
+                <button type="button" onclick="updatePendingCompraQtd('${it.id}', -1)" class="w-6 h-6 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-xs font-bold cursor-pointer">-</button>
+                <input type="number" min="1" value="${it.qtd}" onchange="setPendingCompraQtd('${it.id}', this.value)" 
+                       class="w-12 bg-transparent text-center font-mono font-bold text-xs text-emerald-300 focus:outline-none">
+                <button type="button" onclick="updatePendingCompraQtd('${it.id}', 1)" class="w-6 h-6 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center text-xs font-bold cursor-pointer">+</button>
+                <span class="text-[10px] font-mono text-slate-500 pr-1.5">un</span>
+              </div>
+
+              <button type="button" onclick="removePendingCompraItem('${it.id}')" title="Remover item da lista" 
+                      class="w-7 h-7 rounded-xl bg-slate-950 border border-white/10 hover:border-rose-500/40 text-slate-500 hover:text-rose-400 flex items-center justify-center text-[10px] transition cursor-pointer">
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
     // Modal Compras & Ações
     function openNewCompraModal() {
       if (!canAccessCompras()) {
@@ -3600,11 +3970,13 @@
           const u = APP_USERS[currentUser];
           solicitanteInput.value = `${u.name} (${u.filial})`;
         } else {
-          solicitanteInput.value = 'Adilson (Palotina)';
+          solicitanteInput.value = 'Thiago (Matriz)';
         }
       }
 
       populateCompraDatalist();
+      switchCompraInputMode('manual');
+      renderPendingCompraItems();
 
       setTimeout(() => {
         const itemInput = document.getElementById('compra-item');
@@ -3639,7 +4011,10 @@
       if (Array.isArray(CATALOGO_MATERIAIS)) {
         CATALOGO_MATERIAIS.forEach(cat => {
           if (Array.isArray(cat.itens)) {
-            cat.itens.forEach(it => todosItens.push(it.nome));
+            cat.itens.forEach(it => {
+              const str = typeof it === 'object' ? (it.nome || '') : String(it);
+              if (str) todosItens.push(str);
+            });
           }
         });
       }
@@ -3659,84 +4034,115 @@
         showToast('Acesso Restrito: Apenas Administradores e Adilson podem registrar compras.', 'warning');
         return;
       }
-      const itemInput = document.getElementById('compra-item');
-      const item = itemInput ? itemInput.value.trim() : '';
-      const qtd = parseInt(document.getElementById('compra-qtd').value) || 1;
-      const urgencia = document.getElementById('compra-urgencia').value;
-      const solicitanteInput = document.getElementById('compra-solicitante');
-      const solicitante = (solicitanteInput ? solicitanteInput.value.trim() : '') || (currentUser ? `${APP_USERS[currentUser]?.name} (${APP_USERS[currentUser]?.filial})` : 'Thiago (Matriz)');
-      const obs = document.getElementById('compra-obs').value.trim();
 
-      if (!item) {
-        alert('Por favor, informe a descrição do material necessário.');
+      // Se o usuário digitou algo no input mas não clicou em "Adicionar", inclui automaticamente
+      const itemInput = document.getElementById('compra-item');
+      const rawItem = itemInput ? itemInput.value.trim() : '';
+      if (rawItem) {
+        addPendingCompraItem();
+      }
+
+      if (pendingCompraItems.length === 0) {
+        alert('Por favor, adicione pelo menos um material à lista de compras antes de registrar.');
         if (itemInput) itemInput.focus();
         return;
       }
 
-      const catNome = getMaterialCategory(item);
-      const newId = `COM-${Math.floor(1000 + Math.random() * 9000)}`;
-      const metaJson = JSON.stringify({
-        code: newId,
-        item: item,
-        qtd: qtd,
-        solicitante: solicitante,
-        urgencia: urgencia,
-        obs: obs
+      const urgencia = document.getElementById('compra-urgencia').value;
+      const solicitanteInput = document.getElementById('compra-solicitante');
+      const solicitante = (solicitanteInput ? solicitanteInput.value.trim() : '') || (currentUser ? `${APP_USERS[currentUser]?.name} (${APP_USERS[currentUser]?.filial})` : 'Thiago (Matriz)');
+      const obsGeral = document.getElementById('compra-obs').value.trim();
+      const btn = document.getElementById('btn-submit-compras-batch');
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-xs"></i> <span>Salvando no Supabase...</span>';
+      }
+
+      const loteId = `LOTE-${Math.floor(1000 + Math.random() * 9000)}`;
+      const newComprasLocais = [];
+      const supabasePayloads = [];
+
+      pendingCompraItems.forEach(it => {
+        const newCode = `COM-${Math.floor(1000 + Math.random() * 9000)}`;
+        const catNome = it.categoria || getMaterialCategory(it.item);
+        const metaJson = JSON.stringify({
+          code: newCode,
+          lote: loteId,
+          item: it.item,
+          qtd: it.qtd,
+          solicitante: solicitante,
+          urgencia: urgencia,
+          obs: obsGeral
+        });
+        const obsFormatted = `[CODE:${newCode}] [LOTE:${loteId}] [QTD:${it.qtd}] [URGENCIA:${urgencia}] ${obsGeral} [META:${metaJson}]`;
+
+        supabasePayloads.push({
+          fornecedor_nome: solicitante,
+          descricao: it.item,
+          valor_total: 0,
+          status: 'solicitado',
+          categoria: catNome,
+          observacoes: obsFormatted
+        });
+
+        newComprasLocais.push({
+          id: newCode,
+          rawId: null,
+          item: it.item,
+          qtd: it.qtd,
+          solicitante: solicitante,
+          urgencia: urgencia,
+          data: new Date().toLocaleString('pt-BR'),
+          obs: obsGeral,
+          status: 'solicitado',
+          categoria: catNome,
+          lote: loteId
+        });
       });
-      const obsFormatted = `[CODE:${newId}] [QTD:${qtd}] [URGENCIA:${urgencia}] ${obs} [META:${metaJson}]`;
 
-      const payload = {
-        fornecedor_nome: solicitante,
-        descricao: item,
-        valor_total: 0,
-        status: 'solicitado',
-        categoria: catNome,
-        observacoes: obsFormatted
-      };
-
-      const novaCompraLocal = {
-        id: newId,
-        rawId: null,
-        item: item,
-        qtd: qtd,
-        solicitante: solicitante,
-        urgencia: urgencia,
-        data: new Date().toLocaleString('pt-BR'),
-        obs: obs,
-        status: 'solicitado',
-        categoria: catNome
-      };
-
-      pedidosCompra.unshift(novaCompraLocal);
+      // UI Otimista
+      newComprasLocais.reverse().forEach(c => pedidosCompra.unshift(c));
       saveState();
       switchMainTab('compras');
       closeNewCompraModal();
 
-      // Limpar campos
+      // Limpar campos e lista pendente
+      pendingCompraItems = [];
       if (itemInput) itemInput.value = '';
       const obsInput = document.getElementById('compra-obs');
       if (obsInput) obsInput.value = '';
-      const qtdInput = document.getElementById('compra-qtd');
-      if (qtdInput) qtdInput.value = '10';
-
+      const pasteArea = document.getElementById('compra-paste-area');
+      if (pasteArea) pasteArea.value = '';
+      renderPendingCompraItems();
       renderAll();
 
-      if (supabase) {
+      if (supabase && supabasePayloads.length > 0) {
         try {
-          const { data, error } = await supabase.from('compras').insert([payload]).select();
+          const { data, error } = await supabase.from('compras').insert(supabasePayloads).select();
           if (error) throw error;
-          if (data && data[0]) {
-            novaCompraLocal.rawId = data[0].id;
-            knownCompraIds.add(data[0].id);
+          if (data && Array.isArray(data)) {
+            data.forEach(d => {
+              knownCompraIds.add(d.id);
+            });
           }
-          showToast(`Requisição ${newId} sincronizada com sucesso na nuvem!`, 'success');
+          showToast(`🚀 ${supabasePayloads.length} materiais de compra salvos com sucesso na nuvem!`, 'success');
           loadSupabaseCompras();
         } catch (err) {
-          console.error('Erro ao registrar compra no Supabase:', err);
+          console.error('Erro ao registrar compras no Supabase:', err);
           showToast(`Salvo localmente (offline): ${err.message || ''}`, 'warning');
+        } finally {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i> <span id="btn-submit-compras-label">Solicitar Itens de Compra</span>';
+          }
         }
       } else {
-        showToast(`Requisição de Compra ${newId} aberta com sucesso!`, 'success');
+        showToast(`${newComprasLocais.length} materiais de compra abertos com sucesso!`, 'success');
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-paper-plane text-xs"></i> <span id="btn-submit-compras-label">Solicitar Itens de Compra</span>';
+        }
       }
     }
 
