@@ -556,8 +556,9 @@
         <div>
           <div class="text-xs font-black text-white flex items-center gap-2">
             <span id="floating-cart-count">0 itens</span> no carrinho
+            <span class="text-[9px] bg-white/20 text-white font-bold px-1.5 py-0.5 rounded-full inline-flex items-center gap-1"><i class="fa-solid fa-floppy-disk text-[8px]"></i> Salvo auto</span>
           </div>
-          <p class="text-[10px] text-orange-100 font-medium">Toque para conferir e fechar</p>
+          <p class="text-[10px] text-orange-100 font-medium">Toque para conferir • Não perde ao minimizar</p>
         </div>
       </div>
       <div class="flex items-center gap-1.5 bg-white text-orange-600 px-3.5 py-2 rounded-xl text-xs font-black shadow-md">
@@ -811,7 +812,7 @@
 
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Técnico Solicitante *</label>
-            <input type="text" id="checkout-solicitante" placeholder="Ex: Jean Carlos" 
+            <input type="text" id="checkout-solicitante" oninput="saveMobileCartToStorage()" placeholder="Ex: Jean Carlos" 
                    class="w-full bg-slate-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
           </div>
 
@@ -833,7 +834,7 @@
 
           <div>
             <label class="block font-semibold text-slate-300 mb-1">Observações Operacionais (Opcional)</label>
-            <textarea id="checkout-obs" rows="2" placeholder="Ex: Material para manutenção cliente X, van das 14h..." 
+            <textarea id="checkout-obs" oninput="saveMobileCartToStorage()" rows="2" placeholder="Ex: Material para manutenção cliente X, van das 14h..." 
                       class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500 resize-none"></textarea>
           </div>
         </div>
@@ -1373,6 +1374,110 @@
     }
 
     // ========================================================
+    // 4.1 PERSISTÊNCIA DURÁVEL DO CARRINHO E SESSÃO (MOBILE RESILIENTE)
+    // Garante que quando o técnico minimizar para ver WhatsApp, atender
+    // ligação ou o sistema hibernar, o carrinho e os dados digitados
+    // NUNCA expirem nem sumam!
+    // ========================================================
+    const STORAGE_MOBILE_CART_KEY = 'vigi_mobile_cart_v1';
+    const STORAGE_MOBILE_OBS_KEY = 'vigi_mobile_checkout_obs';
+    const STORAGE_MOBILE_SOLICITANTE_KEY = 'vigi_mobile_checkout_solic';
+    const STORAGE_MOBILE_URG_KEY = 'vigi_mobile_checkout_urg';
+    const STORAGE_MOBILE_LAST_ACTIVE = 'vigi_mobile_last_active';
+
+    function saveMobileCartToStorage() {
+      try {
+        localStorage.setItem(STORAGE_MOBILE_CART_KEY, JSON.stringify(mobileCart));
+        if (currentUser) {
+          localStorage.setItem('vigi_mobile_user', currentUser);
+          localStorage.setItem('vigi_auth_session', currentUser);
+          localStorage.setItem('vigi_mobile_session', currentUser);
+        }
+        const obsEl = document.getElementById('checkout-obs');
+        if (obsEl && obsEl.value) {
+          localStorage.setItem(STORAGE_MOBILE_OBS_KEY, obsEl.value);
+        }
+        const solicEl = document.getElementById('checkout-solicitante');
+        if (solicEl && solicEl.value) {
+          localStorage.setItem(STORAGE_MOBILE_SOLICITANTE_KEY, solicEl.value);
+        }
+        const urgEl = document.getElementById('checkout-urgencia');
+        if (urgEl && urgEl.value) {
+          localStorage.setItem(STORAGE_MOBILE_URG_KEY, urgEl.value);
+        }
+        localStorage.setItem(STORAGE_MOBILE_LAST_ACTIVE, Date.now().toString());
+      } catch (e) {
+        console.warn('Erro ao salvar carrinho no armazenamento local:', e);
+      }
+    }
+
+    function loadMobileCartFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_MOBILE_CART_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            // Se o usuário não for admin, sanitiza itens restritos
+            if (!isAdmin()) {
+              Object.keys(parsed).forEach(it => {
+                if (typeof isItemRestrictedForSolicitantes === 'function' && isItemRestrictedForSolicitantes(it)) {
+                  delete parsed[it];
+                }
+              });
+            }
+            mobileCart = parsed;
+          }
+        }
+        const savedObs = localStorage.getItem(STORAGE_MOBILE_OBS_KEY);
+        const obsEl = document.getElementById('checkout-obs');
+        if (savedObs && obsEl && !obsEl.value) {
+          obsEl.value = savedObs;
+        }
+        const savedSolic = localStorage.getItem(STORAGE_MOBILE_SOLICITANTE_KEY);
+        const solicEl = document.getElementById('checkout-solicitante');
+        if (savedSolic && solicEl && !solicEl.value) {
+          solicEl.value = savedSolic;
+        }
+        const savedUrg = localStorage.getItem(STORAGE_MOBILE_URG_KEY);
+        if (savedUrg) {
+          setCheckoutUrgencia(savedUrg);
+        }
+      } catch (e) {
+        console.warn('Erro ao carregar carrinho salvo:', e);
+      }
+    }
+
+    function clearMobileCartStorage() {
+      try {
+        localStorage.removeItem(STORAGE_MOBILE_CART_KEY);
+        localStorage.removeItem(STORAGE_MOBILE_OBS_KEY);
+        localStorage.removeItem(STORAGE_MOBILE_SOLICITANTE_KEY);
+        localStorage.removeItem(STORAGE_MOBILE_URG_KEY);
+      } catch (e) {}
+    }
+
+    // Wake Lock para evitar tela desligar enquanto o técnico monta o pedido
+    let mobileWakeLock = null;
+    async function requestAppWakeLock() {
+      try {
+        if ('wakeLock' in navigator && !mobileWakeLock) {
+          mobileWakeLock = await navigator.wakeLock.request('screen');
+          mobileWakeLock.addEventListener('release', () => {
+            mobileWakeLock = null;
+          });
+        }
+      } catch (err) {}
+    }
+    function releaseAppWakeLock() {
+      try {
+        if (mobileWakeLock) {
+          mobileWakeLock.release();
+          mobileWakeLock = null;
+        }
+      } catch (err) {}
+    }
+
+    // ========================================================
     // CONTROLE DE MATERIAIS RESTRITOS (FERRAMENTAS & FIBRA ÓPTICA)
     // Somente os admins podem visualizar e solicitar materiais do tipo
     // multímetro, ferramentas e tudo referente a fibra óptica.
@@ -1477,7 +1582,7 @@
     function checkAuth() {
       const urlParams = new URLSearchParams(window.location.search);
       const paramUser = (urlParams.get('user') || urlParams.get('u') || '').trim().toLowerCase();
-      const stored = sessionStorage.getItem('vigi_mobile_session') || localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_mobile_user');
+      const stored = localStorage.getItem('vigi_mobile_user') || localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_mobile_session') || sessionStorage.getItem('vigi_mobile_session');
       const targetUser = (paramUser && APP_USERS[paramUser]) ? paramUser : stored;
 
       const viewLogin = document.getElementById('view-login');
@@ -1486,15 +1591,20 @@
         sessionStorage.setItem('vigi_mobile_session', currentUser);
         localStorage.setItem('vigi_auth_session', currentUser);
         localStorage.setItem('vigi_mobile_user', currentUser);
+        localStorage.setItem(STORAGE_MOBILE_LAST_ACTIVE, Date.now().toString());
         if (viewLogin) {
           viewLogin.style.display = 'none';
           viewLogin.classList.add('hidden');
         }
         setupUserInterface();
+        loadMobileCartFromStorage();
         loadShipmentsFromSupabase();
-        // Para administradores (como Thiago), abre direto no Rastreio para inspecionar os pedidos
-        if (APP_USERS[currentUser].role === 'admin') {
-          switchMobileTab('rastreio');
+        // Para administradores (como Thiago), abre direto no Rastreio para inspecionar os pedidos apenas se não estiver montando pedido
+        if (APP_USERS[currentUser].role === 'admin' && activeTab === 'catalogo') {
+          const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+          if (totalUnits === 0) {
+            switchMobileTab('rastreio');
+          }
         }
       } else {
         currentUser = null;
@@ -1609,7 +1719,11 @@
         sessionStorage.removeItem('vigi_mobile_session');
         localStorage.removeItem('vigi_auth_session');
         localStorage.removeItem('vigi_mobile_user');
+        localStorage.removeItem('vigi_mobile_session');
+        clearMobileCartStorage();
+        releaseAppWakeLock();
         currentUser = null;
+        mobileCart = {};
         const pwdInput = document.getElementById('login-password');
         if (pwdInput) pwdInput.value = '';
         const viewLogin = document.getElementById('view-login');
@@ -1618,6 +1732,7 @@
           viewLogin.classList.remove('hidden');
         }
         initMobileCatalog();
+        updateMobileCartUI();
         showToast('Sessão desconectada com sucesso.', 'info');
       }
     }
@@ -1992,14 +2107,24 @@
 
     function clearMobileCart() {
       mobileCart = {};
+      clearMobileCartStorage();
+      releaseAppWakeLock();
       updateMobileCartUI();
       closeCheckoutModal();
       showToast('Lista zerada.');
     }
 
     function updateMobileCartUI() {
+      saveMobileCartToStorage();
+
       const keys = Object.keys(mobileCart);
       const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+
+      if (totalUnits > 0) {
+        requestAppWakeLock();
+      } else {
+        releaseAppWakeLock();
+      }
 
       const cartBar = document.getElementById('floating-cart-bar');
       const cartCountText = document.getElementById('floating-cart-count');
@@ -2086,6 +2211,7 @@
       } else {
         document.getElementById('urg-btn-urgente').className = "p-2 rounded-xl border text-[11px] font-bold border-rose-500/40 bg-rose-500/20 text-rose-300";
       }
+      saveMobileCartToStorage();
     }
 
     function renderCheckoutList() {
@@ -2409,6 +2535,8 @@
         };
 
         mobileCart = {};
+        clearMobileCartStorage();
+        releaseAppWakeLock();
         updateMobileCartUI();
         closeCheckoutModal();
 
@@ -3040,13 +3168,14 @@
     const detailCheckedItems = {}; // { [orderId_itemIndex]: boolean }
 
     function openMobileOrderDetails(orderId) {
+      if (!orderId) return;
       activeDetailShipmentId = orderId;
-      renderMobileOrderDetails(orderId);
       const modal = document.getElementById('modal-order-details-mobile');
       if (modal) {
-        modal.style.display = 'flex';
         modal.classList.remove('hidden');
+        modal.style.display = 'flex';
       }
+      renderMobileOrderDetails(orderId);
     }
 
     function closeMobileOrderDetails() {
@@ -3065,7 +3194,27 @@
     }
 
     function renderMobileOrderDetails(orderId) {
-      const order = (myShipments || []).find(s => s.id === orderId);
+      if (!orderId) return;
+      let order = (myShipments || []).find(s => s.id === orderId);
+      if (!order) {
+        const cleanId = String(orderId).replace(/^#ENV-/i, '').trim().toLowerCase();
+        order = (myShipments || []).find(s => {
+          if (!s || !s.id) return false;
+          const sId = String(s.id).toLowerCase();
+          return sId === cleanId || sId.startsWith(cleanId) || cleanId.startsWith(sId.slice(0, 6));
+        });
+      }
+      if (!order) {
+        try {
+          const cached = JSON.parse(localStorage.getItem('vigi_cached_shipments') || '[]');
+          const cleanId = String(orderId).replace(/^#ENV-/i, '').trim().toLowerCase();
+          order = (cached || []).find(s => {
+            if (!s || !s.id) return false;
+            const sId = String(s.id).toLowerCase();
+            return sId === cleanId || sId.startsWith(cleanId) || cleanId.startsWith(sId.slice(0, 6));
+          });
+        } catch(e) {}
+      }
       if (!order) return;
 
       const code = '#ENV-' + order.id.slice(0, 6).toUpperCase();
@@ -3727,8 +3876,7 @@
         }
       });
 
-      updateCartBadge();
-      renderMobileCatalog();
+      updateMobileCartUI();
       switchMobileTab('catalogo');
       showToast(`${count} itens carregados no carrinho!`, 'success');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -4478,24 +4626,77 @@
       }
     }, 15000);
 
-    // Inicialização
-    
-    // Fechar modais ao clicar no fundo escuro
-    ["modal-checkout", "modal-success", "modal-order-details-mobile", "modal-mobile-new-compra"].forEach(id => {
+    // ========================================================
+    // RESILIÊNCIA TOTAL AO MINIMIZAR / TROCAR DE ABA NO CELULAR
+    // Quando o técnico minimiza (para ver WhatsApp, atender chamada, etc),
+    // o sistema restaura imediatamente o usuário e os itens do carrinho!
+    // ========================================================
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') {
+        if (!currentUser) {
+          checkAuth();
+        } else {
+          loadMobileCartFromStorage();
+          updateMobileCartUI();
+          if (activeTab === 'rastreio' || activeTab === 'historico') {
+            loadShipmentsFromSupabase();
+          } else if (activeTab === 'compras') {
+            loadComprasFromSupabase();
+          }
+          const totalUnits = Object.values(mobileCart).reduce((a, b) => a + b, 0);
+          if (totalUnits > 0) requestAppWakeLock();
+        }
+      }
+    });
+
+    window.addEventListener('pageshow', () => {
+      if (!currentUser) {
+        checkAuth();
+      } else {
+        loadMobileCartFromStorage();
+        updateMobileCartUI();
+      }
+    });
+
+    window.addEventListener('focus', () => {
+      if (!currentUser) {
+        checkAuth();
+      } else {
+        loadMobileCartFromStorage();
+        updateMobileCartUI();
+      }
+    });
+
+    // Fechar modais ao clicar no fundo escuro com limpeza completa de estado
+    ["modal-checkout", "modal-success", "modal-conferencia", "modal-order-details-mobile", "modal-mobile-new-compra"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("click", (e) => {
           if (e.target === el) {
-            el.style.display = "none";
-            if (el.classList.contains("hidden") === false) el.classList.add("hidden");
+            if (id === 'modal-order-details-mobile') {
+              closeMobileOrderDetails();
+            } else if (id === 'modal-checkout') {
+              closeCheckoutModal();
+            } else if (id === 'modal-conferencia') {
+              voltarParaCheckoutModal();
+            } else if (id === 'modal-mobile-new-compra') {
+              closeMobileCompraModal();
+            } else if (id === 'modal-success') {
+              closeSuccessModal();
+            } else {
+              el.style.display = "none";
+              el.classList.add("hidden");
+            }
           }
         });
       }
     });
 
     window.onload = function() {
-      initMobileCatalog();
       checkAuth();
+      initMobileCatalog();
+      loadMobileCartFromStorage();
+      updateMobileCartUI();
       initRealtime();
     };
   </script>
