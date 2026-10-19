@@ -1367,6 +1367,66 @@
     let lastCreatedOrder = null;
     let adminFilterBranch = "todas";
 
+    function isAdmin() {
+      if (!currentUser || !APP_USERS[currentUser]) return false;
+      return APP_USERS[currentUser].role === 'admin';
+    }
+
+    // ========================================================
+    // CONTROLE DE MATERIAIS RESTRITOS (FERRAMENTAS & FIBRA ÓPTICA)
+    // Somente os admins podem visualizar e solicitar materiais do tipo
+    // multímetro, ferramentas e tudo referente a fibra óptica.
+    // Ocultos para solicitantes / filiais pois não há estoque.
+    // ========================================================
+    function isItemRestrictedForSolicitantes(itemName, categoriaName) {
+      if (!itemName) return false;
+      const name = String(itemName).trim().toLowerCase();
+      const cat = String(categoriaName || '').trim().toLowerCase();
+
+      // Categoria de Ferramentas e Equipamentos Técnicos (Multímetro, Alicates, Furadeiras, etc.)
+      if (cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos')) {
+        return true;
+      }
+
+      // Tudo referente a Fibra Óptica / Ótica (Bobina de Fibra, Conector de Fibra, Kit de Fibra, etc.)
+      if (name.includes('fibra') || name.includes('óptic') || name.includes('optic') ||
+          cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic')) {
+        return true;
+      }
+
+      // Itens específicos de ferramentas ou equipamentos caso estejam fora da categoria
+      if (name === 'multímetro' || name === 'multimetro' || name.startsWith('alicate') || name.startsWith('furadeira') || name.startsWith('parafusadeira')) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function isCategoryRestrictedForSolicitantes(categoriaName) {
+      if (!categoriaName) return false;
+      const cat = String(categoriaName).trim().toLowerCase();
+      return cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos') || cat.includes('fibra');
+    }
+
+    function getCatalogoForUser() {
+      const isAdm = typeof isAdmin === 'function' && isAdmin();
+      if (isAdm) {
+        return CATALOGO_MATERIAIS;
+      }
+      // Filtro para solicitantes: oculta ferramentas, multímetro e tudo referente a fibra óptica
+      return CATALOGO_MATERIAIS.map(cat => {
+        if (isCategoryRestrictedForSolicitantes(cat.categoria)) {
+          return null;
+        }
+        const filteredItens = cat.itens.filter(item => !isItemRestrictedForSolicitantes(item, cat.categoria));
+        if (filteredItens.length === 0) return null;
+        return {
+          ...cat,
+          itens: filteredItens
+        };
+      }).filter(Boolean);
+    }
+
     // Toast
     function showToast(msg, type = 'info') {
       const container = document.getElementById('toast-container');
@@ -1557,6 +1617,7 @@
           viewLogin.style.display = 'flex';
           viewLogin.classList.remove('hidden');
         }
+        initMobileCatalog();
         showToast('Sessão desconectada com sucesso.', 'info');
       }
     }
@@ -1648,6 +1709,19 @@
           navGrid.classList.add('grid-cols-4');
         }
       }
+
+      // Se não for admin, expurga qualquer material restrito do carrinho
+      if (!isAdmin()) {
+        let purged = false;
+        Object.keys(mobileCart).forEach(it => {
+          if (isItemRestrictedForSolicitantes(it)) {
+            delete mobileCart[it];
+            purged = true;
+          }
+        });
+        if (purged) updateMobileCartUI();
+      }
+      initMobileCatalog();
     }
 
     // 6. NAVEGAÇÃO DE ABAS MOBILE
@@ -1689,20 +1763,29 @@
 
     // 7. CATÁLOGO MOBILE & CHIPS
     function initMobileCatalog() {
+      const userCatalog = getCatalogoForUser();
       const chipsContainer = document.getElementById('mobile-category-chips');
+      const totalItens = userCatalog.reduce((acc, c) => acc + c.itens.length, 0);
+
+      // Se a categoria ativa atualmente não existe no catálogo do usuário (ex: ferramentas), volta para 'todas'
+      if (activeCategory !== 'todas' && !userCatalog.some(c => c.categoria === activeCategory)) {
+        activeCategory = 'todas';
+      }
+
       chipsContainer.innerHTML = `
         <button type="button" onclick="setMobileCategoryFilter('todas')" id="m-chip-todas" 
-                class="px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30">
-          Todos (${CATALOGO_MATERIAIS.reduce((acc, c) => acc + c.itens.length, 0)})
+                class="px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap ${activeCategory === 'todas' ? 'bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30' : 'text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5'}">
+          Todos (${totalItens})
         </button>
       `;
 
-      CATALOGO_MATERIAIS.forEach((cat, idx) => {
+      userCatalog.forEach((cat, idx) => {
+        const isActive = activeCategory === cat.categoria;
         chipsContainer.innerHTML += `
           <button type="button" onclick="setMobileCategoryFilter('${cat.categoria}')" id="m-chip-${idx}" 
-                  class="px-3 py-1.5 rounded-xl font-semibold text-xs whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5">
+                  class="px-3.5 py-1.5 rounded-xl text-xs whitespace-nowrap transition flex items-center gap-1.5 ${isActive ? 'font-bold bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30' : 'font-semibold text-slate-400 hover:text-white bg-slate-900 border border-white/5'}">
             <i class="fa-solid ${cat.icon} text-orange-400 text-[10px]"></i>
-            <span>${cat.categoria}</span>
+            <span>${cat.categoria} (${cat.itens.length})</span>
           </button>
         `;
       });
@@ -1712,15 +1795,17 @@
 
     function setMobileCategoryFilter(cat) {
       activeCategory = cat;
+      const userCatalog = getCatalogoForUser();
       const buttons = document.querySelectorAll('#mobile-category-chips button');
       buttons.forEach(b => {
         b.className = "px-3 py-1.5 rounded-xl font-semibold text-xs whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5";
       });
 
       if (cat === 'todas') {
-        document.getElementById('m-chip-todas').className = "px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30";
+        const btnTodas = document.getElementById('m-chip-todas');
+        if (btnTodas) btnTodas.className = "px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30";
       } else {
-        const catIdx = CATALOGO_MATERIAIS.findIndex(c => c.categoria === cat);
+        const catIdx = userCatalog.findIndex(c => c.categoria === cat);
         if (catIdx !== -1) {
           const btn = document.getElementById(`m-chip-${catIdx}`);
           if (btn) btn.className = "px-3.5 py-1.5 rounded-xl font-bold text-xs whitespace-nowrap bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 flex items-center gap-1.5";
@@ -1732,7 +1817,7 @@
 
     function renderMobileCatalog() {
       const container = document.getElementById('mobile-catalog-grid');
-      const searchTerm = document.getElementById('mobile-search').value.toLowerCase();
+      const searchTerm = document.getElementById('mobile-search').value.toLowerCase().trim();
       const clearBtn = document.getElementById('btn-clear-search');
       
       if (searchTerm.length > 0) {
@@ -1743,8 +1828,9 @@
 
       container.innerHTML = '';
       let matchCount = 0;
+      const userCatalog = getCatalogoForUser();
 
-      CATALOGO_MATERIAIS.forEach(cat => {
+      userCatalog.forEach(cat => {
         if (activeCategory !== 'todas' && cat.categoria !== activeCategory) return;
 
         const filteredItens = cat.itens.filter(i => i.toLowerCase().includes(searchTerm));
@@ -1859,6 +1945,10 @@
     }
 
     function incrementMobileCart(item) {
+      if (!isAdmin() && isItemRestrictedForSolicitantes(item)) {
+        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        return;
+      }
       triggerHaptic('light');
       mobileCart[item] = (mobileCart[item] || 0) + 1;
       updateMobileCartUI();
@@ -1874,12 +1964,20 @@
     }
 
     function addQuantityMobileCart(item, amount) {
+      if (!isAdmin() && isItemRestrictedForSolicitantes(item)) {
+        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        return;
+      }
       triggerHaptic('medium');
       mobileCart[item] = (mobileCart[item] || 0) + amount;
       updateMobileCartUI();
     }
 
     function promptSetMobileCart(item, currentQty) {
+      if (!isAdmin() && isItemRestrictedForSolicitantes(item)) {
+        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        return;
+      }
       const val = prompt(`Digite a quantidade desejada de:\n"${item}"`, currentQty > 0 ? currentQty : 1);
       if (val === null) return;
       const num = parseInt(val.trim(), 10);
@@ -2191,6 +2289,14 @@
       if (itemsKeys.length === 0) {
         alert('Adicione pelo menos 1 material à solicitação.');
         return;
+      }
+
+      if (!isAdmin()) {
+        const restrictedAttempt = itemsKeys.find(nome => isItemRestrictedForSolicitantes(nome));
+        if (restrictedAttempt) {
+          alert(`O material "${restrictedAttempt}" é exclusivo para gestão da Matriz/Admins e não está disponível em estoque para filiais. Remova-o da solicitação para prosseguir.`);
+          return;
+        }
       }
 
       if (btn) {
@@ -4205,9 +4311,11 @@
 
       // Popula datalist de materiais
       const dl = document.getElementById('m-compra-materiais-list');
-      if (dl && dl.children.length === 0) {
+      if (dl) {
+        dl.innerHTML = '';
         const all = new Set();
-        CATALOGO_MATERIAIS.forEach(c => c.itens.forEach(it => {
+        const activeCat = getCatalogoForUser();
+        activeCat.forEach(c => c.itens.forEach(it => {
           const str = typeof it === 'object' ? (it.nome || '') : String(it);
           if (str) all.add(str);
         }));

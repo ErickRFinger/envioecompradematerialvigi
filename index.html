@@ -1214,7 +1214,7 @@
           <!-- Filtro de Busca de Materiais -->
           <div class="relative">
             <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-            <input type="text" id="modal-material-search" oninput="renderModalCatalogItems()" placeholder="Buscar câmeras, dvr, cabos, fontes, ferramentas..." 
+            <input type="text" id="modal-material-search" oninput="renderModalCatalogItems()" placeholder="Buscar câmeras, DVRs, cabos, conectores, fontes..." 
                    class="w-full bg-slate-900 border border-white/10 rounded-xl pl-8 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-orange-500">
           </div>
 
@@ -1779,6 +1779,61 @@
       return u.role === 'admin' || u.username === 'palotina1';
     }
 
+    // ========================================================
+    // 4.1 CONTROLE DE MATERIAIS RESTRITOS (FERRAMENTAS & FIBRA ÓPTICA)
+    // Somente os admins podem visualizar e solicitar materiais do tipo
+    // multímetro, ferramentas e tudo referente a fibra óptica.
+    // Ocultos para solicitantes / filiais pois não há estoque.
+    // ========================================================
+    function isItemRestrictedForSolicitantes(itemName, categoriaName) {
+      if (!itemName) return false;
+      const name = String(itemName).trim().toLowerCase();
+      const cat = String(categoriaName || '').trim().toLowerCase();
+
+      // Categoria de Ferramentas e Equipamentos Técnicos (Multímetro, Alicates, Furadeiras, etc.)
+      if (cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos')) {
+        return true;
+      }
+
+      // Tudo referente a Fibra Óptica / Ótica (Bobina de Fibra, Conector de Fibra, Kit de Fibra, etc.)
+      if (name.includes('fibra') || name.includes('óptic') || name.includes('optic') ||
+          cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic')) {
+        return true;
+      }
+
+      // Itens específicos de ferramentas ou equipamentos caso estejam fora da categoria
+      if (name === 'multímetro' || name === 'multimetro' || name.startsWith('alicate') || name.startsWith('furadeira') || name.startsWith('parafusadeira')) {
+        return true;
+      }
+
+      return false;
+    }
+
+    function isCategoryRestrictedForSolicitantes(categoriaName) {
+      if (!categoriaName) return false;
+      const cat = String(categoriaName).trim().toLowerCase();
+      return cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos') || cat.includes('fibra');
+    }
+
+    function getCatalogoForUser() {
+      const isAdm = typeof isAdmin === 'function' && isAdmin();
+      if (isAdm) {
+        return CATALOGO_MATERIAIS;
+      }
+      // Filtro para solicitantes: oculta ferramentas, multímetro e tudo referente a fibra óptica
+      return CATALOGO_MATERIAIS.map(cat => {
+        if (isCategoryRestrictedForSolicitantes(cat.categoria)) {
+          return null;
+        }
+        const filteredItens = cat.itens.filter(item => !isItemRestrictedForSolicitantes(item, cat.categoria));
+        if (filteredItens.length === 0) return null;
+        return {
+          ...cat,
+          itens: filteredItens
+        };
+      }).filter(Boolean);
+    }
+
     function saveState() {
       localStorage.setItem('vigi_pedidos_envio_v2', JSON.stringify(pedidosEnvio));
       localStorage.setItem('vigi_pedidos_compra_v2', JSON.stringify(pedidosCompra));
@@ -2030,6 +2085,19 @@
       if (!hasComprasAccess && viewCompras && viewCompras.style.display !== 'none' && !viewCompras.classList.contains('hidden')) {
         switchMainTab('envios');
       }
+
+      // Se não for admin, limpa quaisquer itens restritos que possam ter ficado no carrinho
+      if (!isAdmin()) {
+        let purged = false;
+        Object.keys(currentCart).forEach(it => {
+          if (isItemRestrictedForSolicitantes(it)) {
+            delete currentCart[it];
+            purged = true;
+          }
+        });
+        if (purged) updateModalCartUI();
+      }
+      initCatalogUI();
 
       renderAll();
     }
@@ -3450,20 +3518,28 @@
     }
 
     function initCatalogUI() {
+      const userCatalog = getCatalogoForUser();
       const chipsBar = document.getElementById('category-chips-bar');
+      const totalCount = userCatalog.reduce((acc, c) => acc + c.itens.length, 0);
+
+      if (selectedActiveCategory !== 'todas' && !userCatalog.some(c => c.categoria === selectedActiveCategory)) {
+        selectedActiveCategory = 'todas';
+      }
+
       chipsBar.innerHTML = `
         <button type="button" onclick="selectModalCategory('todas')" id="cat-chip-todas" 
-                class="px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 cursor-pointer">
-          Todas (${CATALOGO_MATERIAIS.reduce((acc, c) => acc + c.itens.length, 0)})
+                class="px-3 py-1 rounded-xl text-xs whitespace-nowrap cursor-pointer transition ${selectedActiveCategory === 'todas' ? 'font-bold bg-orange-600 text-white shadow shadow-orange-600/30' : 'font-semibold text-slate-400 hover:text-white bg-slate-900 border border-white/5'}">
+          Todas (${totalCount})
         </button>
       `;
 
-      CATALOGO_MATERIAIS.forEach((cat, idx) => {
+      userCatalog.forEach((cat, idx) => {
+        const isActive = selectedActiveCategory === cat.categoria;
         chipsBar.innerHTML += `
           <button type="button" onclick="selectModalCategory('${cat.categoria}')" id="cat-chip-${idx}" 
-                  class="px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5 cursor-pointer">
+                  class="px-3 py-1 rounded-xl text-xs whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer ${isActive ? 'font-bold bg-orange-600 text-white shadow shadow-orange-600/30' : 'font-semibold text-slate-400 hover:text-white bg-slate-900 border border-white/5'}">
             <i class="fa-solid ${cat.icon} text-orange-400 text-[10px]"></i>
-            <span>${cat.categoria}</span>
+            <span>${cat.categoria} (${cat.itens.length})</span>
           </button>
         `;
       });
@@ -3473,15 +3549,17 @@
 
     function selectModalCategory(cat) {
       selectedActiveCategory = cat;
+      const userCatalog = getCatalogoForUser();
       const buttons = document.querySelectorAll('#category-chips-bar button');
       buttons.forEach(b => {
         b.className = "px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-white bg-slate-900 border border-white/5 transition flex items-center gap-1.5 cursor-pointer";
       });
 
       if (cat === 'todas') {
-        document.getElementById('cat-chip-todas').className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 cursor-pointer";
+        const btnTodas = document.getElementById('cat-chip-todas');
+        if (btnTodas) btnTodas.className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 cursor-pointer";
       } else {
-        const catIdx = CATALOGO_MATERIAIS.findIndex(c => c.categoria === cat);
+        const catIdx = userCatalog.findIndex(c => c.categoria === cat);
         if (catIdx !== -1) {
           const btn = document.getElementById(`cat-chip-${catIdx}`);
           if (btn) btn.className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 flex items-center gap-1.5 cursor-pointer";
@@ -3493,11 +3571,13 @@
 
     function renderModalCatalogItems() {
       const container = document.getElementById('modal-catalog-list');
-      const searchTerm = document.getElementById('modal-material-search').value.toLowerCase();
+      const searchTerm = document.getElementById('modal-material-search').value.toLowerCase().trim();
       container.innerHTML = '';
 
       let count = 0;
-      CATALOGO_MATERIAIS.forEach(cat => {
+      const userCatalog = getCatalogoForUser();
+
+      userCatalog.forEach(cat => {
         if (selectedActiveCategory !== 'todas' && cat.categoria !== selectedActiveCategory) return;
 
         cat.itens.forEach(item => {
@@ -3539,6 +3619,10 @@
     }
 
     function incrementModalCart(item) {
+      if (!isAdmin() && isItemRestrictedForSolicitantes(item)) {
+        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        return;
+      }
       currentCart[item] = (currentCart[item] || 0) + 1;
       updateModalCartUI();
     }
@@ -3560,6 +3644,12 @@
 
     function openNewEnvioModal() {
       currentCart = {};
+      if (!isAdmin()) {
+        Object.keys(currentCart).forEach(it => {
+          if (isItemRestrictedForSolicitantes(it)) delete currentCart[it];
+        });
+      }
+      initCatalogUI();
       updateModalCartUI();
       document.getElementById('modal-material-search').value = '';
       
@@ -3596,6 +3686,14 @@
       if (cartKeys.length === 0) {
         alert('Selecione pelo menos um material do catálogo para a solicitação.');
         return;
+      }
+
+      if (!isAdmin()) {
+        const restrictedItem = cartKeys.find(nome => isItemRestrictedForSolicitantes(nome));
+        if (restrictedItem) {
+          alert(`O material "${restrictedItem}" é exclusivo para gestão da Matriz/Admins e não está disponível em estoque para filiais. Remova-o para prosseguir.`);
+          return;
+        }
       }
 
       btn.disabled = true;
@@ -4008,8 +4106,9 @@
       }
       datalist.innerHTML = '';
       const todosItens = [];
-      if (Array.isArray(CATALOGO_MATERIAIS)) {
-        CATALOGO_MATERIAIS.forEach(cat => {
+      const userCatalog = getCatalogoForUser();
+      if (Array.isArray(userCatalog)) {
+        userCatalog.forEach(cat => {
           if (Array.isArray(cat.itens)) {
             cat.itens.forEach(it => {
               const str = typeof it === 'object' ? (it.nome || '') : String(it);
@@ -4342,7 +4441,8 @@
 
       // Opções de catálogo para inclusão inline
       const allCatalogItems = [];
-      CATALOGO_MATERIAIS.forEach(c => {
+      const userCatalogForDetail = getCatalogoForUser();
+      userCatalogForDetail.forEach(c => {
         c.itens.forEach(item => {
           if (!allCatalogItems.includes(item)) allCatalogItems.push(item);
         });
@@ -4531,6 +4631,10 @@
         return;
       }
       const nome = sel.value;
+      if (!isAdmin() && isItemRestrictedForSolicitantes(nome)) {
+        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        return;
+      }
       const qtd = parseInt(inputQtd ? inputQtd.value : 1, 10) || 1;
 
       const existing = currentDetailItems.find(it => it.nome.toLowerCase() === nome.toLowerCase());
@@ -5283,7 +5387,8 @@
       if (!dl) return;
       dl.innerHTML = '';
       const allItems = new Set();
-      CATALOGO_MATERIAIS.forEach(cat => {
+      const userCat = getCatalogoForUser();
+      userCat.forEach(cat => {
         cat.itens.forEach(it => allItems.add(it));
       });
       Array.from(allItems).sort().forEach(item => {
