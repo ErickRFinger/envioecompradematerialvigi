@@ -1678,6 +1678,56 @@
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
+      },
+      "iury": {
+        username: "beltrao1",
+        name: "Iury (Beltrão)",
+        role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
+        password: "clic3369",
+        filial: "Beltrão (Iury)",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        avatar: "IU"
+      },
+      "cleverson": {
+        username: "beltrao2",
+        name: "Cleverson (Beltrão)",
+        role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
+        password: "clic3369",
+        filial: "Beltrão (Cleverson)",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        avatar: "CL"
+      },
+      "adilson": {
+        username: "palotina1",
+        name: "Adilson (Palotina)",
+        role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
+        password: "clic3369",
+        filial: "Palotina (Adilson)",
+        dbBranch: "PALOTINA PR",
+        avatar: "AD"
+      },
+      "palotina": {
+        username: "palotina1",
+        name: "Adilson (Palotina)",
+        role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
+        password: "clic3369",
+        filial: "Palotina (Adilson)",
+        dbBranch: "PALOTINA PR",
+        avatar: "AD"
+      },
+      "leonardo": {
+        username: "pato1",
+        name: "Leonardo (Pato Branco)",
+        role: "filial",
+        passwordHash: TECH_PASSWORD_HASH,
+        password: "clic3369",
+        filial: "Pato Branco",
+        dbBranch: "PATO BRANCO PR",
+        avatar: "LE"
       }
     };
 
@@ -1821,15 +1871,68 @@
              cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic');
     }
 
+    // ========================================================
+    // PERMISSÃO ESPECÍFICA DE ACESSO À ABA DE FERRAMENTAS:
+    // Regra da diretoria:
+    // - SOMENTE Iury, Giseli e Adilson (e Administradores) podem visualizar e pedir ferramentas.
+    // - CLEVERSON, LEONARDO E TÉCNICOS DE SMO NÃO podem ter acesso a essa aba.
+    // - Fibra óptica permanece restrita a administradores.
+    // ========================================================
+    function canUserRequestTools(userKey) {
+      const target = userKey || currentUser;
+      if (!target) return false;
+      const u = APP_USERS[target];
+      if (!u) return false;
+
+      // Administradores da Matriz têm acesso total
+      if (u.role === 'admin') return true;
+
+      const uname = String(u.username || target).trim().toLowerCase();
+      const name = String(u.name || '').trim().toLowerCase();
+      const filial = String(u.filial || '').trim().toLowerCase();
+
+      // Bloqueio explícito: Cleverson, Leonardo e Técnicos de SMO não podem acessar a aba de ferramentas
+      if (
+        uname === 'beltrao2' || uname.includes('cleverson') || name.includes('cleverson') ||
+        uname === 'pato1' || uname.includes('pato') || uname.includes('leonardo') || name.includes('leonardo') || filial.includes('pato') ||
+        uname === 'smo1' || uname.includes('smo') || uname.includes('terceiros') || name.includes('smo') || filial.includes('smo')
+      ) {
+        return false;
+      }
+
+      // Permissão concedida exclusivamente para: Iury, Giseli e Adilson
+      const isIury = uname === 'beltrao1' || uname.includes('iury') || name.includes('iury') || filial.includes('iury');
+      const isGiseli = uname === 'barracao1' || uname.includes('giseli') || uname.includes('barracao') || name.includes('giseli') || filial.includes('giseli');
+      const isAdilson = uname === 'palotina1' || uname.includes('adilson') || uname.includes('palotina') || name.includes('adilson') || filial.includes('adilson');
+
+      return isIury || isGiseli || isAdilson;
+    }
+
     function isItemRestrictedForSolicitantes(itemName, categoriaName) {
-      // Ferramentas são permitidas com justificativa. Apenas fibra permanece restrita.
-      return isItemFiberRestricted(itemName, categoriaName);
+      // 1. Fibra óptica: sempre restrita para filiais (sem estoque)
+      if (isItemFiberRestricted(itemName, categoriaName)) return true;
+
+      // 2. Ferramentas: liberadas exclusivamente para Iury, Giseli e Adilson (bloqueadas para Cleverson, Leonardo e SMO)
+      if (isItemTool(itemName, categoriaName)) {
+        return !canUserRequestTools();
+      }
+
+      return false;
     }
 
     function isCategoryRestrictedForSolicitantes(categoriaName) {
       if (!categoriaName) return false;
       const cat = String(categoriaName).trim().toLowerCase();
-      return cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic');
+
+      // Fibra óptica sempre restrita
+      if (cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic')) return true;
+
+      // Aba de Ferramentas: oculta se o usuário não for autorizado (Cleverson, Leonardo, SMO)
+      if (isItemTool(null, categoriaName)) {
+        return !canUserRequestTools();
+      }
+
+      return false;
     }
 
     function getCatalogoForUser() {
@@ -1841,8 +1944,10 @@
         }));
       }
 
-      // Filtro para solicitantes: oculta apenas materiais de fibra óptica (sem estoque).
-      // A categoria de Ferramentas é preservada como aba separada com exigência de justificativa.
+      // Filtro para solicitantes:
+      // - Oculta materiais de fibra óptica (sem estoque).
+      // - Oculta categoria de Ferramentas para Cleverson, Leonardo e SMO.
+      // - Mantém categoria de Ferramentas separada (com justificativa) apenas para Iury, Giseli e Adilson.
       return CATALOGO_MATERIAIS.map(cat => {
         if (isCategoryRestrictedForSolicitantes(cat.categoria)) {
           return null;
@@ -3774,7 +3879,11 @@
 
     function incrementModalCart(item) {
       if (!isAdmin() && isItemRestrictedForSolicitantes(item)) {
-        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        if (isItemTool(item)) {
+          showToast('Aba de ferramentas restrita exclusivamente a Iury, Giseli e Adilson.', 'error');
+        } else {
+          showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        }
         return;
       }
       const isFirst = !currentCart[item] || currentCart[item] === 0;
@@ -3904,7 +4013,11 @@
       if (!isAdmin()) {
         const restrictedItem = cartKeys.find(nome => isItemRestrictedForSolicitantes(nome));
         if (restrictedItem) {
-          alert(`O material "${restrictedItem}" é exclusivo para gestão da Matriz/Admins e não está disponível em estoque para filiais. Remova-o para prosseguir.`);
+          if (isItemTool(restrictedItem)) {
+            alert(`⚠️ ACESSO RESTRITO A FERRAMENTAS:\n\nO material "${restrictedItem}" é uma ferramenta. O acesso à aba e pedido de ferramentas é exclusivo para Iury, Giseli e Adilson.\n\nRemova-o da solicitação para prosseguir.`);
+          } else {
+            alert(`O material "${restrictedItem}" é exclusivo para gestão da Matriz/Admins e não está disponível em estoque para filiais. Remova-o para prosseguir.`);
+          }
           return;
         }
       }
@@ -4891,7 +5004,11 @@
       }
       const nome = sel.value;
       if (!isAdmin() && isItemRestrictedForSolicitantes(nome)) {
-        showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        if (isItemTool(nome)) {
+          showToast('Aba de ferramentas restrita exclusivamente a Iury, Giseli e Adilson.', 'error');
+        } else {
+          showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
+        }
         return;
       }
       const qtd = parseInt(inputQtd ? inputQtd.value : 1, 10) || 1;

@@ -48,6 +48,8 @@ graph TD
 2. **Catálogo Completo com 10 Categorias e ~90 Materiais Reais:**
    - Marketing e Outros (Adesivos, Camisas, Placas)
    - **Equipamentos Técnicos (Ferramentas)**: Aba separada no catálogo com **justificativa obrigatória por material** (motivo de reposição como "estragou, tentamos arrumar mas não deu certo").
+     - **Permitidos para visualizar e pedir ferramentas**: SOMENTE **Iury** (`beltrao1`/`iury`), **Giseli** (`barracao1`/`giseli`), **Adilson** (`palotina1`/`adilson`) e **Administradores**.
+     - **Bloqueados para ferramentas**: **Cleverson** (`beltrao2`/`cleverson`), **Leonardo** (`pato1`/`leonardo`) e **Técnicos de SMO** (`smo1`/`smo`/`terceiros`). A aba é completamente ocultada do catálogo deles e bloqueada contra pedidos.
    - Cabos e Fios (Bobinas de Fibra [restrita], Cabos de Rede, Energia...)
    - Elétrica e Proteção (Fontes 12V, Nobreaks, Baterias...)
    - Infraestrutura e Fixação (Canaletas, Parafusos, Caixas de Passagem, Eletroduto em barras de 3m...)
@@ -56,7 +58,7 @@ graph TD
    - Alarmes e Sensores (Centrais, Sensores com/sem fio, Sirenes...)
    - Conectores e Vídeo (RJ45, Balun, P4, BNC, Conector Wago...)
    - Gravadores DVR (Hikvision, Intelbras, UNV 4/8/16 canais)
-   > *Nota de Controle:* Materiais de fibra óptica (`Bobina de Cabo de Fibra`, `Conector de Fibra`, `Kit de Fibra`) são exclusivos para Admins (sem estoque para filiais). Ferramentas são liberadas para os técnicos em aba separada com exigência de justificativa individual. Suprimentos regulares seguem fluxo normal.
+   > *Nota de Controle:* Materiais de fibra óptica (`Bobina de Cabo de Fibra`, `Conector de Fibra`, `Kit de Fibra`) são exclusivos para Admins (sem estoque para filiais). Ferramentas são liberadas exclusivamente para Iury, Giseli e Adilson em aba separada com exigência de justificativa individual. Suprimentos regulares seguem liberados para todos os técnicos.
 3. **Modal de Solicitação Inteligente:**
    - Seleção de Filial com botão dedicado (`Francisco Beltrão`, `Palotina`, `Barracão`, `Pato Branco`, `Terceiros SMO`).
    - Carrossel com chips de filtros por categoria com destaque visual para ferramentas (`Exige Motivo`).
@@ -89,18 +91,18 @@ graph TD
 ### 👥 Usuários e Permissões (RBAC) Cadastrados no Supabase:
 
 #### 🛡️ Administradores Gerais (Acesso Total, Todas as Filiais & Exclusão de Ordens):
-- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin`
-- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin`
-- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin`
-- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin`
+- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
 
 #### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
-- **`beltrao1`** • Iury (Beltrão) • Senha: `clic3369` • Role: `filial`
-- **`beltrao2`** • Cleverson (Beltrão) • Senha: `clic3369` • Role: `filial`
-- **`palotina1`** • Adilson (Palotina) • Senha: `clic3369` • Role: `filial`
-- **`barracao1`** • Giseli (Barracão) • Senha: `clic3369` • Role: `filial`
-- **`pato1`** • Leonardo (Pato) • Senha: `clic3369` • Role: `filial`
-- **`smo1`** • Terceiros SMO (SMO) • Senha: `clic3369` • Role: `filial`
+- **`beltrao1` / `iury`** • Iury (Beltrão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`barracao1` / `giseli`** • Giseli (Barracão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`palotina1` / `adilson`** • Adilson (Palotina) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`beltrao2` / `cleverson`** • Cleverson (Beltrão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
+- **`pato1` / `leonardo`** • Leonardo (Pato) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
+- **`smo1` / `terceiros`** • Terceiros SMO (SMO) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
 
 ---
 
