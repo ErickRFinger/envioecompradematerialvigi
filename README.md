@@ -53,10 +53,10 @@ graph TD
    - Cabos e Fios (Bobinas de Fibra [restrita], Lubrificante Passa Fio [restrito], Cabos de Rede, Energia...)
    - Elétrica e Proteção (Fontes 12V, Nobreaks, Baterias...)
    - Infraestrutura e Fixação (Canaletas, Parafusos, Caixas de Passagem, Eletroduto em barras de 3m...)
-   - Câmeras (Hikvision, UNV, ColorVu, IP, Dome, Bullet...)
+   - Câmeras (Modelos homologados UNV Bullet/Dome, ColorVu, Dual Light, Hik Sirene, IP Bullet/Dome, EZVIZ, Varifocal)
    - Informática e Diversos (HDs 1TB/2TB, SSDs, Switches, Kits de Fibra [restrito]...)
    - Alarmes e Sensores (Centrais, Sensores com/sem fio, Sirenes...)
-   - Conectores e Vídeo (RJ45, Balun, P4, BNC, Conector Wago...)
+   - Conectores e Vídeo (BNC, tomada macho, P4, RJ45, Wago para emenda de energia, Balun, POE, Media Converter)
    - Gravadores DVR (Hikvision, Intelbras, UNV 4/8/16 canais)
    > *Nota de Controle:* Materiais sem estoque para filiais (itens de fibra óptica e `Lubrificante Passa Fio`) são exclusivos para Admins (ocultos no catálogo de filiais). Ferramentas são liberadas exclusivamente para Iury, Giseli e Adilson em aba separada com exigência de justificativa individual. Suprimentos regulares seguem liberados para todos os técnicos.
 3. **Modal de Solicitação Inteligente:**
