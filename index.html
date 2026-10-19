@@ -1227,6 +1227,11 @@
           <div id="modal-catalog-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 max-h-56 overflow-y-auto p-1 bg-slate-950/60 rounded-2xl border border-white/5">
             <!-- Injected by JS -->
           </div>
+
+          <!-- Justificativas Obrigatórias de Ferramentas -->
+          <div id="modal-tool-justifications-box" class="space-y-2 hidden pt-2 border-t border-amber-500/20">
+            <!-- Injected by JS -->
+          </div>
         </div>
 
         <!-- Observações -->
@@ -1762,6 +1767,7 @@
     let pedidosCompra = Array.isArray(storedCompras) ? storedCompras : [];
 
     let currentCart = {};
+    let currentToolJustifications = {}; // [item]: string de justificativa individual obrigatória
     let activeBranchFilter = 'todas';
     let selectedActiveCategory = 'todas';
     let currentViewMode = 'kanban';
@@ -1780,47 +1786,63 @@
     }
 
     // ========================================================
-    // 4.1 CONTROLE DE MATERIAIS RESTRITOS (FERRAMENTAS & FIBRA ÓPTICA)
-    // Somente os admins podem visualizar e solicitar materiais do tipo
-    // multímetro, ferramentas e tudo referente a fibra óptica.
-    // Ocultos para solicitantes / filiais pois não há estoque.
+    // 4.1 CONTROLE DE MATERIAIS: FERRAMENTAS (JUSTIFICATIVA) & FIBRA ÓPTICA (RESTRITO)
+    // 1. Ferramentas e Equipamentos Técnicos: liberados para os técnicos,
+    //    porém com ABA SEPARADA e JUSTIFICATIVA OBRIGATÓRIA detalhada por item.
+    // 2. Fibra Óptica: restrita exclusivamente para Admins/Matriz (sem estoque).
     // ========================================================
-    function isItemRestrictedForSolicitantes(itemName, categoriaName) {
-      if (!itemName) return false;
-      const name = String(itemName).trim().toLowerCase();
+    function isItemTool(itemName, categoriaName) {
+      if (!itemName && !categoriaName) return false;
+      const name = String(itemName || '').trim().toLowerCase();
       const cat = String(categoriaName || '').trim().toLowerCase();
 
-      // Categoria de Ferramentas e Equipamentos Técnicos (Multímetro, Alicates, Furadeiras, etc.)
+      // Categoria oficial de ferramentas
       if (cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos')) {
         return true;
       }
 
-      // Tudo referente a Fibra Óptica / Ótica (Bobina de Fibra, Conector de Fibra, Kit de Fibra, etc.)
-      if (name.includes('fibra') || name.includes('óptic') || name.includes('optic') ||
-          cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic')) {
-        return true;
-      }
+      // Palavras-chave dos 18 itens de ferramentas do almoxarifado
+      const toolKeywords = [
+        'alicate', 'furadeira', 'parafusadeira', 'multímetro', 'multimetro',
+        'broca', 'martelo', 'escada', 'testador de cabo', 'serrinha',
+        'aplicador de silicone', 'aspirador de pó', 'aspirador de po',
+        'caixa de ferramentas', 'ponteira philips'
+      ];
+      return toolKeywords.some(kw => name.includes(kw));
+    }
 
-      // Itens específicos de ferramentas ou equipamentos caso estejam fora da categoria
-      if (name === 'multímetro' || name === 'multimetro' || name.startsWith('alicate') || name.startsWith('furadeira') || name.startsWith('parafusadeira')) {
-        return true;
-      }
+    function isItemFiberRestricted(itemName, categoriaName) {
+      if (!itemName && !categoriaName) return false;
+      const name = String(itemName || '').trim().toLowerCase();
+      const cat = String(categoriaName || '').trim().toLowerCase();
 
-      return false;
+      // Apenas itens de fibra óptica sem estoque para filiais
+      return name.includes('fibra') || name.includes('óptic') || name.includes('optic') ||
+             cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic');
+    }
+
+    function isItemRestrictedForSolicitantes(itemName, categoriaName) {
+      // Ferramentas são permitidas com justificativa. Apenas fibra permanece restrita.
+      return isItemFiberRestricted(itemName, categoriaName);
     }
 
     function isCategoryRestrictedForSolicitantes(categoriaName) {
       if (!categoriaName) return false;
       const cat = String(categoriaName).trim().toLowerCase();
-      return cat.includes('ferramenta') || cat.includes('equipamentos técnicos') || cat.includes('equipamentos tecnicos') || cat.includes('fibra');
+      return cat.includes('fibra') || cat.includes('óptic') || cat.includes('optic');
     }
 
     function getCatalogoForUser() {
       const isAdm = typeof isAdmin === 'function' && isAdmin();
       if (isAdm) {
-        return CATALOGO_MATERIAIS;
+        return CATALOGO_MATERIAIS.map(cat => ({
+          ...cat,
+          isToolCategory: isItemTool(null, cat.categoria)
+        }));
       }
-      // Filtro para solicitantes: oculta ferramentas, multímetro e tudo referente a fibra óptica
+
+      // Filtro para solicitantes: oculta apenas materiais de fibra óptica (sem estoque).
+      // A categoria de Ferramentas é preservada como aba separada com exigência de justificativa.
       return CATALOGO_MATERIAIS.map(cat => {
         if (isCategoryRestrictedForSolicitantes(cat.categoria)) {
           return null;
@@ -1829,9 +1851,36 @@
         if (filteredItens.length === 0) return null;
         return {
           ...cat,
+          isToolCategory: isItemTool(null, cat.categoria),
           itens: filteredItens
         };
       }).filter(Boolean);
+    }
+
+    function setModalToolJustification(item, text) {
+      if (!text || !text.trim()) {
+        delete currentToolJustifications[item];
+      } else {
+        currentToolJustifications[item] = text.trim();
+      }
+      renderModalCatalogItems();
+    }
+
+    function promptModalToolJustification(item) {
+      const current = currentToolJustifications[item] || '';
+      const ans = prompt(`⚠️ JUSTIFICATIVA OBRIGATÓRIA PARA FERRAMENTA:\n\nInforme o motivo da solicitação de "${item}":\n(Ex: "O meu estragou, tentamos arrumar mas não deu certo, se possível mandar outro")`, current);
+      if (ans !== null) {
+        if (ans.trim().length >= 5) {
+          setModalToolJustification(item, ans);
+          updateModalCartUI();
+          showToast(`Motivo de "${item}" registrado!`, 'success');
+        } else if (ans.trim().length === 0) {
+          setModalToolJustification(item, '');
+          updateModalCartUI();
+        } else {
+          alert('Por favor, informe uma justificativa detalhada (mínimo de 5 caracteres).');
+        }
+      }
     }
 
     function saveState() {
@@ -2303,6 +2352,16 @@
               cleanObs = cleanObs.replace(ajMatch[0], "").trim();
             }
 
+            let toolJustMap = {};
+            const justMatch = cleanObs.match(/\[JUSTIFICATIVAS:(.*?)\]/);
+            if (justMatch) {
+              try {
+                toolJustMap = JSON.parse(justMatch[1]);
+              } catch (e) {}
+              cleanObs = cleanObs.replace(justMatch[0], "").trim();
+            }
+            cleanObs = cleanObs.replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim();
+
             const dateObj = new Date(row.created_at);
             const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
@@ -2320,6 +2379,7 @@
                 nome: it.product_name,
                 qtd: it.quantity || 1,
                 qtdOriginal: orig,
+                justificativa: toolJustMap[it.product_name] || null,
                 checked: false
               };
             });
@@ -2336,6 +2396,7 @@
                     nome: origNome,
                     qtd: 0,
                     qtdOriginal: originalMap[origNome],
+                    justificativa: toolJustMap[origNome] || null,
                     checked: false
                   });
                 }
@@ -2353,6 +2414,7 @@
               rawNotes: rawNotes,
               originalMap: originalMap,
               ajusteHistorico: ajusteHistorico,
+              toolJustMap: toolJustMap,
               status: st,
               itens: parsedItens
             };
@@ -2770,16 +2832,24 @@
           </div>
         `;
 
+        const hasTools = (pedido.toolJustMap && Object.keys(pedido.toolJustMap).length > 0) || pedido.itens.some(it => isItemTool(it.nome));
+
         const previewItens = pedido.itens.slice(0, 3).map(it => {
           const isItemDivergent = it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal;
-          return `<li class="truncate flex justify-between items-center text-slate-200 text-xs py-1.5 border-b border-white/[0.06] last:border-none">
-            <span class="truncate flex items-center gap-2 ${it.qtd === 0 ? 'text-slate-500 line-through' : 'text-white font-semibold'}">
-              <span class="w-2 h-2 rounded-full shrink-0 ${isItemDivergent ? 'bg-amber-400 shadow-glow-amber' : 'bg-orange-400'}"></span>
-              <span class="truncate">${highlightSearch(it.nome, searchTerm)}</span>
-            </span> 
-            <span class="font-mono font-black ${isItemDivergent ? 'text-amber-300 bg-amber-500/20 border-amber-500/40' : 'text-orange-300 bg-slate-900 border-white/10'} ml-2 shrink-0 px-2 py-0.5 rounded-md border text-[11px] shadow-sm">
-              ${it.qtd} un ${isItemDivergent ? `<span class="opacity-60 line-through text-[9px]">(${it.qtdOriginal})</span>` : ''}
-            </span>
+          const itTool = isItemTool(it.nome);
+          const itJust = it.justificativa || (pedido.toolJustMap && pedido.toolJustMap[it.nome]);
+          return `<li class="truncate flex flex-col text-slate-200 text-xs py-1.5 border-b border-white/[0.06] last:border-none">
+            <div class="flex justify-between items-center w-full">
+              <span class="truncate flex items-center gap-2 ${it.qtd === 0 ? 'text-slate-500 line-through' : 'text-white font-semibold'}">
+                <span class="w-2 h-2 rounded-full shrink-0 ${itTool ? 'bg-amber-400' : isItemDivergent ? 'bg-amber-400 shadow-glow-amber' : 'bg-orange-400'}"></span>
+                <span class="truncate">${highlightSearch(it.nome, searchTerm)}</span>
+                ${itTool ? '<i class="fa-solid fa-wrench text-[9px] text-amber-400" title="Ferramenta"></i>' : ''}
+              </span> 
+              <span class="font-mono font-black ${isItemDivergent ? 'text-amber-300 bg-amber-500/20 border-amber-500/40' : 'text-orange-300 bg-slate-900 border-white/10'} ml-2 shrink-0 px-2 py-0.5 rounded-md border text-[11px] shadow-sm">
+                ${it.qtd} un ${isItemDivergent ? `<span class="opacity-60 line-through text-[9px]">(${it.qtdOriginal})</span>` : ''}
+              </span>
+            </div>
+            ${itJust ? `<span class="text-[9.5px] text-amber-300/80 italic truncate pl-4 pt-0.5" title="${escapeHtml(itJust)}">Motivo: "${escapeHtml(itJust)}"</span>` : ''}
           </li>`;
         }).join('');
         const maisItens = pedido.itens.length > 3 ? `<div class="text-[10px] text-slate-400 font-semibold pt-1 text-center bg-slate-900/40 rounded py-0.5 mt-1 border border-white/5">+ ${pedido.itens.length - 3} itens adicionais...</div>` : '';
@@ -2890,6 +2960,7 @@
             <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1 flex justify-between items-center">
               <span>Materiais na Carga</span>
               <div class="flex items-center gap-1">
+                ${hasTools ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Solicitação inclui ferramentas com justificativa"><i class="fa-solid fa-wrench mr-0.5"></i>Ferramentas</span>` : ''}
                 ${hasDivergence ? `<span class="bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded text-[9px] font-bold" title="Pedido com quantidades ajustadas"><i class="fa-solid fa-sliders mr-0.5"></i>Ajustado</span>` : ''}
                 <span class="text-orange-300 font-mono font-bold bg-orange-500/15 px-2 py-0.5 rounded-md text-[10px]">${totalItens} un</span>
               </div>
@@ -3563,11 +3634,16 @@
 
       userCatalog.forEach((cat, idx) => {
         const isActive = selectedActiveCategory === cat.categoria;
+        const isToolCat = cat.isToolCategory || isItemTool(null, cat.categoria);
         chipsBar.innerHTML += `
           <button type="button" onclick="selectModalCategory('${cat.categoria}')" id="cat-chip-${idx}" 
-                  class="px-3 py-1 rounded-xl text-xs whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer ${isActive ? 'font-bold bg-orange-600 text-white shadow shadow-orange-600/30' : 'font-semibold text-slate-400 hover:text-white bg-slate-900 border border-white/5'}">
-            <i class="fa-solid ${cat.icon} text-orange-400 text-[10px]"></i>
-            <span>${cat.categoria} (${cat.itens.length})</span>
+                  class="px-3 py-1 rounded-xl text-xs whitespace-nowrap transition flex items-center gap-1.5 cursor-pointer ${
+                    isActive 
+                      ? (isToolCat ? 'font-bold bg-amber-600 text-white shadow shadow-amber-600/30 ring-1 ring-amber-400' : 'font-bold bg-orange-600 text-white shadow shadow-orange-600/30') 
+                      : (isToolCat ? 'font-semibold text-amber-300 hover:text-white bg-amber-950/40 border border-amber-500/30' : 'font-semibold text-slate-400 hover:text-white bg-slate-900 border border-white/5')
+                  }">
+            <i class="fa-solid ${cat.icon} ${isToolCat ? 'text-amber-400' : 'text-orange-400'} text-[10px]"></i>
+            <span>${cat.categoria} (${cat.itens.length})${isToolCat ? ' ⚠️' : ''}</span>
           </button>
         `;
       });
@@ -3589,8 +3665,9 @@
       } else {
         const catIdx = userCatalog.findIndex(c => c.categoria === cat);
         if (catIdx !== -1) {
+          const isToolCat = userCatalog[catIdx].isToolCategory || isItemTool(null, userCatalog[catIdx].categoria);
           const btn = document.getElementById(`cat-chip-${catIdx}`);
-          if (btn) btn.className = "px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap bg-orange-600 text-white shadow shadow-orange-600/30 flex items-center gap-1.5 cursor-pointer";
+          if (btn) btn.className = `px-3 py-1 rounded-xl text-xs font-bold whitespace-nowrap ${isToolCat ? 'bg-amber-600 text-white shadow shadow-amber-600/30 ring-1 ring-amber-400' : 'bg-orange-600 text-white shadow shadow-orange-600/30'} flex items-center gap-1.5 cursor-pointer`;
         }
       }
 
@@ -3605,8 +3682,28 @@
       let count = 0;
       const userCatalog = getCatalogoForUser();
 
+      const isCurrentCatTool = selectedActiveCategory !== 'todas' && (
+        selectedActiveCategory.toLowerCase().includes('ferramenta') || 
+        selectedActiveCategory.toLowerCase().includes('equipamentos')
+      );
+
+      if (isCurrentCatTool) {
+        container.innerHTML += `
+          <div class="col-span-1 sm:col-span-2 lg:col-span-3 p-2.5 rounded-xl bg-amber-500/15 border border-amber-500/40 text-amber-200 text-xs space-y-1 mb-1">
+            <div class="font-extrabold text-amber-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-wrench text-amber-400"></i>
+              <span>Aba de Ferramentas & Equipamentos (Controle de Reposição)</span>
+            </div>
+            <p class="text-[10px] text-amber-200/90 leading-relaxed">
+              Atenção: para solicitar ferramentas é <strong>obrigatório justificar o motivo</strong> (ex: a minha estragou, tentamos arrumar mas não deu certo, se possível mandar outra, etc.).
+            </p>
+          </div>
+        `;
+      }
+
       userCatalog.forEach(cat => {
         if (selectedActiveCategory !== 'todas' && cat.categoria !== selectedActiveCategory) return;
+        const isToolCat = cat.isToolCategory || isItemTool(null, cat.categoria);
 
         cat.itens.forEach(item => {
           if (searchTerm && !item.toLowerCase().includes(searchTerm)) return;
@@ -3614,24 +3711,53 @@
 
           const currentQty = currentCart[item] || 0;
           const isSelected = currentQty > 0;
+          const isTool = isToolCat || isItemTool(item, cat.categoria);
+          const currentJust = currentToolJustifications[item] || '';
+          const hasJust = currentJust.trim().length >= 5;
 
           const itemCard = document.createElement('div');
-          itemCard.className = `p-2.5 rounded-xl border flex items-center justify-between gap-2 transition ${
+          itemCard.className = `p-2.5 rounded-xl border flex flex-col justify-between gap-2 transition ${
             isSelected 
-              ? 'bg-orange-500/15 border-orange-500/50 shadow-glow-vigi' 
-              : 'bg-slate-900/90 border-white/5 hover:border-white/20'
+              ? (isTool ? 'bg-amber-500/15 border-amber-500/60 shadow-glow-amber' : 'bg-orange-500/15 border-orange-500/50 shadow-glow-vigi')
+              : (isTool ? 'bg-amber-950/20 border-amber-500/20 hover:border-amber-500/40' : 'bg-slate-900/90 border-white/5 hover:border-white/20')
           }`;
 
+          let toolJustBtnHtml = '';
+          if (isSelected && isTool) {
+            toolJustBtnHtml = `
+              <div class="mt-1 pt-1.5 border-t border-amber-500/20 w-full">
+                <button type="button" onclick="promptModalToolJustification('${item.replace(/'/g, "\\'")}')" 
+                        class="w-full text-left p-1.5 rounded-lg border text-[10px] flex items-center justify-between gap-1 transition cursor-pointer ${
+                          hasJust 
+                            ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' 
+                            : 'bg-amber-500/20 border-amber-500/50 text-amber-200 animate-pulse'
+                        }">
+                  <span class="truncate flex items-center gap-1">
+                    <i class="fa-solid ${hasJust ? 'fa-check text-emerald-400' : 'fa-pen text-amber-400'} text-[10px]"></i>
+                    ${hasJust ? `Motivo: "${escapeHtml(currentJust)}"` : '⚠️ Digitar Motivo Obrigatório'}
+                  </span>
+                  <span class="text-amber-400 font-bold underline shrink-0">${hasJust ? 'Editar' : 'Digitar'}</span>
+                </button>
+              </div>
+            `;
+          }
+
           itemCard.innerHTML = `
-            <div class="truncate flex-1">
-              <span class="font-bold text-white block truncate text-[11px]">${item}</span>
-              <span class="text-[9px] text-slate-500 block truncate">${cat.categoria}</span>
+            <div class="flex items-center justify-between gap-2 w-full">
+              <div class="truncate flex-1">
+                <div class="flex items-center gap-1">
+                  <span class="font-bold text-white block truncate text-[11px]">${item}</span>
+                  ${isTool ? '<span class="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 py-0.2 rounded font-bold uppercase shrink-0">Exige Motivo</span>' : ''}
+                </div>
+                <span class="text-[9px] text-slate-500 block truncate">${cat.categoria}</span>
+              </div>
+              <div class="flex items-center gap-1 shrink-0 bg-slate-950 p-1 rounded-lg border border-white/5">
+                <button type="button" onclick="decrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded bg-slate-800 text-slate-200 hover:bg-slate-700 flex items-center justify-center font-bold text-xs cursor-pointer">-</button>
+                <span class="w-6 text-center font-mono font-bold text-xs ${isSelected ? (isTool ? 'text-amber-300 font-black' : 'text-orange-400') : 'text-slate-500'}">${currentQty}</span>
+                <button type="button" onclick="incrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded ${isTool ? 'bg-amber-600 hover:bg-amber-500' : 'bg-orange-600 hover:bg-orange-500'} text-white flex items-center justify-center font-bold text-xs shadow-sm cursor-pointer">+</button>
+              </div>
             </div>
-            <div class="flex items-center gap-1 shrink-0 bg-slate-950 p-1 rounded-lg border border-white/5">
-              <button type="button" onclick="decrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded bg-slate-800 text-slate-200 hover:bg-slate-700 flex items-center justify-center font-bold text-xs cursor-pointer">-</button>
-              <span class="w-6 text-center font-mono font-bold text-xs ${isSelected ? 'text-orange-400' : 'text-slate-500'}">${currentQty}</span>
-              <button type="button" onclick="incrementModalCart('${item.replace(/'/g, "\\'")}')" class="w-6 h-6 rounded bg-orange-600 text-white hover:bg-orange-500 flex items-center justify-center font-bold text-xs shadow-sm cursor-pointer">+</button>
-            </div>
+            ${toolJustBtnHtml}
           `;
           container.appendChild(itemCard);
         });
@@ -3651,14 +3777,21 @@
         showToast('Material exclusivo da Matriz/Admins (indisponível para filiais).', 'warning');
         return;
       }
+      const isFirst = !currentCart[item] || currentCart[item] === 0;
       currentCart[item] = (currentCart[item] || 0) + 1;
+      if (isFirst && isItemTool(item) && !currentToolJustifications[item]) {
+        setTimeout(() => promptModalToolJustification(item), 100);
+      }
       updateModalCartUI();
     }
 
     function decrementModalCart(item) {
       if (currentCart[item] && currentCart[item] > 0) {
         currentCart[item]--;
-        if (currentCart[item] === 0) delete currentCart[item];
+        if (currentCart[item] === 0) {
+          delete currentCart[item];
+          delete currentToolJustifications[item];
+        }
       }
       updateModalCartUI();
     }
@@ -3667,11 +3800,57 @@
       const totalUnits = Object.values(currentCart).reduce((a, b) => a + b, 0);
       const typesCount = Object.keys(currentCart).length;
       document.getElementById('modal-cart-counter-text').innerText = `${totalUnits} peças (${typesCount} tipos)`;
+
+      // Container dinâmico de justificativas de ferramentas
+      const justBox = document.getElementById('modal-tool-justifications-box');
+      if (justBox) {
+        const toolKeys = Object.keys(currentCart).filter(it => isItemTool(it));
+        if (toolKeys.length === 0) {
+          justBox.classList.add('hidden');
+          justBox.innerHTML = '';
+        } else {
+          justBox.classList.remove('hidden');
+          justBox.innerHTML = `
+            <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2">
+              <div class="font-extrabold text-amber-300 flex items-center justify-between">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-wrench text-amber-400"></i> Justificativas Obrigatórias (${toolKeys.length} ${toolKeys.length === 1 ? 'ferramenta' : 'ferramentas'})</span>
+                <span class="text-[10px] text-amber-400/80 font-mono">Exigido pela Matriz</span>
+              </div>
+              <p class="text-[11px] text-amber-200/80 leading-relaxed">
+                Descreva o motivo de reposição de cada ferramenta selecionada (ex: estragou, quebrou na obra, sem conserto, etc.):
+              </p>
+              <div class="space-y-2 pt-1">
+                ${toolKeys.map(t => {
+                  const val = currentToolJustifications[t] || '';
+                  const isOk = val.trim().length >= 5;
+                  return `
+                    <div class="space-y-1 bg-slate-950/70 p-2.5 rounded-xl border ${isOk ? 'border-emerald-500/30' : 'border-amber-500/40'}">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <span class="font-extrabold text-white flex items-center gap-1">
+                          <i class="fa-solid fa-wrench text-amber-400 text-[10px]"></i> ${t} (${currentCart[t]} un)
+                        </span>
+                        <span class="text-[10px] font-bold ${isOk ? 'text-emerald-400' : 'text-amber-400'}">
+                          ${isOk ? '<i class="fa-solid fa-check"></i> Preenchido' : '⚠️ Obrigatório'}
+                        </span>
+                      </div>
+                      <textarea rows="2" placeholder="Motivo obrigatório: ex: O meu quebrou em atendimento, tentamos arrumar mas não deu certo..."
+                                oninput="setModalToolJustification('${t.replace(/'/g, "\\'")}', this.value)"
+                                class="w-full bg-slate-900 border border-white/10 rounded-lg p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 resize-none">${escapeHtml(val)}</textarea>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+      }
+
       renderModalCatalogItems();
     }
 
     function openNewEnvioModal() {
       currentCart = {};
+      currentToolJustifications = {};
       if (!isAdmin()) {
         Object.keys(currentCart).forEach(it => {
           if (isItemRestrictedForSolicitantes(it)) delete currentCart[it];
@@ -3730,6 +3909,18 @@
         }
       }
 
+      // Validação mandatória de justificativa para ferramentas
+      const missingJustTools = cartKeys.filter(it => {
+        if (!isItemTool(it)) return false;
+        const j = (currentToolJustifications[it] || '').trim();
+        return j.length < 5;
+      });
+
+      if (missingJustTools.length > 0) {
+        alert('⚠️ JUSTIFICATIVA OBRIGATÓRIA PARA FERRAMENTAS:\n\nPara solicitar ferramentas, é obrigatório preencher o motivo da solicitação de cada uma antes de registrar.\n\nFalta preencher o motivo de:\n• ' + missingJustTools.join('\n• ') + '\n\n(Ex: "O meu estragou, tentamos arrumar mas não deu certo, se possível mandar outro")');
+        return;
+      }
+
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Registrando...';
 
@@ -3748,7 +3939,17 @@
         else if (filial.includes('SMO') || filial.includes('Terceiros')) recipientTag = '[TERCEIROS SMO] ';
         else if (filial.includes('Pato') || filial.includes('Leonardo')) recipientTag = '[PATO BRANCO] ';
 
-        const fullNotes = `[${urgencia.toUpperCase()}] ${recipientTag}${obs ? obs : 'Solicitação lançada pelo painel'}`;
+        // Serializa justificativas das ferramentas
+        const toolJustEntries = Object.entries(currentToolJustifications).filter(([k]) => cartKeys.includes(k) && isItemTool(k));
+        let justTag = '';
+        let justReadable = '';
+        if (toolJustEntries.length > 0) {
+          const mapToSave = Object.fromEntries(toolJustEntries);
+          justTag = ` [JUSTIFICATIVAS:${JSON.stringify(mapToSave)}]`;
+          justReadable = `\n\n⚠️ JUSTIFICATIVAS DE FERRAMENTAS:\n` + toolJustEntries.map(([t, mot]) => `• ${t}: "${mot}"`).join('\n');
+        }
+
+        const fullNotes = `[${urgencia.toUpperCase()}] ${recipientTag}${obs ? obs : 'Solicitação lançada pelo painel'}${justTag}${justReadable}`;
 
         const shipmentPayload = {
           branch_name: dbBranch,
@@ -4435,6 +4636,7 @@
           diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-300 bg-cyan-500/20 border border-cyan-500/40 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-plus"></i> Adicional (+${extra} un)</span>`;
         }
 
+        const itemJust = it.justificativa || (pedido.toolJustMap && pedido.toolJustMap[it.nome]) || '';
         const rowBg = it.checked ? 'bg-emerald-950/20 border-emerald-500/20' : 'hover:bg-slate-900/50 border-white/5';
 
         return `
@@ -4444,8 +4646,10 @@
               <div class="font-bold text-white text-xs ${it.checked ? 'text-emerald-300' : ''} flex items-center gap-1.5">
                 ${it.checked ? '<i class="fa-solid fa-check text-emerald-400 text-xs"></i>' : ''}
                 <span>${it.nome}</span>
+                ${isItemTool(it.nome) ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 py-0.2 rounded font-mono font-bold">Ferramenta</span>' : ''}
               </div>
               <div class="text-[10px] text-slate-500 uppercase font-semibold">${it.categoria || 'MATERIAL'}</div>
+              ${itemJust ? `<div class="text-[10px] text-amber-300 italic font-medium mt-0.5"><i class="fa-solid fa-wrench text-amber-400 mr-1"></i><strong>Motivo:</strong> "${escapeHtml(itemJust)}"</div>` : ''}
             </td>
             <td class="py-2.5 px-3 text-center">
               ${it.qtdOriginal > 0 
@@ -4543,6 +4747,22 @@
           <input type="text" id="modal-detail-obs-input" value="${pedido.obs || ''}" onchange="updateObsConference(this.value)" placeholder="Ex: Faltavam 10 câmeras em estoque, restante será enviado na próxima terça..." 
                  class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500 placeholder-slate-600 transition">
         </div>
+
+        ${(pedido.toolJustMap && Object.keys(pedido.toolJustMap).length > 0) ? `
+          <div class="glass-surface p-3.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 space-y-1.5">
+            <span class="text-[10px] text-amber-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-wrench text-amber-400"></i> Justificativas Registradas pelo Técnico para Ferramentas:
+            </span>
+            <ul class="text-xs text-amber-200/90 space-y-1 pl-1">
+              ${Object.entries(pedido.toolJustMap).map(([tool, mot]) => `
+                <li class="flex items-start gap-1.5">
+                  <span class="text-amber-400 font-bold shrink-0">• ${escapeHtml(tool)}:</span>
+                  <span class="italic text-slate-200">"${escapeHtml(mot)}"</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        ` : ''}
 
         <!-- Tabela de Conferência Física -->
         <div class="border border-white/10 rounded-2xl overflow-hidden bg-slate-950/80 shadow-lg">
@@ -4853,18 +5073,20 @@
 
     // Gerador de Mensagem de Romaneio Formatada para WhatsApp
     function buildWhatsAppRomaneio(pedido) {
-      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
+      const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: (pedido.status || 'Aguardando Separação') };
+      const statusLabel = statusObj && statusObj.nome ? statusObj.nome.toUpperCase() : 'AGUARDANDO';
 
       let msg = `📦 *SISTEM ENVIO VIGI - ROMANEIO ${pedido.id}*\n`;
       msg += `📍 *Filial Destino:* ${pedido.filial}\n`;
       msg += `👤 *Solicitante:* ${pedido.solicitante}\n`;
-      msg += `🚨 *Status:* ${statusObj.nome.toUpperCase()}\n`;
+      msg += `🚨 *Status:* ${statusLabel}\n`;
       msg += `⚡ *Prioridade:* ${pedido.urgencia}\n`;
       if (pedido.obs) msg += `📝 *Obs Almoxarifado:* ${pedido.obs}\n`;
       msg += `\n📋 *MATERIAIS NA REMESSA:*\n`;
 
       let hasDivergence = false;
       pedido.itens.forEach((it) => {
+        const itJust = it.justificativa || (pedido.toolJustMap && pedido.toolJustMap[it.nome]);
         if (it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal) {
           hasDivergence = true;
           if (it.qtd === 0) {
@@ -4874,6 +5096,9 @@
           }
         } else {
           msg += `▪️ *${it.qtd}x* ${it.nome}\n`;
+        }
+        if (itJust) {
+          msg += `   └ ⚠️ _Motivo: "${itJust}"_\n`;
         }
       });
 
@@ -4921,7 +5146,20 @@
       const dataPed = pedido.data || (pedido.created_at ? new Date(pedido.created_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'));
       const dataHoje = new Date().toLocaleString('pt-BR');
       const urgencia = pedido.urgencia || 'Normal';
-      const obs = pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes.replace(/\[.*?\]/g, '').trim() : '');
+      let toolJustMap = pedido.toolJustMap || {};
+      if (Object.keys(toolJustMap).length === 0 && typeof pedido.rawNotes === 'string') {
+        const justMatch = pedido.rawNotes.match(/\[JUSTIFICATIVAS:(.*?)\]/);
+        if (justMatch) {
+          try { toolJustMap = JSON.parse(justMatch[1]); } catch(e) {}
+        }
+      }
+      if (Object.keys(toolJustMap).length === 0 && typeof pedido.notes === 'string') {
+        const justMatch = pedido.notes.match(/\[JUSTIFICATIVAS:(.*?)\]/);
+        if (justMatch) {
+          try { toolJustMap = JSON.parse(justMatch[1]); } catch(e) {}
+        }
+      }
+      const obs = (pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes : '')).replace(/\[.*?\]/g, '').replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim();
       const statusRaw = (pedido.status || 'aguardando').toLowerCase();
 
       let statusBadgeColor = '#00204A';
@@ -4942,6 +5180,7 @@
         const qtdPedida = (it.qtdOriginal !== undefined) ? it.qtdOriginal : (it.quantity || it.qtd || 1);
         const qtdSeparada = (it.qtd !== undefined) ? it.qtd : (it.quantity || qtdPedida);
         const checked = !!it.checked;
+        const itemJust = it.justificativa || toolJustMap[nome] || '';
 
         totalSolicitado += Number(qtdPedida) || 0;
         totalSeparado += Number(qtdSeparada) || 0;
@@ -4961,6 +5200,7 @@
             <td style="padding: 6px 8px;">
               <div style="font-weight: 800; font-size: 11px; color: #0f172a;">${nome}</div>
               <div style="font-size: 9px; color: #64748b; text-transform: uppercase;">${cat} ${divergenciaTag}</div>
+              ${itemJust ? `<div style="font-size: 8.5px; color: #b45309; font-style: italic; margin-top: 2px;">⚠️ <strong>Motivo da Ferramenta:</strong> "${escapeHtml(itemJust)}"</div>` : ''}
             </td>
             <td style="padding: 6px 8px; text-align: center; font-family: monospace; font-size: 11px; font-weight: bold; color: #334155;">
               ${qtdPedida} un
@@ -5240,6 +5480,15 @@
     ${obs ? `
       <div class="obs-section">
         <strong>Observações do Pedido:</strong> ${obs}
+      </div>
+    ` : ''}
+
+    ${Object.keys(toolJustMap).length > 0 ? `
+      <div style="margin-top: 6px; padding: 6px 10px; background: #fffbeb; border: 1.5px solid #fde68a; border-radius: 6px; margin-bottom: 8px;">
+        <strong style="color: #92400e; font-size: 9.5px; text-transform: uppercase;">⚠️ Justificativas de Ferramentas Registradas pelo Técnico:</strong>
+        <ul style="margin: 3px 0 0 0; padding-left: 16px; font-size: 9px; color: #78350f;">
+          ${Object.entries(toolJustMap).map(([tool, mot]) => `<li><strong>${escapeHtml(tool)}:</strong> "${escapeHtml(mot)}"</li>`).join('')}
+        </ul>
       </div>
     ` : ''}
 

@@ -47,19 +47,22 @@ graph TD
    - **Aba 2 (Compras):** 3 colunas gerenciando o ciclo de suprimentos com fornecedores.
 2. **Catálogo Completo com 10 Categorias e ~90 Materiais Reais:**
    - Marketing e Outros (Adesivos, Camisas, Placas)
-   - Ferramentas e Equipamentos Técnicos (Alicates, Furadeiras, Parafusadeiras...)
-   - Cabos e Fios (Bobinas de Fibra, Cabos de Rede, Energia...)
+   - **Equipamentos Técnicos (Ferramentas)**: Aba separada no catálogo com **justificativa obrigatória por material** (motivo de reposição como "estragou, tentamos arrumar mas não deu certo").
+   - Cabos e Fios (Bobinas de Fibra [restrita], Cabos de Rede, Energia...)
    - Elétrica e Proteção (Fontes 12V, Nobreaks, Baterias...)
-   - Infraestrutura e Fixação (Canaletas, Parafusos, Caixas de Passagem...)
+   - Infraestrutura e Fixação (Canaletas, Parafusos, Caixas de Passagem, Eletroduto em barras de 3m...)
    - Câmeras (Hikvision, UNV, ColorVu, IP, Dome, Bullet...)
-   - Informática e Diversos (HDs 1TB/2TB, SSDs, Switches, Kits de Fibra...)
+   - Informática e Diversos (HDs 1TB/2TB, SSDs, Switches, Kits de Fibra [restrito]...)
    - Alarmes e Sensores (Centrais, Sensores com/sem fio, Sirenes...)
    - Conectores e Vídeo (RJ45, Balun, P4, BNC, Conector Wago...)
    - Gravadores DVR (Hikvision, Intelbras, UNV 4/8/16 canais)
+   > *Nota de Controle:* Materiais de fibra óptica (`Bobina de Cabo de Fibra`, `Conector de Fibra`, `Kit de Fibra`) são exclusivos para Admins (sem estoque para filiais). Ferramentas são liberadas para os técnicos em aba separada com exigência de justificativa individual. Suprimentos regulares seguem fluxo normal.
 3. **Modal de Solicitação Inteligente:**
-   - Seleção de Filial com botão dedicado (`Francisco Beltrão`, `Palotina`, `Barracão`).
-   - Carrossel com chips de filtros por categoria.
+   - Seleção de Filial com botão dedicado (`Francisco Beltrão`, `Palotina`, `Barracão`, `Pato Branco`, `Terceiros SMO`).
+   - Carrossel com chips de filtros por categoria com destaque visual para ferramentas (`Exige Motivo`).
+   - Formulário inline / modal para digitação de justificativa de cada ferramenta selecionada (mínimo de 5 caracteres).
    - Stepper de quantidades (`-` / `+`) com iluminação do card e carrinho em tempo real.
+   - Persistência durável do carrinho e justificativas no `localStorage` para evitar perda de dados quando o celular minimizar.
 4. **Disparo Formatado para WhatsApp em 1 Clique:**
    - Botão **"Zap"** que gera mensagem formatada em Markdown com emojis e copia para a área de transferência para colar no grupo da filial.
 5. **Romaneio / Checklist de Separação para Impressão:**
