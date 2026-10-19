@@ -171,15 +171,26 @@ assert.strictEqual(mobileCtx.canUserRequestTools('smo'), false, 'Técnicos SMO a
 assert.strictEqual(mobileCtx.canUserRequestTools('terceiros'), false, 'Terceiros SMO NÃO PODEM ter permissão de ferramentas');
 console.log('✓ Matriz de permissões canUserRequestTools() validada 100%.');
 
-// 1.2 Visibilidade do Catálogo por Usuário
-console.log('1.2 Visibilidade da Categoria de Ferramentas no Catálogo');
+// 1.2 Visibilidade do Catálogo por Usuário & Ocultação de Lubrificante
+console.log('1.2 Visibilidade de Ferramentas, Fibra e Lubrificante de Fio:');
+assert.strictEqual(mobileCtx.isItemLubrificanteRestricted('Lubrificante Passa Fio'), true, 'Lubrificante Passa Fio deve ser restrito');
+assert.strictEqual(mobileCtx.isItemRestrictedForSolicitantes('Lubrificante Passa Fio'), true, 'Lubrificante de fio deve ser restrito para filiais');
 
-// Testando Iury (PERMITIDO)
+// Testando Iury (PERMITIDO ferramentas, BLOQUEADO fibra e lubrificante)
 vm.runInContext('currentUser = "beltrao1";', mobileCtx);
 const iuryCatalog = mobileCtx.getCatalogoForUser();
 const iuryCats = iuryCatalog.map(c => c.categoria);
 assert.ok(iuryCats.includes('EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)'), 'Iury DEVE visualizar a aba de ferramentas');
 assert.ok(!iuryCats.includes('FIBRA'), 'Iury não deve visualizar materiais de fibra óptica');
+const iuryCabos = iuryCatalog.find(c => c.categoria === 'CABOS E FIOS');
+assert.ok(iuryCabos && !iuryCabos.itens.includes('Lubrificante Passa Fio'), 'Iury NÃO DEVE visualizar Lubrificante Passa Fio');
+assert.ok(iuryCabos && iuryCabos.itens.includes('Caixa de Cabo de Rede'), 'Iury DEVE visualizar Caixa de Cabo de Rede');
+
+// Testando Admin (visualiza lubrificante e fibra)
+vm.runInContext('currentUser = "thiago";', mobileCtx);
+const adminCatalog = mobileCtx.getCatalogoForUser();
+const adminCabos = adminCatalog.find(c => c.categoria === 'CABOS E FIOS');
+assert.ok(adminCabos && adminCabos.itens.includes('Lubrificante Passa Fio'), 'Admin DEVE visualizar Lubrificante Passa Fio no estoque');
 
 // Testando Giseli (PERMITIDO)
 vm.runInContext('currentUser = "barracao1";', mobileCtx);
@@ -284,13 +295,24 @@ console.log('✓ canUserRequestTools() no index.html idêntico e consistente.');
 
 // 2.2 Catálogo em index.html
 console.log('2.2 Catálogo do index.html para perfis autorizados vs não-autorizados:');
+assert.strictEqual(desktopCtx.isItemLubrificanteRestricted('Lubrificante Passa Fio'), true, 'Lubrificante deve ser restrito no desktop');
+
 vm.runInContext('currentUser = "pato1";', desktopCtx); // Leonardo
 const patoCat = desktopCtx.getCatalogoForUser();
 assert.ok(!patoCat.some(c => c.categoria === 'EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)'), 'Leonardo não deve ter aba de ferramentas no index.html');
+const patoCabos = patoCat.find(c => c.categoria === 'CABOS E FIOS');
+assert.ok(patoCabos && !patoCabos.itens.includes('Lubrificante Passa Fio'), 'Leonardo não deve ver Lubrificante Passa Fio no index.html');
 
 vm.runInContext('currentUser = "barracao1";', desktopCtx); // Giseli
 const giseliDeskCat = desktopCtx.getCatalogoForUser();
 assert.ok(giseliDeskCat.some(c => c.categoria === 'EQUIPAMENTOS TÉCNICOS (FERRAMENTAS)'), 'Giseli deve ter aba de ferramentas no index.html');
+const giseliCabos = giseliDeskCat.find(c => c.categoria === 'CABOS E FIOS');
+assert.ok(giseliCabos && !giseliCabos.itens.includes('Lubrificante Passa Fio'), 'Giseli não deve ver Lubrificante Passa Fio no index.html');
+
+vm.runInContext('currentUser = "erick";', desktopCtx); // Admin Erick
+const erickDeskCat = desktopCtx.getCatalogoForUser();
+const erickCabos = erickDeskCat.find(c => c.categoria === 'CABOS E FIOS');
+assert.ok(erickCabos && erickCabos.itens.includes('Lubrificante Passa Fio'), 'Admin Erick deve ver Lubrificante Passa Fio no estoque Matriz');
 
 // 2.3 Bloqueio de submissão em submitNewEnvio no index.html
 console.log('2.3 Validação de submissão desktop em submitNewEnvio:');

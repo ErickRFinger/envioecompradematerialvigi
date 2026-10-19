@@ -1626,9 +1626,16 @@
       return isIury || isGiseli || isAdilson;
     }
 
+    function isItemLubrificanteRestricted(itemName) {
+      if (!itemName) return false;
+      const name = String(itemName).trim().toLowerCase();
+      return name.includes('lubrificante') || name.includes('passa fio') || name.includes('passa-fio');
+    }
+
     function isItemRestrictedForSolicitantes(itemName, categoriaName) {
-      // 1. Fibra óptica: sempre restrita para filiais (sem estoque)
+      // 1. Materiais sem estoque para filiais (Fibra óptica e Lubrificante de fio)
       if (isItemFiberRestricted(itemName, categoriaName)) return true;
+      if (isItemLubrificanteRestricted(itemName)) return true;
 
       // 2. Ferramentas: liberadas exclusivamente para Iury, Giseli e Adilson (bloqueadas para Cleverson, Leonardo e SMO)
       if (isItemTool(itemName, categoriaName)) {

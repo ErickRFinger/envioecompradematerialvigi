@@ -50,7 +50,7 @@ graph TD
    - **Equipamentos Técnicos (Ferramentas)**: Aba separada no catálogo com **justificativa obrigatória por material** (motivo de reposição como "estragou, tentamos arrumar mas não deu certo").
      - **Permitidos para visualizar e pedir ferramentas**: SOMENTE **Iury** (`beltrao1`/`iury`), **Giseli** (`barracao1`/`giseli`), **Adilson** (`palotina1`/`adilson`) e **Administradores**.
      - **Bloqueados para ferramentas**: **Cleverson** (`beltrao2`/`cleverson`), **Leonardo** (`pato1`/`leonardo`) e **Técnicos de SMO** (`smo1`/`smo`/`terceiros`). A aba é completamente ocultada do catálogo deles e bloqueada contra pedidos.
-   - Cabos e Fios (Bobinas de Fibra [restrita], Cabos de Rede, Energia...)
+   - Cabos e Fios (Bobinas de Fibra [restrita], Lubrificante Passa Fio [restrito], Cabos de Rede, Energia...)
    - Elétrica e Proteção (Fontes 12V, Nobreaks, Baterias...)
    - Infraestrutura e Fixação (Canaletas, Parafusos, Caixas de Passagem, Eletroduto em barras de 3m...)
    - Câmeras (Hikvision, UNV, ColorVu, IP, Dome, Bullet...)
@@ -58,7 +58,7 @@ graph TD
    - Alarmes e Sensores (Centrais, Sensores com/sem fio, Sirenes...)
    - Conectores e Vídeo (RJ45, Balun, P4, BNC, Conector Wago...)
    - Gravadores DVR (Hikvision, Intelbras, UNV 4/8/16 canais)
-   > *Nota de Controle:* Materiais de fibra óptica (`Bobina de Cabo de Fibra`, `Conector de Fibra`, `Kit de Fibra`) são exclusivos para Admins (sem estoque para filiais). Ferramentas são liberadas exclusivamente para Iury, Giseli e Adilson em aba separada com exigência de justificativa individual. Suprimentos regulares seguem liberados para todos os técnicos.
+   > *Nota de Controle:* Materiais sem estoque para filiais (itens de fibra óptica e `Lubrificante Passa Fio`) são exclusivos para Admins (ocultos no catálogo de filiais). Ferramentas são liberadas exclusivamente para Iury, Giseli e Adilson em aba separada com exigência de justificativa individual. Suprimentos regulares seguem liberados para todos os técnicos.
 3. **Modal de Solicitação Inteligente:**
    - Seleção de Filial com botão dedicado (`Francisco Beltrão`, `Palotina`, `Barracão`, `Pato Branco`, `Terceiros SMO`).
    - Carrossel com chips de filtros por categoria com destaque visual para ferramentas (`Exige Motivo`).
