@@ -1,0 +1,10 @@
+# ── Nunca publicar credenciais, backups ou material de desenvolvimento ──────
+.env
+.env.*
+*.env
+*.key
+*.pem
+scratch/
+*.sql
+.DS_Store
+SENHAS_EXPOSTAS.local.txt

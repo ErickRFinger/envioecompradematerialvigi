@@ -151,6 +151,84 @@
       color: #94a3b8;
     }
 
+    /* ========================================================
+       ACESSIBILIDADE & VISUALIZAÇÃO
+       ======================================================== */
+
+    /* 1. Foco visível para navegação por teclado (WCAG 2.4.7) */
+    :focus-visible {
+      outline: 2px solid #fd5f00;
+      outline-offset: 2px;
+      border-radius: 0.5rem;
+    }
+    /* Remove o outline padrão apenas quando o foco não é visível (mouse) */
+    :focus:not(:focus-visible) {
+      outline: none;
+    }
+
+    /* 2. Respeita usuários que preferem menos movimento (WCAG 2.3.3) */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+      .card-dragging { transform: none !important; }
+      .glass-surface-card:hover { transform: none !important; }
+    }
+
+    /* 3. Skeleton loading (evita tela vazia durante fetch ao Supabase) */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.03) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.4s ease-in-out infinite;
+      border-radius: 0.75rem;
+    }
+    @keyframes skeleton-shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton { animation: none; background: rgba(255,255,255,0.05); }
+    }
+
+    /* 4. Alvos de toque maiores em telas pequenas (WCAG 2.5.8) */
+    @media (max-width: 768px) {
+      button, a[role="button"], input[type="button"], input[type="submit"] {
+        min-height: 44px;
+      }
+    }
+
+    /* 5. Texto de placeholder com contraste adequado (WCAG 1.4.3) */
+    ::placeholder {
+      color: #94a3b8;
+      opacity: 1;
+    }
+
+    /* 6. Indicador de carga para região aria-live (visualmente oculto) */
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* 7. Barra de rolagem com contraste maior (visibilidade) */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: #000c1e; }
+    ::-webkit-scrollbar-thumb {
+      background: #1e3a5f;
+      border-radius: 9999px;
+      border: 2px solid #000c1e;
+    }
+    ::-webkit-scrollbar-thumb:hover { background: #fd5f00; }
+
     @media print {
       html, body {
         background: #ffffff !important;
@@ -184,7 +262,9 @@
   <!-- ======================================================== -->
   <!-- TOAST NOTIFICATION CONTAINER -->
   <!-- ======================================================== -->
-  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
+  <div id="toast-container" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
+  <!-- Anunciador para leitores de tela (atualizações dinâmicas do painel) -->
+  <div id="sr-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!-- ======================================================== -->
   <!-- 0. TELA DE LOGIN OBRIGATÓRIA (NÃO ENTRA LOGADO DIRETO) -->
@@ -262,6 +342,26 @@
                 <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">TH</div>
                 <div class="text-left truncate">
                   <span class="block truncate text-white">Thiago</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
+            </button>
+            <button type="button" onclick="selectQuickUserDesktop('deivid')" id="quick-card-deivid" data-user="deivid" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">DE</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Deivid</span>
+                  <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
+            </button>
+            <button type="button" onclick="selectQuickUserDesktop('gabriely')" id="quick-card-gabriely" data-user="gabriely" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-orange-500/20 text-orange-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-orange-500/30">GA</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Gabriely</span>
                   <span class="text-[10px] text-orange-400 font-semibold block">Admin</span>
                 </div>
               </div>
@@ -1071,6 +1171,20 @@
               </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
+            <button onclick="switchCurrentUser('deivid')" id="switch-btn-deivid" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Deivid</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
+            <button onclick="switchCurrentUser('gabriely')" id="switch-btn-gabriely" class="p-3 rounded-2xl border border-orange-500/30 bg-orange-500/10 text-orange-300 font-bold hover:bg-orange-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Gabriely</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px]"></i>
+            </button>
           </div>
         </div>
 
@@ -1127,9 +1241,33 @@
 
       </div>
 
-      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 flex items-center justify-between">
-        <span class="text-[11px] text-slate-500"><i class="fa-solid fa-key text-[10px] mr-1 text-slate-400"></i> Senhas: Filiais <span class="font-mono text-amber-400 font-bold">clic3369</span> • Admins <span class="font-mono text-orange-400 font-bold">Clic@3369</span></span>
-        <button onclick="closeUserSwitchModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Fechar</button>
+      <div class="px-6 py-3.5 bg-slate-950/90 border-t border-white/10 space-y-3">
+        <div id="switch-password-area" class="hidden space-y-2">
+          <label for="switch-user-password" class="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-key text-[10px] text-orange-400"></i>
+            Confirme a senha de <span id="switch-target-name" class="text-orange-300 font-black">—</span> para assumir este perfil
+          </label>
+          <div class="relative">
+            <input type="password" id="switch-user-password" autocomplete="off" placeholder="Digite a senha do perfil selecionado"
+                   class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 pr-10 text-xs text-slate-200 focus:outline-none focus:border-orange-500 placeholder-slate-600 transition">
+            <button type="button" onclick="toggleSwitchPasswordVisibility()" aria-label="Mostrar ou ocultar senha" class="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white cursor-pointer">
+              <i id="switch-password-toggle-icon" class="fa-regular fa-eye text-xs"></i>
+            </button>
+          </div>
+          <p id="switch-password-error" class="hidden text-[11px] font-bold text-red-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-circle-exclamation"></i> <span id="switch-password-error-text">Senha incorreta.</span>
+          </p>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <span class="text-[11px] text-slate-500"><i class="fa-solid fa-shield-halved text-[10px] mr-1 text-emerald-400"></i> Alternância de perfil protegida por senha</span>
+          <div class="flex items-center gap-2">
+            <button id="switch-confirm-btn" onclick="confirmUserSwitch()" style="display: none;"
+                    class="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-orange-600 to-amber-600 hover:brightness-110 transition cursor-pointer shadow-lg shadow-orange-600/25">
+              Confirmar Troca
+            </button>
+            <button onclick="closeUserSwitchModal()" class="px-4 py-2 rounded-xl font-semibold text-slate-400 hover:text-white cursor-pointer">Fechar</button>
+          </div>
+        </div>
       </div>
 
     </div>
@@ -1493,16 +1631,72 @@
       : null;
 
     // 1.1 CRIPTOGRAFIA & UTILITÁRIOS DE SEGURANÇA
-    const ADMIN_PASSWORD_HASH = "5b328b3ac509bb4910b2cb8f212ee690981c7c6a21e636e3f7f63c785b8d9fb5"; // SHA-256 de Clic@3369
-    const TECH_PASSWORD_HASH = "dcf9cba09d38920c5861cbb92f9d72bd45ab02a47cada2f33719f01fa8d5bcf0";  // SHA-256 de clic3369
+    // ------------------------------------------------------------------
+    // As senhas NUNCA trafegam em texto puro no bundle. Cada usuário possui
+    // um par (salt, hash) gerado offline com PBKDF2-SHA256 (210.000 iterações).
+    // A autenticação acontece no cliente; a proteção real dos dados depende
+    // das políticas RLS do Supabase (ver SEGURANCA.md).
+    const PBKDF2_ITERATIONS = 210000;
+    const PBKDF2_KEY_LEN = 32;
+    const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // validade da sessão restaurada (8h)
 
-    async function hashPassword(str) {
-      if (!str) return '';
+    // Credenciais derivadas offline (salt + hash por usuário canônico).
+    const USER_CREDENTIALS = {
+      "erick":     { salt: "7be481ed9fb618f95a6cfeba1c3cef3b", hash: "c61968e16f402b9639910f396d06781ed469b4b5a76c7335f1ea0b65e1651234" },
+      "klaus":     { salt: "8ca133fc01f89ba1f7e8eead04dc9a29", hash: "708ad69969f6470da99c4ac2f07062a6f704f35d86e95c74508dd377e818a56b" },
+      "daniel":    { salt: "a04b5ef2cbc0c00bf8b2dc360ff671cc", hash: "ea09e9c6cc04220248303aa29209a024c479e9dd902c4ac13eccc35a2ce78438" },
+      "thiago":    { salt: "4e49d100904f73e12e2f1740a0174f7b", hash: "b22d49405229b5f0301b63fa8511325329fb911dc275520b7f895d8ae5701d7e" },
+      "deivid":    { salt: "84f4da00575802bd31ddc75957e7fc4f", hash: "9dc537a9fa49dce138b8a9d2e1113ba2b0216cf91293efe25bd1427fd5eb1b80" },
+      "gabriely":  { salt: "f9914a72325f891227fa2961168e2ab4", hash: "060c0e1ec87faf389268cb3dd54bb468567ce98bc243aa7452c05884458edb3b" },
+      "beltrao1":  { salt: "c69c8c773552ddb436b6b24d72e2a9b0", hash: "cbce7c8233bac9b2d3f805a95ef44109e299435e21403dc9f06ca8e80b7b0afe" },
+      "beltrao2":  { salt: "7092129315c1d9a3e9d75c11072e6532", hash: "cb663dae2103ff11fe7fa1c6f9be300ae6a74bf42e683dd90ddf07ebda03a709" },
+      "palotina1": { salt: "e8239a667adba7a6c85df2102652a020", hash: "6b627bb57e59874bfd1451540cff741d42463c7eeac8e8a1ba614b1305da0071" },
+      "barracao1": { salt: "54f3d9d31957adc0a93a6d7b02012dc7", hash: "0daff8bc1a5a03ec2cb89e2bca8e9dc39cf90fb5e1dce6f5a8fb7c123040ee05" },
+      "pato1":     { salt: "9338cf714648e087fb463f25031fe0ae", hash: "af4e4373002de02de7fa3b4b2907c7e760bf52f874be361f97fa2992ed8af593" },
+      "smo1":      { salt: "35908a8f6a44c209cc7e699b0901466f", hash: "fa64314941a683d025124f267f6fe0b380f223d430c20da3511a09901bef2e1c" }
+    };
+
+    function hexToBytes(hex) {
+      const out = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.substr(i * 2, 2), 16);
+      return out;
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Derivação de chave PBKDF2-SHA256 (WebCrypto nativo, zero dependências).
+    async function derivePasswordHash(password, saltHex) {
+      if (!password || !saltHex) return '';
       const encoder = new TextEncoder();
-      const data = encoder.encode(str);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']
+      );
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: hexToBytes(saltHex), iterations: PBKDF2_ITERATIONS, hash: 'SHA-256' },
+        keyMaterial,
+        PBKDF2_KEY_LEN * 8
+      );
+      return bytesToHex(new Uint8Array(bits));
+    }
+
+    // Comparação em tempo constante (evita vazamento por timing).
+    function safeCompare(a, b) {
+      if (!a || !b || a.length !== b.length) return false;
+      let diff = 0;
+      for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
+      return diff === 0;
+    }
+
+    // Verifica a senha de um usuário contra o par salt/hash canônico.
+    async function verifyUserPassword(user, password) {
+      if (!user || !password) return false;
+      const canonical = user.username || (APP_USERS[user] ? APP_USERS[user].username : null);
+      const cred = canonical ? USER_CREDENTIALS[canonical] : null;
+      if (!cred) return false;
+      const derived = await derivePasswordHash(password, cred.salt);
+      return safeCompare(derived, cred.hash);
     }
 
     function escapeHtml(str) {
@@ -1531,8 +1725,6 @@
         username: "erick",
         name: "Erick",
         role: "admin",
-        passwordHash: ADMIN_PASSWORD_HASH,
-        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "ER"
@@ -1541,8 +1733,6 @@
         username: "klaus",
         name: "Klaus",
         role: "admin",
-        passwordHash: ADMIN_PASSWORD_HASH,
-        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "KL"
@@ -1551,8 +1741,6 @@
         username: "daniel",
         name: "Daniel",
         role: "admin",
-        passwordHash: ADMIN_PASSWORD_HASH,
-        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "DA"
@@ -1561,20 +1749,32 @@
         username: "thiago",
         name: "Thiago",
         role: "admin",
-        passwordHash: ADMIN_PASSWORD_HASH,
-        password: "Clic@3369",
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "TH"
       },
+      "deivid": {
+        username: "deivid",
+        name: "Deivid",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "DE"
+      },
+      "gabriely": {
+        username: "gabriely",
+        name: "Gabriely",
+        role: "admin",
+        filial: "Todas as Filiais",
+        dbBranch: "MATRIZ",
+        avatar: "GA"
+      },
 
-      // --- FILIAIS / OPERADORES REGIONAIS (Senha: clic3369) ---
+      // --- FILIAIS / OPERADORES REGIONAIS (credencial definida por PBKDF2) ---
       "beltrao1": {
         username: "beltrao1",
         name: "Iury (Beltrão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "IU"
@@ -1583,8 +1783,6 @@
         username: "beltrao2",
         name: "Cleverson (Beltrão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "CL"
@@ -1593,8 +1791,6 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
         avatar: "AD"
@@ -1603,8 +1799,6 @@
         username: "barracao1",
         name: "Giseli (Barracão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1613,8 +1807,6 @@
         username: "barracao",
         name: "Giseli (Barracão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1623,8 +1815,6 @@
         username: "giseli",
         name: "Giseli (Barracão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Barracão (Giseli)",
         dbBranch: "BARRACAO PR",
         avatar: "GI"
@@ -1633,8 +1823,6 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
@@ -1643,8 +1831,6 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
@@ -1653,8 +1839,6 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1663,8 +1847,6 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1673,8 +1855,6 @@
         username: "smo1",
         name: "Terceiros SMO",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Terceiros SMO",
         dbBranch: "TERCEIROS SMO",
         avatar: "SM"
@@ -1683,8 +1863,6 @@
         username: "beltrao1",
         name: "Iury (Beltrão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Beltrão (Iury)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "IU"
@@ -1693,8 +1871,6 @@
         username: "beltrao2",
         name: "Cleverson (Beltrão)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Beltrão (Cleverson)",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "CL"
@@ -1703,8 +1879,6 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
         avatar: "AD"
@@ -1713,8 +1887,6 @@
         username: "palotina1",
         name: "Adilson (Palotina)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Palotina (Adilson)",
         dbBranch: "PALOTINA PR",
         avatar: "AD"
@@ -1723,8 +1895,6 @@
         username: "pato1",
         name: "Leonardo (Pato Branco)",
         role: "filial",
-        passwordHash: TECH_PASSWORD_HASH,
-        password: "clic3369",
         filial: "Pato Branco",
         dbBranch: "PATO BRANCO PR",
         avatar: "LE"
@@ -2024,6 +2194,18 @@
     }
 
     // 5. TOAST NOTIFICATIONS
+    // ========================================================
+    // ACESSIBILIDADE: anuncio para leitores de tela
+    // ========================================================
+    // Anuncia mensagens de forma não visual (WCAG 4.1.3 Status Messages).
+    function announce(text) {
+      const el = document.getElementById('sr-announcer');
+      if (!el) return;
+      // Zera antes de setar para garantir que leitores anunciem repetições.
+      el.textContent = '';
+      setTimeout(() => { el.textContent = String(text == null ? '' : text); }, 60);
+    }
+
     function showToast(msg, type = 'info') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -2042,7 +2224,13 @@
       }
 
       toast.className = `glass-surface pointer-events-auto flex items-center gap-3 px-4.5 py-3 rounded-2xl shadow-2xl border ${border} text-xs text-white transform transition-all duration-300 translate-y-3 opacity-0`;
-      toast.innerHTML = `${icon} <span class="font-medium">${msg}</span>`;
+      // Somente o ícone (HTML estático e controlado) é injetado via innerHTML.
+      // A mensagem é SEMPRE texto puro -> elimina XSS vindo do Supabase.
+      toast.innerHTML = icon;
+      const msgEl = document.createElement('span');
+      msgEl.className = 'font-medium';
+      msgEl.textContent = String(msg == null ? '' : msg);
+      toast.appendChild(msgEl);
       
       container.appendChild(toast);
       setTimeout(() => {
@@ -2053,15 +2241,18 @@
         toast.classList.add('opacity-0', 'translate-y-3');
         setTimeout(() => toast.remove(), 300);
       }, 3500);
+
+      // Anúncio equivalente para leitores de tela.
+      announce(msg);
     }
 
     // 6. AUTENTICAÇÃO OBRIGATÓRIA (TELA DE LOGIN)
     function checkDesktopAuth() {
-      const active = sessionStorage.getItem('vigi_active_session') || localStorage.getItem('vigi_auth_session') || localStorage.getItem('vigi_active_session');
+      // Restaura SOMENTE sessões previamente emitidas e ainda válidas.
+      const active = readValidDesktopSession();
       if (active && APP_USERS[active]) {
         currentUser = active;
-        sessionStorage.setItem('vigi_active_session', active);
-        localStorage.setItem('vigi_auth_session', active);
+        persistDesktopSession(active);
         const loginEl = document.getElementById('view-login');
         if (loginEl) {
           loginEl.style.display = 'none';
@@ -2159,6 +2350,71 @@
     let loginFailAttempts = 0;
     let loginLockUntil = 0;
 
+    // ========================================================
+    // GESTÃO DE SESSÃO (desktop)
+    // ========================================================
+    // A sessão é emitida somente após login com senha válida e expira em
+    // SESSION_TTL_MS. Nada em URL ou storage não validado abre o painel.
+    const SESSION_KEY_DESKTOP = 'vigi_active_session';
+    const SESSION_META_KEY = 'vigi_session_meta';
+
+    function persistDesktopSession(username) {
+      try {
+        sessionStorage.setItem(SESSION_KEY_DESKTOP, username);
+        localStorage.setItem('vigi_auth_session', username);
+        localStorage.setItem(SESSION_META_KEY, JSON.stringify({ user: username, ts: Date.now() }));
+      } catch (e) { /* storage indisponível */ }
+    }
+
+    function clearDesktopSession() {
+      try {
+        sessionStorage.removeItem(SESSION_KEY_DESKTOP);
+        localStorage.removeItem('vigi_auth_session');
+        localStorage.removeItem(SESSION_META_KEY);
+      } catch (e) { /* ignore */ }
+    }
+
+    // Retorna o usuário de uma sessão válida ou null.
+    // IMPORTANTE: as DUAS fontes de sessão (sessionStorage e localStorage)
+    // passam pela MESMA validação temporal (TTL de 8h). Sem isso, uma
+    // sessionStorage remanescente burlaria a expiração.
+    function readDesktopSessionMeta() {
+      try {
+        const raw = localStorage.getItem(SESSION_META_KEY);
+        if (!raw) return null;
+        const meta = JSON.parse(raw);
+        if (!meta || !meta.user || !meta.ts) return null;
+        if (Date.now() - meta.ts > SESSION_TTL_MS) {
+          clearDesktopSession();
+          return null;
+        }
+        return meta;
+      } catch (e) { return null; }
+    }
+
+    function readValidDesktopSession() {
+      let username = null;
+      try { username = sessionStorage.getItem(SESSION_KEY_DESKTOP); } catch (e) {}
+
+      // Metadados de validade (com TTL) — obrigatórios para qualquer fonte.
+      const meta = readDesktopSessionMeta();
+
+      if (username) {
+        // Sessão de aba: só vale se os metadados existirem, não tiverem
+        // expirado e apontarem para o mesmo usuário.
+        if (!meta || meta.user !== username) { clearDesktopSession(); return null; }
+        return username;
+      }
+
+      // Fallback: sessão persistida (mesma aba restaurada / outro device),
+      // validada pela data de emissão.
+      if (!meta) return null;
+      username = meta.user;
+
+      if (!username || !APP_USERS[username]) { clearDesktopSession(); return null; }
+      return username;
+    }
+
     async function handleDesktopLogin(e) {
       e.preventDefault();
       const now = Date.now();
@@ -2176,15 +2432,13 @@
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Autenticando com criptografia...';
 
       const user = APP_USERS[username];
-      const inputHash = await hashPassword(password);
-      const expectedHash = user ? (user.passwordHash || (user.role === 'admin' ? ADMIN_PASSWORD_HASH : TECH_PASSWORD_HASH)) : null;
-      const isValid = user && (inputHash === expectedHash || password === user.password);
+      const isValid = await verifyUserPassword(user, password);
 
       if (isValid) {
         loginFailAttempts = 0;
+        loginLockUntil = 0;
         currentUser = username;
-        sessionStorage.setItem('vigi_active_session', username);
-        localStorage.setItem('vigi_auth_session', username);
+        persistDesktopSession(username);
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
@@ -2207,8 +2461,8 @@
 
     function handleDesktopLogout() {
       if (confirm('Deseja realmente sair da conta atual?')) {
-        sessionStorage.removeItem('vigi_active_session');
-        localStorage.removeItem('vigi_auth_session');
+        clearDesktopSession();
+        pendingSwitchUser = null;
         currentUser = null;
         const pwdInput = document.getElementById('desktop-login-password');
         if (pwdInput) pwdInput.value = '';
@@ -2327,17 +2581,121 @@
       }
     }
 
+    // ========================================================
+    // TROCA DE PERFIL PROTEGIDA POR SENHA
+    // ========================================================
+    // Sem isso, qualquer pessoa logada poderia "assumir" o perfil de um
+    // administrador com um clique. Agora a troca exige a senha do perfil
+    // de destino (verificação PBKDF2) e só é liberada para Admins.
+    let pendingSwitchUser = null;
+
     function switchCurrentUser(username) {
-      if (APP_USERS[username]) {
-        currentUser = username;
-        sessionStorage.setItem('vigi_active_session', username);
-        localStorage.setItem('vigi_auth_session', username);
-        closeUserSwitchModal();
-        applyUserRoleSettings();
-        loadSupabaseShipments();
-        loadSupabaseCompras();
-        showToast(`Perfil alterado para: ${APP_USERS[username].name}`, 'success');
+      if (!APP_USERS[username]) return;
+
+      // Sem privilégio de administrador, a troca de perfil é negada.
+      if (!isAdmin()) {
+        showToast('Acesso Restrito: somente Administradores podem alternar perfis operacionais.', 'warning');
+        return;
       }
+
+      // Já é o perfil ativo: apenas fecha o modal.
+      if (currentUser === username) {
+        closeUserSwitchModal();
+        return;
+      }
+
+      pendingSwitchUser = username;
+      const target = APP_USERS[username];
+
+      const area = document.getElementById('switch-password-area');
+      const nameEl = document.getElementById('switch-target-name');
+      const input = document.getElementById('switch-user-password');
+      const errBox = document.getElementById('switch-password-error');
+      const confirmBtn = document.getElementById('switch-confirm-btn');
+
+      if (nameEl) nameEl.textContent = target.name;
+      if (area) area.classList.remove('hidden');
+      if (confirmBtn) confirmBtn.style.display = 'inline-flex';
+      if (errBox) errBox.classList.add('hidden');
+      if (input) { input.value = ''; input.focus(); }
+
+      // Destaque visual do alvo
+      document.querySelectorAll('[id^="switch-btn-"]').forEach(b => {
+        b.classList.remove('ring-2', 'ring-orange-500/50', 'scale-[1.02]');
+      });
+      const btn = document.getElementById(`switch-btn-${username}`);
+      if (btn) btn.classList.add('ring-2', 'ring-orange-500/50', 'scale-[1.02]');
+    }
+
+    function toggleSwitchPasswordVisibility() {
+      const input = document.getElementById('switch-user-password');
+      const icon = document.getElementById('switch-password-toggle-icon');
+      if (!input || !icon) return;
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    async function confirmUserSwitch() {
+      if (!pendingSwitchUser) {
+        showToast('Selecione um perfil para alternar.', 'warning');
+        return;
+      }
+      if (!isAdmin()) {
+        showToast('Acesso Restrito: somente Administradores podem alternar perfis operacionais.', 'warning');
+        return;
+      }
+
+      const input = document.getElementById('switch-user-password');
+      const errBox = document.getElementById('switch-password-error');
+      const errText = document.getElementById('switch-password-error-text');
+      const confirmBtn = document.getElementById('switch-confirm-btn');
+      const password = input ? input.value : '';
+      const target = APP_USERS[pendingSwitchUser];
+
+      if (!password) {
+        if (errText) errText.textContent = 'Informe a senha do perfil selecionado.';
+        if (errBox) errBox.classList.remove('hidden');
+        if (input) input.focus();
+        return;
+      }
+
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
+      }
+
+      const valid = await verifyUserPassword(target, password);
+
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = 'Confirmar Troca';
+      }
+
+      if (!valid) {
+        if (errText) errText.textContent = 'Senha incorreta para o perfil ' + (target ? target.name : '') + '.';
+        if (errBox) errBox.classList.remove('hidden');
+        if (input) { input.value = ''; input.focus(); }
+        return;
+      }
+
+      // Troca efetivada
+      currentUser = pendingSwitchUser;
+      try {
+        sessionStorage.setItem('vigi_active_session', currentUser);
+        localStorage.setItem('vigi_auth_session', currentUser);
+        localStorage.setItem('vigi_session_meta', JSON.stringify({ user: currentUser, ts: Date.now() }));
+      } catch (e) { /* storage indisponível */ }
+      pendingSwitchUser = null;
+      closeUserSwitchModal();
+      applyUserRoleSettings();
+      loadSupabaseShipments();
+      loadSupabaseCompras();
+      showToast(`Perfil alterado para: ${APP_USERS[currentUser].name}`, 'success');
     }
 
     // 7.1 SISTEMA DE NOTIFICAÇÕES SONORAS (WEB AUDIO API - ZERO DEPENDÊNCIA)
@@ -4405,8 +4763,8 @@
             <div class="flex items-center gap-2.5 min-w-0">
               <span class="w-5 h-5 rounded-lg bg-emerald-500/15 text-emerald-400 font-mono text-[10px] font-bold flex items-center justify-center shrink-0 border border-emerald-500/30">${idx + 1}</span>
               <div class="min-w-0">
-                <span class="font-extrabold text-white text-xs block truncate">${it.item}</span>
-                <span class="text-[9px] text-slate-400 uppercase font-semibold tracking-wider">${it.categoria || getMaterialCategory(it.item)}</span>
+                <span class="font-extrabold text-white text-xs block truncate">${escapeHtml(it.item)}</span>
+                <span class="text-[9px] text-slate-400 uppercase font-semibold tracking-wider">${escapeHtml(it.categoria || getMaterialCategory(it.item))}</span>
               </div>
             </div>
 
@@ -4788,10 +5146,10 @@
             <td class="py-2.5 px-3">
               <div class="font-bold text-white text-xs ${it.checked ? 'text-emerald-300' : ''} flex items-center gap-1.5">
                 ${it.checked ? '<i class="fa-solid fa-check text-emerald-400 text-xs"></i>' : ''}
-                <span>${it.nome}</span>
+                <span>${escapeHtml(it.nome)}</span>
                 ${isItemTool(it.nome) ? '<span class="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1 py-0.2 rounded font-mono font-bold">Ferramenta</span>' : ''}
               </div>
-              <div class="text-[10px] text-slate-500 uppercase font-semibold">${it.categoria || 'MATERIAL'}</div>
+              <div class="text-[10px] text-slate-500 uppercase font-semibold">${escapeHtml(it.categoria || 'MATERIAL')}</div>
               ${itemJust ? `<div class="text-[10px] text-amber-300 italic font-medium mt-0.5"><i class="fa-solid fa-wrench text-amber-400 mr-1"></i><strong>Motivo:</strong> "${escapeHtml(itemJust)}"</div>` : ''}
             </td>
             <td class="py-2.5 px-3 text-center">
@@ -4887,7 +5245,7 @@
             </span>
             <span class="text-[10px] text-slate-500">Editável pelo Almoxarifado</span>
           </div>
-          <input type="text" id="modal-detail-obs-input" value="${pedido.obs || ''}" onchange="updateObsConference(this.value)" placeholder="Ex: Faltavam 10 câmeras em estoque, restante será enviado na próxima terça..." 
+          <input type="text" id="modal-detail-obs-input" value="${escapeHtml(pedido.obs || '')}" onchange="updateObsConference(this.value)" placeholder="Ex: Faltavam 10 câmeras em estoque, restante será enviado na próxima terça..."
                  class="w-full bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-orange-500 placeholder-slate-600 transition">
         </div>
 
@@ -5288,8 +5646,10 @@
     // ========================================================
     function generateRomaneioPrintHTML(pedido, itemsList) {
       const code = pedido.id || ('#ENV-' + (pedido.rawId || '').slice(0, 6).toUpperCase());
-      const filial = pedido.filial || pedido.branch_name || 'Matriz / Filial';
-      const solicitante = pedido.solicitante || pedido.sender_name || 'Técnico';
+      // Dados vindos do Supabase são tratados como texto puro (evita XSS no output).
+      const esc = escapeHtml;
+      const filial = esc(pedido.filial || pedido.branch_name || 'Matriz / Filial');
+      const solicitante = esc(pedido.solicitante || pedido.sender_name || 'Técnico');
       const dataPed = pedido.data || (pedido.created_at ? new Date(pedido.created_at).toLocaleString('pt-BR') : new Date().toLocaleString('pt-BR'));
       const dataHoje = new Date().toLocaleString('pt-BR');
       const urgencia = pedido.urgencia || 'Normal';
@@ -5306,7 +5666,7 @@
           try { toolJustMap = JSON.parse(justMatch[1]); } catch(e) {}
         }
       }
-      const obs = (pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes : '')).replace(/\[.*?\]/g, '').replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim();
+      const obs = esc((pedido.obs || (typeof pedido.notes === 'string' ? pedido.notes : '')).replace(/\[.*?\]/g, '').replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim());
       const statusRaw = (pedido.status || 'aguardando').toLowerCase();
 
       let statusBadgeColor = '#00204A';

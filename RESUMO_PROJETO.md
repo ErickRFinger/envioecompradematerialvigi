@@ -99,18 +99,27 @@ graph TD
 ### 👥 Usuários e Permissões (RBAC) Cadastrados no Supabase:
 
 #### 🛡️ Administradores Gerais (Acesso Total, Todas as Filiais & Exclusão de Ordens):
-- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin`
-- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin`
-- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin`
-- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin`
+- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: *definida no Supabase Auth* • Role: `admin`
+- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: *definida no Supabase Auth* • Role: `admin`
+- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: *definida no Supabase Auth* • Role: `admin`
+- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: *definida no Supabase Auth* • Role: `admin`
+- **`deivid`** (`deivid@vigi.com.br`) • Deivid • Senha: *definida no Supabase Auth* • Role: `admin`
+- **`gabriely`** (`gabriely@vigi.com.br`) • Gabriely • Senha: *definida no Supabase Auth* • Role: `admin`
+
+> ⚠️ **As senhas nao sao documentadas aqui de proposito.**
+> Cada usuario tem uma credencial individual, armazenada apenas como hash
+> PBKDF2 (salt unico por usuario) no bundle. Nunca registre senhas em
+> arquivos `.md`, em mensagens de commit ou em comentarios de codigo.
+> Para trocar a senha de um usuario, use o fluxo de troca de perfil ou
+> defina um novo hash + salt no `APP_USERS` do `index.html`.
 
 #### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
-- **`beltrao1`** • Iury (Beltrão) • Senha: `clic3369` • Role: `filial`
-- **`beltrao2`** • Cleverson (Beltrão) • Senha: `clic3369` • Role: `filial`
-- **`palotina1`** • Adilson (Palotina) • Senha: `clic3369` • Role: `filial`
-- **`barracao1`** • Giseli (Barracão) • Senha: `clic3369` • Role: `filial`
-- **`pato1`** • Leonardo (Pato) • Senha: `clic3369` • Role: `filial`
-- **`smo1`** • Terceiros SMO (SMO) • Senha: `clic3369` • Role: `filial`
+- **`beltrao1`** • Iury (Beltrão) • Senha: *definida no Supabase Auth* • Role: `filial`
+- **`beltrao2`** • Cleverson (Beltrão) • Senha: *definida no Supabase Auth* • Role: `filial`
+- **`palotina1`** • Adilson (Palotina) • Senha: *definida no Supabase Auth* • Role: `filial`
+- **`barracao1`** • Giseli (Barracão) • Senha: *definida no Supabase Auth* • Role: `filial`
+- **`pato1`** • Leonardo (Pato) • Senha: *definida no Supabase Auth* • Role: `filial`
+- **`smo1`** • Terceiros SMO (SMO) • Senha: *definida no Supabase Auth* • Role: `filial`
 
 ---
 

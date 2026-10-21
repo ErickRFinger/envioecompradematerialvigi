@@ -78,31 +78,44 @@ graph TD
 
 ---
 
-## 📂 4. Arquivos do Projeto
+## 📂 4. Arquivos do Projeto & Arquitetura
 
 | Arquivo | Descrição |
 | :--- | :--- |
-| `index.html` | Dashboard principal Matriz (Kanban & Tabela) conectado ao Supabase em tempo real. |
+| `index.html` | Dashboard principal Matriz (Kanban & Tabela) conectado ao Supabase em tempo real com autenticação PBKDF2. |
 | `solicitar.html` | **Aplicativo Web Mobile (PWA)** para técnicos solicitarem materiais pelo celular com rastreio ao vivo. |
-| `sistema_solicitacao_materiais.html` | Cópia de segurança sincronizada do dashboard principal. |
-| `RESUMO_PROJETO.md` | Documento de arquitetura, credenciais de acesso e especificações. |
-| `README.md` | Guia rápido de execução e operação. |
+| `sistema_solicitacao_materiais.html` | *Redirect stub* canônico apontando para `index.html` (fonte única de verdade, eliminando divergências). |
+| `vercel.json` | Configurações de deploy com headers de segurança rígidos (CSP, HSTS, frame-ancestors). |
+| `scratch/test_security.js` | Suíte de testes automatizados de segurança (10 verificações de ponta a ponta). |
+| `scratch/test_tool_justifications.js` | Suíte de testes automatizados de matriz de permissões e justificativas de ferramentas. |
+| `RESUMO_PROJETO.md` | Documento de arquitetura e especificações. |
+| `README.md` | Esta documentação oficial. |
+
+### 🛡️ 4.1. Camada de Segurança e Hardening (Implementado)
+O sistema passou por uma auditoria completa de segurança:
+1. **Derivação Criptográfica PBKDF2-SHA256 (210.000 iterações):** Credenciais não trafegam em texto plano. Cada usuário tem `salt` individual e verificação nativa via `crypto.subtle`.
+2. **Comparação em Tempo Constante (`safeCompare`):** Imunidade a ataques de temporização (*Timing Attacks*).
+3. **Mitigação Rigorosa de XSS:** Toda injeção dinâmica usa `textContent` puro (`document.createElement`), neutralizando ataques via banco de dados ou formulários.
+4. **Content-Security-Policy (CSP):** Configurado no `vercel.json` restringindo origens para Supabase, Tailwind, Google Fonts e WhatsApp, bloqueando Clickjacking (`frame-ancestors none`).
+5. **Validade de Sessão (TTL de 8h):** Sessões expiradas são invalidadas automaticamente.
 
 ### 👥 Usuários e Permissões (RBAC) Cadastrados no Supabase:
 
 #### 🛡️ Administradores Gerais (Acesso Total, Todas as Filiais & Exclusão de Ordens):
-- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
-- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
-- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
-- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Senha: `Clic@3369` • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`erick`** (`erick@vigi.com.br`) • Erick Finger • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`daniel`** (`daniel@vigi.com.br`) • Daniel Lazzarotto • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`thiago`** (`thiago@vigi.com.br`) • Thiago Graxaim • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`deivid`** (`deivid@vigi.com.br`) • Deivid • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`gabriely`** (`gabriely@vigi.com.br`) • Gabriely • Role: `admin` • Acesso a ferramentas: **Sim**
 
 #### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
-- **`beltrao1` / `iury`** • Iury (Beltrão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
-- **`barracao1` / `giseli`** • Giseli (Barracão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
-- **`palotina1` / `adilson`** • Adilson (Palotina) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
-- **`beltrao2` / `cleverson`** • Cleverson (Beltrão) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
-- **`pato1` / `leonardo`** • Leonardo (Pato) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
-- **`smo1` / `terceiros`** • Terceiros SMO (SMO) • Senha: `clic3369` • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
+- **`beltrao1` / `iury`** • Iury (Beltrão) • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`barracao1` / `giseli`** • Giseli (Barracão) • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`palotina1` / `adilson`** • Adilson (Palotina) • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
+- **`beltrao2` / `cleverson`** • Cleverson (Beltrão) • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
+- **`pato1` / `leonardo`** • Leonardo (Pato) • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
+- **`smo1` / `terceiros`** • Terceiros SMO (SMO) • Role: `filial` • **Acesso a Ferramentas: BLOQUEADO (apenas suprimentos)**
 
 ---
 

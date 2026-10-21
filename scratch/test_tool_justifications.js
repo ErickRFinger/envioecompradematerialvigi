@@ -6,6 +6,8 @@
  * 3. Para quem tem acesso (Iury, Giseli, Adilson), cada ferramenta exige justificativa obrigatória (>= 5 caracteres).
  * 4. Suprimentos normais permanecem livres para todos sem justificativa.
  * 5. Fibra óptica permanece restrita a administradores.
+ * 6. SUÍTE DE SEGURANÇA (ver scratch/test_security.js): senhas, backdoors de URL,
+ *    XSS, sessão e troca de perfil protegida por senha.
  */
 
 const fs = require('fs');
@@ -50,7 +52,11 @@ function getOrCreateElement(id) {
       disabled: false,
       appendChild: function(child) {
         if (id === 'toast-container' && child) {
-          windowMock.lastToast = { msg: child.innerHTML, text: child.innerText };
+          // showToast agora injeta a mensagem via textContent (anti-XSS),
+          // então reconstruímos o texto a partir dos filhos anexados.
+          const childTexts = (child._children || []).map(c => c.textContent || '');
+          const full = [child.innerHTML || ''].concat(childTexts).join(' ').trim();
+          windowMock.lastToast = { msg: full, text: childTexts.join(' ') };
         }
       },
       addEventListener: function() {},
@@ -72,7 +78,10 @@ const windowMock = {
     createElement: (tag) => ({
       tagName: tag,
       classList: { add: () => {}, remove: () => {} },
-      appendChild: () => {},
+      _children: [],
+      textContent: '',
+      innerHTML: '',
+      appendChild: function(child) { this._children.push(child); },
       style: {},
       remove: () => {}
     }),
@@ -160,6 +169,8 @@ assert.strictEqual(mobileCtx.canUserRequestTools('palotina1'), true, 'Adilson (p
 assert.strictEqual(mobileCtx.canUserRequestTools('adilson'), true, 'Adilson alias DEVE ter permissão de ferramentas');
 assert.strictEqual(mobileCtx.canUserRequestTools('thiago'), true, 'Admin Thiago DEVE ter permissão de ferramentas');
 assert.strictEqual(mobileCtx.canUserRequestTools('erick'), true, 'Admin Erick DEVE ter permissão de ferramentas');
+assert.strictEqual(mobileCtx.canUserRequestTools('deivid'), true, 'Admin Deivid DEVE ter permissão de ferramentas');
+assert.strictEqual(mobileCtx.canUserRequestTools('gabriely'), true, 'Admin Gabriely DEVE ter permissão de ferramentas');
 
 // Bloqueados: Cleverson, Leonardo e SMO
 assert.strictEqual(mobileCtx.canUserRequestTools('beltrao2'), false, 'Cleverson (beltrao2) NÃO PODE ter permissão de ferramentas');
@@ -285,6 +296,8 @@ assert.strictEqual(desktopCtx.canUserRequestTools('iury'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('barracao1'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('palotina1'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('thiago'), true);
+assert.strictEqual(desktopCtx.canUserRequestTools('deivid'), true);
+assert.strictEqual(desktopCtx.canUserRequestTools('gabriely'), true);
 
 assert.strictEqual(desktopCtx.canUserRequestTools('beltrao2'), false);
 assert.strictEqual(desktopCtx.canUserRequestTools('cleverson'), false);
