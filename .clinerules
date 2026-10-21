@@ -1,0 +1,35 @@
+# Diretrizes Obrigatórias de Desenvolvimento (Padrão Erick Ruan Finger)
+
+Você está trabalhando no projeto **SISTEM ENVIO VIGI**. Siga estas regras rigorosamente em toda e qualquer tarefa:
+
+## 1. Testes Automatizados Obrigatórios
+- Antes de declarar qualquer tarefa concluída ou reportar sucesso ao usuário, execute:
+  ```bash
+  npm test
+  ```
+- O comando executa as 4 suítes:
+  1. `test_tool_justifications.js` (permissões de ferramentas e justificativas)
+  2. `test_security.js` (criptografia PBKDF2, sem senhas no bundle, CSP, anti-XSS)
+  3. `test_order_details_modal.js` (proteção anti-ghost-click e resolução universal de IDs)
+  4. `test_api_proxy.js` (proxy serverless /api/login e /api/transaction)
+- **NENHUM teste pode falhar.** Se algum quebrar, corrija antes de prosseguir.
+
+## 2. Integridade dos Modais e Anti-Ghost-Click
+- Nos arquivos `index.html` e `solicitar.html`, preserve rigorosamente:
+  - `window.modalOpenedTimestamps` e debounce de 350ms (`Date.now() - openedAt < 350`).
+  - `modalMouseDownTarget` para assegurar que cliques iniciados dentro do modal não fechem ao soltar no backdrop.
+  - `onclick="event.stopPropagation()"` nos cards/sheets internos de modais (`modal-card-details`, `modal-order-details-mobile`, etc.).
+
+## 3. Segurança & Proxy Serverless
+- Acesso ao banco Supabase deve priorizar os endpoints `/api/login` e `/api/transaction`.
+- A chave `service_role` NUNCA deve ser exposta no código cliente (`index.html`, `solicitar.html`).
+- As senhas nunca trafegam em texto puro.
+
+## 4. Documentação Contínua
+- Ao criar ou alterar funcionalidades, atualize o `README.md` mantendo as 6 seções obrigatórias:
+  1. Visão Geral e Objetivo
+  2. Stack Tecnológica & Pré-requisitos
+  3. Mapa da Arquitetura & Estrutura de Arquivos
+  4. Como Rodar & Como Publicar
+  5. Configurações & Variáveis de Ambiente
+  6. Histórico de Evolução & Decisões Técnicas

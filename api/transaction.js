@@ -32,7 +32,8 @@ module.exports = async function (req, res) {
     }
 
     const body = lib.readBody(req);
-    const table = (body.table || '').trim();
+    const query = (req && req.query) || {};
+    const table = (body.table || query.table || '').trim();
     if (!table || !lib.TABLE_LIST.includes(table)) {
       res.status(400).json({ ok: false, error: 'Tabela invalida.' });
       return;
@@ -40,7 +41,14 @@ module.exports = async function (req, res) {
 
     // ── GET: listagem ──────────────────────────────────────────────────────
     if (method === 'GET') {
-      const path = table + '?select=*&order=created_at.desc&limit=100';
+      let filter = '';
+      if (table === lib.TABLES.SHIPMENTS && session.role !== 'admin' && session.dbBranch) {
+        filter = '&branch_name=eq.' + encodeURIComponent(session.dbBranch);
+      }
+      if (table === lib.TABLES.ITEMS && (query.shipment_id || body.shipment_id)) {
+        filter = '&shipment_id=eq.' + encodeURIComponent(query.shipment_id || body.shipment_id);
+      }
+      const path = table + '?select=*' + filter + '&order=created_at.desc&limit=100';
       const data = await lib.sbFetch(path);
       res.status(200).json({ ok: true, data: Array.isArray(data) ? data : [] });
       return;
