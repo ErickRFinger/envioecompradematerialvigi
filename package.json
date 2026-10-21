@@ -4,8 +4,9 @@
   "description": "SISTEM ENVIO VIGI - Sistema de Gestão de Envios e Materiais VIGI",
   "scripts": {
     "deploy": "vercel --prod --yes",
-    "test": "node scratch/test_tool_justifications.js && node scratch/test_security.js",
+    "test": "node scratch/test_tool_justifications.js && node scratch/test_security.js && node scratch/test_order_details_modal.js",
     "test:permissoes": "node scratch/test_tool_justifications.js",
-    "test:seguranca": "node scratch/test_security.js"
+    "test:seguranca": "node scratch/test_security.js",
+    "test:modais": "node scratch/test_order_details_modal.js"
   }
 }

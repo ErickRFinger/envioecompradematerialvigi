@@ -85,9 +85,14 @@ graph TD
 | `index.html` | Dashboard principal Matriz (Kanban & Tabela) conectado ao Supabase em tempo real com autenticação PBKDF2. |
 | `solicitar.html` | **Aplicativo Web Mobile (PWA)** para técnicos solicitarem materiais pelo celular com rastreio ao vivo. |
 | `sistema_solicitacao_materiais.html` | *Redirect stub* canônico apontando para `index.html` (fonte única de verdade, eliminando divergências). |
+| `api/transaction.js` | Proxy serverless CRUD completo (listCompras, listShipments, create/update/deleteShipment). |
+| `api/login.js` | Endpoint serverless de login e emissão de tokens HMAC seguros (8h de validade). |
+| `api/_lib.js` | Biblioteca do servidor com validação criptográfica, rate limiting por IP e conexão Supabase. |
+| `SEGURANCA.md` | Documentação oficial e completa do modelo de segurança e auditoria. |
 | `vercel.json` | Configurações de deploy com headers de segurança rígidos (CSP, HSTS, frame-ancestors). |
 | `scratch/test_security.js` | Suíte de testes automatizados de segurança (10 verificações de ponta a ponta). |
 | `scratch/test_tool_justifications.js` | Suíte de testes automatizados de matriz de permissões e justificativas de ferramentas. |
+| `scratch/test_order_details_modal.js` | Suíte de testes automatizados para estabilidade e abertura dos modais de pedidos. |
 | `RESUMO_PROJETO.md` | Documento de arquitetura e especificações. |
 | `README.md` | Esta documentação oficial. |
 
@@ -186,6 +191,23 @@ Implementar login para segmentar as telas:
 
 ## 🚀 Como Executar Localmente
 Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o protótipo:
-1. Abra a pasta `C:\Users\User\Desktop\VIGI_Gestao_Materiais`.
-2. Dê **dois cliques no arquivo `index.html`** (abre instantaneamente em qualquer navegador moderno como Chrome, Edge, Firefox).
-3. A aplicação já carrega com pedidos demonstrativos ativos e todas as interações funcionais.
+1. Abra a pasta do projeto.
+2. Dê dois cliques em `index.html` (Desktop Matriz) ou `solicitar.html` (Mobile Técnicos) no seu navegador.
+3. Para executar a suíte completa de testes automatizados:
+   ```bash
+   npm test
+   ```
+
+---
+
+## 📜 7. Histórico de Decisões Técnicas & Evolução Recente
+
+### V1.2.4 (Estabilidade de Modais & Correção de Fechamento Instantâneo)
+- **Diagnóstico do Problema:** Ao clicar para inspecionar/visualizar um pedido tanto no desktop quanto no celular, o modal abria e sumia em milissegundos (*ghost-click* / *tap-through*). O backdrop (`fixed inset-0`) tornava-se visível no mesmo frame do evento de clique, capturando o disparo do `click` e disparando imediatamente `closeModal()`.
+- **Proteção Anti-Ghost-Click Tripla:**
+  1. **Debounce Temporal (350ms):** Clicar no backdrop nos primeiros 350ms após a exibição do modal é categoricamente ignorado.
+  2. **Verificação de Origem Pointer (`mousedown`):** Só fecha se o `mousedown` começou exatamente no backdrop cinza escuro E o `mouseup`/`click` terminou nele.
+  3. **Isolamento de Bolha (`event.stopPropagation`):** Cards e sheets internos têm propagação de evento cancelada, impedindo que interações com itens ou rolagem fechem a janela.
+- **Resolução de IDs Universal (`findMobileOrder` & `openCardDetails`):** Compatibilidade total com IDs gerados em qualquer formato (`#ENV-XXXXXX`, `ENV-XXXXXX`, prefixo de 6 dígitos ou UUID completo do Supabase).
+- **Atualização Otimista no Mobile:** Ao confirmar um novo pedido no mobile, ele é inserido de imediato em `myShipments` e no cache local antes do roundtrip de rede, garantindo abertura instantânea sem espera de sincronização.
+- **Testes Automatizados:** Adicionado `scratch/test_order_details_modal.js` cobrindo cenários de ghost-click, clique legítimo, propagação e resolução de IDs.

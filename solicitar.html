@@ -698,7 +698,7 @@
   <!-- MODAL / BOTTOM SHEET: NOVA COMPRA (MOBILE - MÚLTIPLOS ITENS) -->
   <!-- ======================================================== -->
   <div id="modal-mobile-new-compra" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end p-0 sm:p-4">
-    <div class="glass-surface-card bg-[#001433] rounded-t-3xl sm:rounded-3xl border border-white/15 w-full max-w-lg mx-auto p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto flex flex-col">
+    <div onclick="event.stopPropagation()" class="glass-surface-card bg-[#001433] rounded-t-3xl sm:rounded-3xl border border-white/15 w-full max-w-lg mx-auto p-4 sm:p-5 space-y-3.5 max-h-[92vh] overflow-y-auto flex flex-col">
       <!-- HEADER -->
       <div class="flex items-center justify-between pb-2.5 border-b border-white/10 shrink-0">
         <div class="flex items-center gap-2">
@@ -839,7 +839,7 @@
   <!-- MODAL / BOTTOM SHEET: REVISÃO & CHECKOUT DO PEDIDO -->
   <!-- ======================================================== -->
   <div id="modal-checkout" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end p-0 sm:p-4">
-    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[90vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
+    <div onclick="event.stopPropagation()" class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[90vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
       
       <!-- Header -->
       <div class="px-5 py-4 bg-slate-950 border-b border-white/10 flex items-center justify-between">
@@ -940,7 +940,7 @@
   <!-- TELA DE CONFERÊNCIA OFICIAL (OBRIGATÓRIA ANTES DO ENVIO) -->
   <!-- ======================================================== -->
   <div id="modal-conferencia" style="display: none;" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden flex flex-col justify-end sm:justify-center items-center p-0 sm:p-4">
-    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-orange-500/40 shadow-glow-vigi animate-in slide-in-from-bottom duration-250">
+    <div onclick="event.stopPropagation()" class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-orange-500/40 shadow-glow-vigi animate-in slide-in-from-bottom duration-250">
       
       <!-- Header da Conferência -->
       <div class="px-5 py-4 bg-slate-950 border-b border-white/10 flex items-center justify-between">
@@ -1026,7 +1026,7 @@
   <!-- MODAL DE SUCESSO & WHATSAPP EM 1 TOQUE -->
   <!-- ======================================================== -->
   <div id="modal-success" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-3xl p-6 w-full max-w-sm text-center space-y-4 border border-emerald-500/40 shadow-glow-emerald animate-in zoom-in-95 duration-200">
+    <div onclick="event.stopPropagation()" class="glass-card rounded-3xl p-6 w-full max-w-sm text-center space-y-4 border border-emerald-500/40 shadow-glow-emerald animate-in zoom-in-95 duration-200">
       
       <div class="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 mx-auto flex items-center justify-center text-2xl shadow-glow-emerald">
         <i class="fa-solid fa-check"></i>
@@ -1077,7 +1077,7 @@
   <!-- MODAL: DETALHES COMPLETOS DO PEDIDO & ROMANEIO MOBILE -->
   <!-- ======================================================== -->
   <div id="modal-order-details-mobile" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md hidden flex flex-col justify-end sm:justify-center p-0 sm:p-4">
-    <div class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
+    <div onclick="event.stopPropagation()" class="glass-card rounded-t-3xl sm:rounded-3xl w-full max-w-lg mx-auto max-h-[92vh] flex flex-col overflow-hidden border border-white/10 animate-in slide-in-from-bottom duration-250">
       
       <!-- Header do Modal -->
       <div class="px-5 py-3.5 bg-slate-950 border-b border-white/10 flex items-center justify-between shrink-0">
@@ -3155,6 +3155,16 @@
           confModal.classList.add('hidden');
         }
 
+        // Adiciona imediatamente ao cache local myShipments para visualização instantânea
+        const optimisticShipment = {
+          ...newShipment,
+          shipment_items: (itemsData && itemsData.length > 0) ? itemsData : itemsPayload
+        };
+        myShipments = [optimisticShipment, ...(myShipments || []).filter(s => s && s.id !== newShipment.id)];
+        try {
+          localStorage.setItem('vigi_cached_shipments', JSON.stringify(myShipments));
+        } catch(e) {}
+
         triggerHaptic('success');
         openSuccessModal(lastCreatedOrder);
         loadShipmentsFromSupabase();
@@ -3709,7 +3719,7 @@
       const countTools = Object.keys(toolJustMap).length;
 
       card.innerHTML = `
-        <div class="flex items-start justify-between gap-2" onclick="openMobileOrderDetails('${order.id}')" style="cursor: pointer;">
+        <div class="flex items-start justify-between gap-2" onclick="event.stopPropagation(); openMobileOrderDetails('${order.id}')" style="cursor: pointer;">
           <div class="space-y-1">
             <div class="flex items-center gap-1.5 flex-wrap">
               <span class="font-mono text-xs font-black text-orange-400 bg-orange-500/10 px-2 py-0.5 rounded-lg border border-orange-500/20">
@@ -3807,15 +3817,54 @@
     let activeDetailShipmentId = null;
     const detailCheckedItems = {}; // { [orderId_itemIndex]: boolean }
 
+    function findMobileOrder(orderId) {
+      if (!orderId) return null;
+      const clean = String(orderId).trim().toLowerCase();
+      const rawUuid = clean.replace(/^#?env-/i, '');
+      const searchPool = [...(myShipments || [])];
+      try {
+        const cached = JSON.parse(localStorage.getItem('vigi_cached_shipments') || '[]');
+        if (Array.isArray(cached)) {
+          cached.forEach(c => {
+            if (c && c.id && !searchPool.some(s => s && s.id === c.id)) {
+              searchPool.push(c);
+            }
+          });
+        }
+      } catch(e) {}
+
+      return searchPool.find(s => {
+        if (!s || !s.id) return false;
+        const sId = String(s.id).toLowerCase();
+        const sRaw = sId.replace(/^#?env-/i, '');
+        return sId === clean ||
+               sId === rawUuid ||
+               sRaw === rawUuid ||
+               sId.startsWith(rawUuid) ||
+               sRaw.startsWith(rawUuid) ||
+               (rawUuid.length >= 6 && sRaw.startsWith(rawUuid.slice(0, 6)));
+      }) || null;
+    }
+
     function openMobileOrderDetails(orderId) {
       if (!orderId) return;
-      activeDetailShipmentId = orderId;
+      const order = findMobileOrder(orderId);
+      if (!order) {
+        showToast('Pedido em sincronização ou não localizado.', 'info');
+        return;
+      }
+      activeDetailShipmentId = order.id;
+      renderMobileOrderDetails(order.id, order);
+
       const modal = document.getElementById('modal-order-details-mobile');
       if (modal) {
-        modal.classList.remove('hidden');
-        modal.style.display = 'flex';
+        window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+        window.modalOpenedTimestamps['modal-order-details-mobile'] = Date.now();
+        setTimeout(() => {
+          modal.classList.remove('hidden');
+          modal.style.display = 'flex';
+        }, 15);
       }
-      renderMobileOrderDetails(orderId);
     }
 
     function closeMobileOrderDetails() {
@@ -3833,28 +3882,9 @@
       renderMobileOrderDetails(orderId);
     }
 
-    function renderMobileOrderDetails(orderId) {
-      if (!orderId) return;
-      let order = (myShipments || []).find(s => s.id === orderId);
-      if (!order) {
-        const cleanId = String(orderId).replace(/^#ENV-/i, '').trim().toLowerCase();
-        order = (myShipments || []).find(s => {
-          if (!s || !s.id) return false;
-          const sId = String(s.id).toLowerCase();
-          return sId === cleanId || sId.startsWith(cleanId) || cleanId.startsWith(sId.slice(0, 6));
-        });
-      }
-      if (!order) {
-        try {
-          const cached = JSON.parse(localStorage.getItem('vigi_cached_shipments') || '[]');
-          const cleanId = String(orderId).replace(/^#ENV-/i, '').trim().toLowerCase();
-          order = (cached || []).find(s => {
-            if (!s || !s.id) return false;
-            const sId = String(s.id).toLowerCase();
-            return sId === cleanId || sId.startsWith(cleanId) || cleanId.startsWith(sId.slice(0, 6));
-          });
-        } catch(e) {}
-      }
+    function renderMobileOrderDetails(orderId, preloadedOrder) {
+      if (!orderId && !preloadedOrder) return;
+      const order = preloadedOrder || findMobileOrder(orderId);
       if (!order) return;
 
       const code = '#ENV-' + order.id.slice(0, 6).toUpperCase();
@@ -5350,12 +5380,22 @@
       }
     });
 
-    // Fechar modais ao clicar no fundo escuro com limpeza completa de estado
+    // Fechar modais ao clicar no fundo escuro com proteção anti-ghost-click e verificação mousedown
+    window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+    let modalMouseDownTarget = null;
+
     ["modal-checkout", "modal-success", "modal-conferencia", "modal-order-details-mobile", "modal-mobile-new-compra"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
+        el.addEventListener("mousedown", (e) => {
+          modalMouseDownTarget = e.target;
+        });
         el.addEventListener("click", (e) => {
-          if (e.target === el) {
+          const openedAt = window.modalOpenedTimestamps[id] || 0;
+          // Ignora cliques imediatos disparados durante a transição de abertura do modal
+          if (Date.now() - openedAt < 350) return;
+          // Só fecha se o clique começou E terminou exatamente no backdrop escuro
+          if (e.target === el && modalMouseDownTarget === el) {
             if (id === 'modal-order-details-mobile') {
               closeMobileOrderDetails();
             } else if (id === 'modal-checkout') {
@@ -5363,7 +5403,7 @@
             } else if (id === 'modal-conferencia') {
               voltarParaCheckoutModal();
             } else if (id === 'modal-mobile-new-compra') {
-              closeMobileCompraModal();
+              closeMobileNewCompraModal();
             } else if (id === 'modal-success') {
               closeSuccessModal();
             } else {
@@ -5371,6 +5411,7 @@
               el.classList.add("hidden");
             }
           }
+          modalMouseDownTarget = null;
         });
       }
     });
