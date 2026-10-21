@@ -93,6 +93,7 @@ graph TD
 | `scratch/test_security.js` | Suíte de testes automatizados de segurança (10 verificações de ponta a ponta). |
 | `scratch/test_tool_justifications.js` | Suíte de testes automatizados de matriz de permissões e justificativas de ferramentas. |
 | `scratch/test_order_details_modal.js` | Suíte de testes automatizados para estabilidade e abertura dos modais de pedidos. |
+| `scratch/test_api_proxy.js` | Suíte de testes automatizados de integração do proxy serverless (`/api/login` e `/api/transaction`). |
 | `RESUMO_PROJETO.md` | Documento de arquitetura e especificações. |
 | `README.md` | Esta documentação oficial. |
 
