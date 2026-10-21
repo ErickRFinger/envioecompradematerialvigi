@@ -24,7 +24,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <!-- Supabase JS CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
 
   <script>
     tailwind.config = {
@@ -1624,43 +1623,73 @@
   <!-- ======================================================== -->
   <script>
     // 1. SERVERLESS PROXY CONFIGURATION
-    // O frontend agora usa /api/transaction em vez de anon key Supabase
-    // O login e as operacoes CRUD sao feitas via API endpoints serverless
-
-    // Token de autorizacao sera obtido via /api/login
     let apiToken = '';
 
-    // Helper para chamar o proxy serverless
-    async function apiFetch(path, options = {}) {
-      const response = await fetch(path, {
-        method: options.method || 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(apiToken && { Authorization: 'Bearer ' + apiToken }),
-          ...options.headers,
-        },
-        body: options.body ? JSON.stringify(options.body) : undefined,
-      });
-      return response;
-    }
+async function apiFetch(path, options = {}) {
+  const response = await fetch(path, {
+    method: options.method || 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(apiToken && { Authorization: 'Bearer ' + apiToken }),
+      ...options.headers,
+    },
+    body: options.body ? JSON.stringify(options.body) : undefined,
+  });
+  return response;
+}
 
-    // Funcao para obter token (chamada via /api/login)
-    async function login(username, password) {
-      const res = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      if (res.ok && data.token) {
-        apiToken = data.token;
+async function login(username, password) {
+  const res = await fetch('/api/login', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  const data = await res.json();
+  if (res.ok && data.token) { apiToken = data.token; }
+  return data;
+}
+
+    const db = (function () {
+      function buildPath(table, ops) {
+        let path = table;
+        if (ops._select && ops._select !== '*') path += '?select=' + ops._select;
+        if (ops._order) { path += '&order=' + ops._order; if (ops._dir) path += '.' + ops._dir; }
+        if (ops._limit) path += '&limit=' + ops._limit;
+        if (ops._eq) path += '&' + ops._eq;
+        return path;
       }
-      return data;
-    }
-
-    // Rastreamento global de abertura de modais para prevenir ghost-clicks/fechamento instantâneo
-    window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
-    window.modalMouseDownTarget = null;
+      function query(table) {
+        const self = {
+          _table: table, _select: '*', _order: null, _dir: 'desc', _limit: null,
+          _eq: null, _method: 'GET', _body: null,
+          select(col) { this._select = col; return self; },
+          order(col, opts) { this._order = col; this._dir = (opts && opts.ascending !== undefined) ? (opts.ascending ? 'asc' : 'desc') : self._dir; return self; },
+          limit(n) { this._limit = n; return self; },
+          eq(col, val) { this._eq = col + '=eq.' + val; return self; },
+          insert(data) { this._method = 'POST'; this._body = JSON.stringify(typeof data === 'object' && !Array.isArray(data) ? [data] : data); return self; },
+          update(data) { this._method = 'PATCH'; this._body = JSON.stringify(data); return self; },
+          delete() { this._method = 'DELETE'; this._eq = null; return self; },
+          then(resolve, reject) {
+            try {
+              const path = buildPath(self._table, self);
+              const url = '/api/transaction' + (path.includes('?') ? '&' : '?') + path;
+              fetch(url, {
+                method: self._method,
+                headers: { 'Content-Type': 'application/json', ...(apiToken && { Authorization: 'Bearer ' + apiToken }) },
+                body: self._body,
+              }).then(resp => {
+                if (!resp.ok) { return resp.json().then(e => { reject(new Error(e.message || e.error || 'HTTP ' + resp.status)); }); }
+                return resp.json();
+              }).then(data => {
+                if (self.ok === false || data.ok === false) { resolve({ data: null, error: data.error || data.message || 'Erro' }); }
+                else { resolve({ data: data.data || data, error: null }); }
+              }).catch(err => { reject(new Error(err.message || 'Rede')); });
+            } catch (e) { reject(new Error(e.message || 'Erro')); }
+          },
+        };
+        return self;
+      }
+      return { from: query };
+    })();
 
     // 1.1 CRIPTOGRAFIA & UTILITÁRIOS DE SEGURANÇA
     // ------------------------------------------------------------------
@@ -2585,7 +2614,6 @@
     function openUserSwitchModal() {
       const el = document.getElementById('modal-user-switch');
       if (el) {
-        window.modalOpenedTimestamps['modal-user-switch'] = Date.now();
         el.classList.remove('hidden');
         el.style.display = 'flex';
       }
@@ -2798,7 +2826,7 @@
       }
     }
 
-    // 8. CARREGAMENTO DE ENVIOS DO SUPABASE EM TEMPO REAL
+    // 8. CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
     async function loadSupabaseShipments() {
       if (!supabase) return;
       const userConfig = APP_USERS[currentUser];
@@ -2964,7 +2992,7 @@
       return 'INFRAESTRUTURA E FIXAÇÃO';
     }
 
-    // 8.1 CARREGAMENTO DE PEDIDOS DE COMPRA EM TEMPO REAL
+    // 8.1 CARREGAMENTO EM TEMPO REAL DE PEDIDOS DE COMPRA (SUPABASE)
     async function loadSupabaseCompras() {
       if (!supabase) return;
       try {
@@ -4400,7 +4428,6 @@
       
       const el = document.getElementById('modal-new-envio');
       if (el) {
-        window.modalOpenedTimestamps['modal-new-envio'] = Date.now();
         el.classList.remove('hidden');
         el.style.display = 'flex';
       }
@@ -4829,7 +4856,6 @@
       }
       const el = document.getElementById('modal-new-compra');
       if (!el) return;
-      window.modalOpenedTimestamps['modal-new-compra'] = Date.now();
       el.style.display = 'flex';
       el.classList.remove('hidden');
 
@@ -5069,17 +5095,7 @@
     function openCardDetails(id) {
       if (!id) return;
       const cleanId = String(id).trim().toLowerCase();
-      const rawUuid = cleanId.replace(/^#?env-/i, '');
-      const pedido = pedidosEnvio.find(p => {
-        if (!p) return false;
-        const pId = String(p.id || '').toLowerCase();
-        const pRaw = String(p.rawId || '').toLowerCase();
-        return pId === cleanId || 
-               pRaw === cleanId || 
-               pRaw === rawUuid ||
-               pId.replace(/^#?env-/i, '') === rawUuid ||
-               (rawUuid.length >= 6 && pRaw.startsWith(rawUuid));
-      });
+      const pedido = pedidosEnvio.find(p => p.id === id || String(p.id).toLowerCase() === cleanId || String(p.id).toLowerCase().includes(cleanId.replace('#env-', '')));
       if (!pedido) return;
 
       currentDetailPedidoId = pedido.id;
@@ -5088,13 +5104,13 @@
       // Garante que o mapa de quantidades originais esteja inicializado
       if (!pedido.originalMap || typeof pedido.originalMap !== 'object') {
         pedido.originalMap = {};
-        (pedido.itens || []).forEach(it => {
+        pedido.itens.forEach(it => {
           pedido.originalMap[it.nome] = it.qtdOriginal !== undefined ? it.qtdOriginal : it.qtd;
         });
       }
 
       // Clona os itens para edição em buffer local no modal
-      currentDetailItems = (pedido.itens || []).map(it => ({
+      currentDetailItems = pedido.itens.map(it => ({
         id: it.id || null,
         productId: it.productId || null,
         categoria: it.categoria || 'OUTROS',
@@ -5108,11 +5124,10 @@
 
       const el = document.getElementById('modal-card-details');
       if (el) {
-        modalOpenedTimestamps['modal-card-details'] = Date.now();
-        setTimeout(() => {
-          el.classList.remove('hidden');
-          el.style.display = 'flex';
-        }, 15);
+        window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+        window.modalOpenedTimestamps['modal-card-details'] = Date.now();
+        el.classList.remove('hidden');
+        el.style.display = 'flex';
       }
     }
 
@@ -5534,7 +5549,7 @@
         }
 
         // Supabase DB Sync
-        if (pedido.rawId && supabase) {
+        if (pedido.rawId && db) {
           // Filtra itens com quantidade > 0 (respeitando a check constraint quantity > 0)
           const activeItems = pedido.itens.filter(it => it.qtd > 0);
           const itemsPayload = activeItems.map(it => {
@@ -6278,22 +6293,20 @@
 
     // Inicialização Obrigatória com Login Check
     
-    // Fechar modais ao clicar no fundo escuro (com proteção anti-ghost-click e verificação mousedown)
+    // Fechar modais ao clicar no fundo escuro com proteção anti-ghost-click e verificação mousedown
     window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
-    window.modalMouseDownTarget = window.modalMouseDownTarget || null;
+    let modalMouseDownTarget = null;
 
     ["modal-user-switch", "modal-new-envio", "modal-new-compra", "modal-card-details"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("mousedown", (e) => {
-          window.modalMouseDownTarget = e.target;
+          modalMouseDownTarget = e.target;
         });
         el.addEventListener("click", (e) => {
           const openedAt = window.modalOpenedTimestamps[id] || 0;
-          // Ignora cliques imediatos disparados durante a transição de abertura do modal
           if (Date.now() - openedAt < 350) return;
-          // Só fecha se o clique começou E terminou exatamente no backdrop escuro
-          if (e.target === el && window.modalMouseDownTarget === el) {
+          if (e.target === el && modalMouseDownTarget === el) {
             if (id === 'modal-card-details') {
               closeCardDetailsModal();
             } else if (id === 'modal-new-envio') {
@@ -6307,7 +6320,7 @@
               el.classList.add("hidden");
             }
           }
-          window.modalMouseDownTarget = null;
+          modalMouseDownTarget = null;
         });
       }
     });
