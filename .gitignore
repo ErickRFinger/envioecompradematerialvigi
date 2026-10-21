@@ -41,3 +41,4 @@ pnpm-debug.log*
 
 # Credenciais expostas - arquivo local, NUNCA versionar
 SENHAS_EXPOSTAS.local.txt
+_backups_migracao/
