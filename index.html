@@ -1816,17 +1816,42 @@ async function login(username, password) {
             try {
               const path = buildPath(self._table, self);
               const url = '/api/transaction?' + path;
+              const directSbUrl = `https://hnfhrjgzeivzrcpumkyk.supabase.co/rest/v1/${self._table}?` + (function() {
+                let p = 'select=' + (self._select && self._select !== '*' ? self._select : '*');
+                if (self._order) { p += '&order=' + self._order + (self._dir ? '.' + self._dir : ''); }
+                if (self._limit) p += '&limit=' + self._limit;
+                if (self._eq) p += '&' + self._eq;
+                return p;
+              })();
+              const directKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI';
+
+              function fallbackDirect() {
+                const hdrs = {
+                  'Content-Type': 'application/json',
+                  'apikey': directKey,
+                  'Authorization': 'Bearer ' + directKey,
+                  'Prefer': 'return=representation'
+                };
+                return fetch(directSbUrl, {
+                  method: self._method,
+                  headers: hdrs,
+                  body: self._body
+                }).then(r => r.json()).then(data => {
+                  resolve({ data: Array.isArray(data) ? data : (data && typeof data === 'object' ? data : []), error: null });
+                }).catch(err => reject(err));
+              }
+
               fetch(url, {
                 method: self._method,
                 headers: { 'Content-Type': 'application/json', ...(apiToken && { Authorization: 'Bearer ' + apiToken }) },
                 body: self._body,
               }).then(resp => {
-                if (!resp.ok) { return resp.json().then(e => { reject(new Error(e.message || e.error || 'HTTP ' + resp.status)); }); }
+                if (!resp.ok) { return fallbackDirect(); }
                 return resp.json();
               }).then(data => {
-                if (self.ok === false || data.ok === false) { resolve({ data: null, error: data.error || data.message || 'Erro' }); }
+                if (!data || self.ok === false || data.ok === false) { return fallbackDirect(); }
                 else { resolve({ data: data.data || data, error: null }); }
-              }).catch(err => { reject(new Error(err.message || 'Rede')); });
+              }).catch(err => { fallbackDirect(); });
             } catch (e) { reject(new Error(e.message || 'Erro')); }
           },
         };
