@@ -42,3 +42,7 @@ pnpm-debug.log*
 # Credenciais expostas - arquivo local, NUNCA versionar
 SENHAS_EXPOSTAS.local.txt
 _backups_migracao/
+
+# Testes e scratches temporários (não versionar)
+scratch/test_live_click.js
+scratch/test_live_kanban.js
