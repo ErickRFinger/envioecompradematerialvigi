@@ -225,3 +225,20 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
 - **Autenticação e Sessão Integradas:**
   - Token serverless emitido e armazenado de forma segura na autenticação de Desktop e Mobile, com restauração automática de sessão e sincronização na troca de perfis operacionais.
 - **Suíte de Testes:** 4 suítes automatizadas verdes cobrindo matriz de permissões de ferramentas, segurança criptográfica, estabilidade de modais e integração do proxy serverless.
+
+### V1.2.6 (Exportação Gerencial CSV & Linha do Tempo Visual do Pedido)
+- **Exportação de Relatórios Gerenciais (.CSV com Filtros):**
+  - Adicionado botão e modal de exportação no topo da Matriz (`#modal-report-filter`) permitindo filtrar por:
+    1. **Período:** Data Inicial e Data Final com inicialização automática dos últimos 30 dias.
+    2. **Filial:** "Todas as Filiais" ou filial específica (Beltrão Iury/Cleverson, Palotina, Barracão, Pato Branco, Terceiros SMO).
+    3. **Tipo de Registro:** Envios de Materiais (Expedição) ou Solicitações de Compras (Suprimentos).
+  - Geração 100% client-side via Blob com separador `;` e **BOM UTF-8 (`\uFEFF`)** para compatibilidade nativa com Microsoft Excel sem corrupção de acentos ou caracteres especiais.
+  - Normalizador de datas resiliente (`parseItemDate`) com suporte tanto a timestamps ISO 8601 quanto a strings no padrão brasileiro legadas (`DD/MM/YYYY HH:MM`).
+- **Linha do Tempo & Rastreabilidade de Pedidos (Audit Timeline):**
+  - No modal de detalhes de romaneio (`#modal-card-details`), foi incorporado um componente visual responsivo em Dark Glassmorphism exibindo o ciclo completo do pedido em 4 etapas:
+    1. **Solicitado:** Pedido emitido no sistema com dados do solicitante.
+    2. **Separação & Conferência:** Almoxarifado Central (Matriz).
+    3. **Despachado (Em Rota):** Transporte em trânsito para a filial.
+    4. **Entrega Confirmada:** Recebimento validado no destino.
+  - Destaque dinâmico da etapa atual com pulso e borda acentuada, selo de "Concluído" nas fases superadas e tratamento gracioso para registros legados.
+- **Validação Automatizada:** Adicionada 5ª suíte de testes (`scratch/test_new_features.js`), validando 100% da integridade do DOM, regras de filtragem, datas e codificação do CSV.

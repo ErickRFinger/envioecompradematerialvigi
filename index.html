@@ -718,10 +718,10 @@
             <span id="badge-urgentes-count" class="bg-rose-500/20 text-rose-300 text-[10px] font-mono font-black px-1.5 py-0.2 rounded-full border border-rose-500/30">0</span>
           </button>
 
-          <!-- Botão Exportar Planilha Excel / CSV -->
-          <button onclick="exportDataToCSV()" title="Exportar dados filtrados para planilha Excel (CSV UTF-8)" class="px-2.5 py-1.5 rounded-xl border border-white/10 bg-slate-950/80 hover:bg-emerald-500/15 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/40 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
+          <!-- Botão Exportar Relatório com Filtros (.CSV) -->
+          <button onclick="openReportFilterModal()" title="Exportar Relatório Gerencial com filtros de período e filial (.CSV)" class="px-2.5 py-1.5 rounded-xl border border-white/10 bg-slate-950/80 hover:bg-emerald-500/15 text-slate-400 hover:text-emerald-300 hover:border-emerald-500/40 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer shrink-0">
             <i class="fa-solid fa-file-excel text-emerald-400 text-xs"></i>
-            <span class="hidden md:inline">Exportar Planilha</span>
+            <span class="hidden md:inline">Exportar Relatório (.CSV)</span>
           </button>
 
           <!-- View Switcher (Kanban vs Table) -->
@@ -1612,6 +1612,84 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- ============================================================ -->
+  <!-- MODAL: Filtro de Relatório Exportação (Período / Filial / Tipo) -->
+  <!-- ============================================================ -->
+  <div id="modal-report-filter" style="display: none;" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xl flex items-center justify-center p-4">
+    <div onclick="event.stopPropagation()" class="glass-surface w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh] border border-white/10">
+      <!-- Header -->
+      <div class="px-6 py-4.5 bg-slate-950/90 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <img src="vigi-logo.png" alt="VIGI" class="h-7 object-contain" />
+          <div>
+            <h2 class="text-base font-extrabold text-white">Exportar Relatório (.CSV)</h2>
+            <p class="text-xs text-slate-400">Filtrar por período, filial e tipo de registro</p>
+          </div>
+        </div>
+        <button onclick="closeReportFilterModal()" class="w-8 h-8 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white flex items-center justify-center cursor-pointer transition">
+          <i class="fa-solid fa-xmark text-sm"></i>
+        </button>
+      </div>
+      <!-- Body -->
+      <div class="p-6 space-y-5 overflow-y-auto">
+        <!-- Período -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label for="rpt-date-from" class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Data Inicial</label>
+            <input type="date" id="rpt-date-from" onchange="syncReportFiltersFromInputs()"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 transition">
+          </div>
+          <div>
+            <label for="rpt-date-to" class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Data Final</label>
+            <input type="date" id="rpt-date-to" onchange="syncReportFiltersFromInputs()"
+                   class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 transition">
+          </div>
+        </div>
+        <!-- Filial -->
+        <div>
+          <label for="rpt-branch" class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Filial Destino</label>
+          <select id="rpt-branch" onchange="syncReportFiltersFromInputs()"
+                  class="w-full px-3 py-2 rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-xs focus:outline-none focus:border-emerald-500 transition">
+            <option value="TODAS">Todas as Filiais</option>
+            <option value="Beltrão (Iury)">Beltrão (Iury)</option>
+            <option value="Beltrão (Cleverson)">Beltrão (Cleverson)</option>
+            <option value="Palotina (Adilson)">Palotina (Adilson)</option>
+            <option value="Barracão (Giseli)">Barracão (Giseli)</option>
+            <option value="Pato Branco">Pato Branco (Leonardo)</option>
+            <option value="Terceiros SMO">Terceiros SMO</option>
+          </select>
+        </div>
+        <!-- Tipo -->
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1.5 uppercase tracking-wider">Tipo de Registro</label>
+          <div class="grid grid-cols-2 gap-2">
+            <label class="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-slate-950/70 text-xs text-slate-300 cursor-pointer transition hover:border-emerald-500/30">
+              <input type="radio" name="rpt-type" value="envios" checked onchange="syncReportFiltersFromInputs()" class="accent-emerald-500">
+              <span>Envios (Expedição)</span>
+            </label>
+            <label class="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-white/10 bg-slate-950/70 text-xs text-slate-300 cursor-pointer transition hover:border-emerald-500/30">
+              <input type="radio" name="rpt-type" value="compras" onchange="syncReportFiltersFromInputs()" class="accent-emerald-500">
+              <span>Compras (Suprimentos)</span>
+            </label>
+          </div>
+        </div>
+        <!-- Resumo -->
+        <div class="glass-surface p-3.5 rounded-2xl border border-white/10 flex items-center justify-between" id="rpt-summary">
+          <span class="text-xs text-slate-400">Total de registros encontrados:</span>
+          <span id="rpt-count" class="text-base font-mono font-black text-emerald-400">0</span>
+        </div>
+      </div>
+      <!-- Footer -->
+      <div class="px-6 py-4 bg-slate-950/90 border-t border-white/10 flex items-center justify-end gap-2">
+        <button onclick="closeReportFilterModal()" class="px-4 py-2 rounded-xl font-bold text-slate-400 hover:text-white text-xs transition cursor-pointer">Cancelar</button>
+        <button onclick="exportFilteredReport()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/30 transition-all transform active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-download"></i>
+          <span>Baixar Planilha (.CSV)</span>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -2996,6 +3074,7 @@ async function login(username, password) {
               solicitante: row.sender_name || 'Técnico',
               urgencia: urgencia,
               data: dataStr,
+              created_at: row.created_at || null,
               obs: cleanObs,
               rawNotes: rawNotes,
               originalMap: originalMap,
@@ -3086,6 +3165,7 @@ async function login(username, password) {
               solicitante: solicitante,
               urgencia: urgencia,
               data: dataStr,
+              created_at: row.created_at || null,
               obs: obs,
               status: status,
               categoria: row.categoria || 'Geral'
@@ -3809,6 +3889,242 @@ async function login(username, password) {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
       showToast(`${filtered.length} pedidos exportados para CSV com sucesso!`, 'success');
+    }
+
+    // =====================================================================
+    // NOVO: Exportação de Relatório com Filtros (Período / Filial / Tipo)
+    // =====================================================================
+    let reportFilters = {
+      dateFrom: null,
+      dateTo: null,
+      branch: 'TODAS',
+      type: 'envios',
+      count: 0
+    };
+
+    function parseItemDate(item) {
+      if (!item) return null;
+      if (item.created_at) {
+        const d = new Date(item.created_at);
+        if (!isNaN(d.getTime())) return d;
+      }
+      if (item.data) {
+        const m = String(item.data).match(/(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{1,2}))?/);
+        if (m) {
+          const day = parseInt(m[1], 10);
+          const month = parseInt(m[2], 10) - 1;
+          const year = parseInt(m[3], 10);
+          const hour = m[4] ? parseInt(m[4], 10) : 0;
+          const min = m[5] ? parseInt(m[5], 10) : 0;
+          return new Date(year, month, day, hour, min);
+        }
+        const d = new Date(item.data);
+        if (!isNaN(d.getTime())) return d;
+      }
+      return null;
+    }
+
+    function openReportFilterModal() {
+      const el = document.getElementById('modal-report-filter');
+      if (!el) return;
+
+      const today = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(today.getDate() - 30);
+
+      const formatInputDate = (d) => {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      };
+
+      const dateFromInput = document.getElementById('rpt-date-from');
+      const dateToInput = document.getElementById('rpt-date-to');
+      if (dateFromInput) dateFromInput.value = formatInputDate(thirtyDaysAgo);
+      if (dateToInput) dateToInput.value = formatInputDate(today);
+
+      const sel = document.getElementById('rpt-branch');
+      if (sel) {
+        if (!isAdmin()) {
+          const u = APP_USERS[currentUser];
+          if (u && u.filial) {
+            for (let i = 0; i < sel.options.length; i++) {
+              if (sel.options[i].value.toLowerCase().includes(u.filial.toLowerCase()) || u.filial.toLowerCase().includes(sel.options[i].value.toLowerCase())) {
+                sel.selectedIndex = i;
+                break;
+              }
+            }
+          }
+        } else {
+          sel.value = 'TODAS';
+        }
+      }
+
+      syncReportFiltersFromInputs();
+      el.classList.remove('hidden');
+      el.style.display = 'flex';
+    }
+
+    function closeReportFilterModal() {
+      const el = document.getElementById('modal-report-filter');
+      if (el) {
+        el.style.display = 'none';
+        el.classList.add('hidden');
+      }
+    }
+
+    function syncReportFiltersFromInputs() {
+      const fromEl = document.getElementById('rpt-date-from');
+      const toEl = document.getElementById('rpt-date-to');
+      const branchEl = document.getElementById('rpt-branch');
+      const typeEl = document.querySelector('input[name="rpt-type"]:checked');
+
+      reportFilters.dateFrom = fromEl ? fromEl.value : null;
+      reportFilters.dateTo = toEl ? toEl.value : null;
+      reportFilters.branch = branchEl ? branchEl.value : 'TODAS';
+      reportFilters.type = typeEl ? typeEl.value : 'envios';
+
+      let count = 0;
+      if (reportFilters.type === 'envios') {
+        if (Array.isArray(pedidosEnvio)) {
+          count = pedidosEnvio.filter(item => matchesReportFilters(item, true)).length;
+        }
+      } else {
+        if (Array.isArray(pedidosCompra)) {
+          count = pedidosCompra.filter(item => matchesReportFilters(item, false)).length;
+        }
+      }
+      reportFilters.count = count;
+      const cntEl = document.getElementById('rpt-count');
+      if (cntEl) cntEl.innerText = count;
+    }
+
+    function matchesReportFilters(item, isEnvio) {
+      if (!reportFilters) return true;
+
+      if (reportFilters.type === 'envios' && !isEnvio) return false;
+      if (reportFilters.type === 'compras' && isEnvio) return false;
+
+      const itemDate = parseItemDate(item);
+      if (itemDate && reportFilters.dateFrom && reportFilters.dateTo) {
+        const itemYmd = itemDate.getFullYear() + '-' +
+          String(itemDate.getMonth() + 1).padStart(2, '0') + '-' +
+          String(itemDate.getDate()).padStart(2, '0');
+        if (itemYmd < reportFilters.dateFrom || itemYmd > reportFilters.dateTo) {
+          return false;
+        }
+      }
+
+      if (reportFilters.branch && reportFilters.branch !== 'TODAS' && reportFilters.branch !== 'TODOS') {
+        const itemBranch = isEnvio ? (item.filial || '') : (item.filial || item.branch_name || '');
+        if (!itemBranch.toLowerCase().includes(reportFilters.branch.toLowerCase())) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function exportFilteredReport() {
+      closeReportFilterModal();
+
+      if (reportFilters.type === 'envios') {
+        if (!pedidosEnvio || pedidosEnvio.length === 0) {
+          showToast('Nenhum envio de materiais para exportar.', 'warning');
+          return;
+        }
+
+        const filtered = pedidosEnvio.filter(item => matchesReportFilters(item, true));
+
+        if (filtered.length === 0) {
+          showToast('Nenhum envio encontrado com os filtros selecionados.', 'warning');
+          return;
+        }
+
+        const headers = ['Código', 'Filial Destino', 'Solicitante', 'Urgência', 'Fase Atual', 'Total Peças', 'Qtd Tipos Itens', 'Materiais na Carga', 'Observações', 'Data'];
+
+        const rows = filtered.map(p => {
+          const statusObj = ENVIOS_COLUNAS.find(c => c.id === p.status) || { nome: p.status };
+          const totalPcs = (p.itens || []).reduce((acc, cur) => acc + (cur.qtd || 0), 0);
+          const materiaisTxt = (p.itens || []).map(it => `${it.qtd}x ${it.nome}`).join(' | ');
+
+          const escapeCSV = (val) => {
+            const str = String(val == null ? '' : val).replace(/"/g, '""');
+            return `"${str}"`;
+          };
+
+          return [
+            escapeCSV(p.id),
+            escapeCSV(p.filial),
+            escapeCSV(p.solicitante),
+            escapeCSV(p.urgencia),
+            escapeCSV(statusObj.nome),
+            escapeCSV(totalPcs),
+            escapeCSV((p.itens || []).length),
+            escapeCSV(materiaisTxt),
+            escapeCSV(p.obs || ''),
+            escapeCSV(p.data)
+          ].join(';');
+        });
+
+        const csvContent = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        const timestamp = new Date().toISOString().slice(0, 10);
+        link.setAttribute('download', `VIGI_Expedicao_Materiais_${timestamp}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(`${filtered.length} envios exportados para CSV com sucesso!`, 'success');
+
+      } else {
+        if (!pedidosCompra || pedidosCompra.length === 0) {
+          showToast('Nenhuma solicitação de compra para exportar.', 'warning');
+          return;
+        }
+
+        const filtered = pedidosCompra.filter(item => matchesReportFilters(item, false));
+
+        if (filtered.length === 0) {
+          showToast('Nenhuma solicitação encontrada com os filtros selecionados.', 'warning');
+          return;
+        }
+
+        const headers = ['Código', 'Item / Material', 'Quantidade', 'Solicitante', 'Urgência', 'Status', 'Data', 'Observações'];
+
+        const rows = filtered.map(c => {
+          const statusLabel = c.status === 'emestoque' ? 'Em Estoque' : c.status === 'comprado' ? 'Comprado / Em Trânsito' : 'Aberto / Necessário';
+          const escapeCSV = (val) => `"${String(val == null ? '' : val).replace(/"/g, '""')}"`;
+
+          return [
+            escapeCSV(c.id),
+            escapeCSV(c.item),
+            escapeCSV(c.qtd),
+            escapeCSV(c.solicitante),
+            escapeCSV(c.urgencia),
+            escapeCSV(statusLabel),
+            escapeCSV(c.data),
+            escapeCSV(c.obs || '')
+          ].join(';');
+        });
+
+        const csvContent = '\uFEFF' + [headers.join(';'), ...rows].join('\r\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        const timestamp = new Date().toISOString().slice(0, 10);
+        link.setAttribute('download', `VIGI_Suprimentos_Compras_${timestamp}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+        showToast(`${filtered.length} solicitações de compra exportadas para CSV com sucesso!`, 'success');
+      }
     }
 
     // 14. KANBAN DE COMPRAS
@@ -5163,6 +5479,116 @@ async function login(username, password) {
       }
     }
 
+    // =====================================================================
+    // NOVO: Linha do Tempo e Histórico do Pedido (Audit Timeline)
+    // =====================================================================
+    function renderOrderTimeline(pedido) {
+      if (!pedido) return '';
+
+      const st = (pedido.status || 'aguardando').toLowerCase();
+      let stageIndex = 0;
+      if (st === 'separando' || st === 'coleta') stageIndex = 1;
+      else if (st === 'enviado' || st === 'emrota' || st === 'em_transito') stageIndex = 2;
+      else if (st === 'chegou' || st === 'recebido' || st === 'entregue') stageIndex = 3;
+
+      const createdDate = parseItemDate(pedido) || new Date();
+      const dateStr = createdDate.toLocaleString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: '2-digit',
+        hour: '2-digit', minute: '2-digit'
+      });
+
+      const stages = [
+        {
+          title: 'Solicitado',
+          subtitle: `Criado por ${escapeHtml(pedido.solicitante || 'Técnico')}`,
+          time: dateStr,
+          icon: 'fa-solid fa-file-lines',
+          activeColor: 'text-amber-400',
+          activeBg: 'bg-amber-500/20',
+          activeBorder: 'border-amber-500/50'
+        },
+        {
+          title: 'Separação e Conferência',
+          subtitle: 'Almoxarifado Central (Matriz)',
+          time: stageIndex >= 1 ? (pedido.data_separacao ? new Date(pedido.data_separacao).toLocaleString('pt-BR') : dateStr) : 'Aguardando início',
+          icon: 'fa-solid fa-boxes-packing',
+          activeColor: 'text-blue-400',
+          activeBg: 'bg-blue-500/20',
+          activeBorder: 'border-blue-500/50'
+        },
+        {
+          title: 'Despachado (Em Rota)',
+          subtitle: `Em trânsito para ${escapeHtml(pedido.filial || 'Filial')}`,
+          time: stageIndex >= 2 ? (pedido.data_despacho ? new Date(pedido.data_despacho).toLocaleString('pt-BR') : dateStr) : 'Aguardando despacho',
+          icon: 'fa-solid fa-truck-fast',
+          activeColor: 'text-purple-400',
+          activeBg: 'bg-purple-500/20',
+          activeBorder: 'border-purple-500/50'
+        },
+        {
+          title: 'Entrega Confirmada',
+          subtitle: 'Recebimento validado no destino',
+          time: stageIndex >= 3 ? (pedido.data_recebimento ? new Date(pedido.data_recebimento).toLocaleString('pt-BR') : dateStr) : 'Aguardando filial',
+          icon: 'fa-solid fa-circle-check',
+          activeColor: 'text-emerald-400',
+          activeBg: 'bg-emerald-500/20',
+          activeBorder: 'border-emerald-500/50'
+        }
+      ];
+
+      return `
+        <div class="glass-surface p-4 rounded-2xl border border-white/10 bg-slate-950/80 space-y-3">
+          <div class="flex items-center justify-between border-b border-white/5 pb-2">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-timeline text-orange-400 text-xs"></i>
+              <span class="font-bold text-xs text-white uppercase tracking-wider text-[11px]">Linha do Tempo & Rastreabilidade</span>
+            </div>
+            <span class="text-[10px] font-mono text-slate-400">Status: <strong class="text-orange-300 font-bold uppercase">${escapeHtml(pedido.status || 'Aguardando')}</strong></span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 pt-1">
+            ${stages.map((stage, idx) => {
+              const isPast = idx < stageIndex;
+              const isCurrent = idx === stageIndex;
+              const isFuture = idx > stageIndex;
+
+              let cardBg = 'bg-slate-900/40 border-white/5 opacity-60';
+              let iconColor = 'text-slate-500';
+              let badge = '';
+
+              if (isPast) {
+                cardBg = 'bg-emerald-950/25 border-emerald-500/30';
+                iconColor = 'text-emerald-400';
+                badge = '<span class="text-[9px] font-bold text-emerald-400 flex items-center gap-1"><i class="fa-solid fa-check"></i> Concluído</span>';
+              } else if (isCurrent) {
+                cardBg = `${stage.activeBg} ${stage.activeBorder} shadow-lg shadow-black/40 ring-1 ring-white/10`;
+                iconColor = stage.activeColor;
+                badge = `<span class="text-[9px] font-black px-1.5 py-0.2 rounded ${stage.activeBg} ${stage.activeColor} border ${stage.activeBorder} animate-pulse">ETAPA ATUAL</span>`;
+              } else {
+                badge = '<span class="text-[9px] text-slate-500">Pendente</span>';
+              }
+
+              return `
+                <div class="p-3 rounded-xl border ${cardBg} flex flex-col justify-between transition-all">
+                  <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                      <div class="w-6 h-6 rounded-lg bg-slate-950/80 border border-white/10 flex items-center justify-center ${iconColor} text-xs">
+                        <i class="${stage.icon}"></i>
+                      </div>
+                      ${badge}
+                    </div>
+                    <h5 class="font-bold text-xs text-slate-200">${stage.title}</h5>
+                    <p class="text-[10px] text-slate-400 line-clamp-1 mt-0.5">${stage.subtitle}</p>
+                  </div>
+                  <span class="text-[10px] font-mono font-medium text-slate-500 mt-2 pt-1 border-t border-white/5 block">${stage.time}</span>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
     function renderCardDetailsModal() {
       const pedido = pedidosEnvio.find(p => p.id === currentDetailPedidoId);
       if (!pedido) return;
@@ -5312,6 +5738,9 @@ async function login(username, password) {
             </div>
           </div>
         </div>
+
+        <!-- Linha do Tempo / Auditoria do Pedido -->
+        ${renderOrderTimeline(pedido)}
 
         ${hasDivergence ? `
           <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
