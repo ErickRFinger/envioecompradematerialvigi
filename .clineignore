@@ -1,0 +1,33 @@
+# ========================================================
+# .clineignore - SISTEM ENVIO VIGI
+# Regras de ignorar para acelerar o Cline / Roo-Code
+# ========================================================
+
+# Arquivos pesados de mídia e imagens (evita consumir tokens e RAM)
+*.png
+*.jpg
+*.jpeg
+*.ico
+*.svg
+*.webp
+*.gif
+
+# Arquivos de documentos e binários
+*.pdf
+*.zip
+*.tar
+*.gz
+*.dmg
+
+# Backups e pastas temporárias
+_BACKUP*/
+backup*/
+*.bak
+*.tmp
+*.log
+
+# Caches e dependências
+node_modules/
+.git/
+.vercel/
+.DS_Store

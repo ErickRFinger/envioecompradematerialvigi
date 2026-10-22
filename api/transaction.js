@@ -20,7 +20,7 @@ const GENERIC_ERROR = 'Erro de autorizacao.';
 module.exports = async function (req, res) {
   try {
     const method = req && req.method;
-    if (!['GET', 'POST', 'PUT', 'DELETE'].includes(method)) {
+    if (!['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
       res.status(405).json({ ok: false, error: 'Metodo nao permitido.' });
       return;
     }
@@ -48,7 +48,10 @@ module.exports = async function (req, res) {
       if (table === lib.TABLES.ITEMS && (query.shipment_id || body.shipment_id)) {
         filter = '&shipment_id=eq.' + encodeURIComponent(query.shipment_id || body.shipment_id);
       }
-      const path = table + '?select=*' + filter + '&order=created_at.desc&limit=100';
+      const selectCol = query.select ? encodeURIComponent(query.select) : '*';
+      const orderCol = query.order ? query.order : 'created_at.desc';
+      const limitVal = query.limit ? encodeURIComponent(query.limit) : '100';
+      const path = table + '?select=' + selectCol + filter + '&order=' + orderCol + '&limit=' + limitVal;
       const data = await lib.sbFetch(path);
       res.status(200).json({ ok: true, data: Array.isArray(data) ? data : [] });
       return;
@@ -56,29 +59,47 @@ module.exports = async function (req, res) {
 
     // ── POST: insert ───────────────────────────────────────────────────────
     if (method === 'POST') {
-      const row = body.row;
-      if (!row || typeof row !== 'object' || Array.isArray(row)) {
+      let rows = body.rows || body.row || (Array.isArray(body) ? body : (typeof body === 'object' && Object.keys(body).length > 0 && !body.table ? [body] : null));
+      if (!rows) {
         res.status(400).json({ ok: false, error: 'row invalido.' });
         return;
       }
-      // Forca a identidade do usuario autenticado.
-      if (table === lib.TABLES.SHIPMENTS) {
-        if (session.dbBranch) row.branch_name = session.dbBranch;
+      if (!Array.isArray(rows)) {
+        rows = [rows];
       }
-      const payload = JSON.stringify([row]);
+      // Forca a identidade do usuario autenticado para filiais
+      if (table === lib.TABLES.SHIPMENTS && session.dbBranch) {
+        rows.forEach(r => { if (typeof r === 'object' && r) r.branch_name = session.dbBranch; });
+      }
+      const payload = JSON.stringify(rows);
       const data = await lib.sbFetch(table, { method: 'POST', body: payload });
       res.status(200).json({ ok: true, data: Array.isArray(data) ? data : [] });
       return;
     }
 
-    // ── PUT: update ────────────────────────────────────────────────────────
-    if (method === 'PUT') {
-      const id = body.id;
+    // ── PUT / PATCH: update ────────────────────────────────────────────────
+    if (method === 'PUT' || method === 'PATCH') {
+      let id = body.id || query.id;
+      if (!id && query.eq) {
+        const m = String(query.eq).match(/^id=eq\.(.+)$/);
+        if (m) id = m[1];
+      }
+      if (!id && typeof query === 'object') {
+        for (const k of Object.keys(query)) {
+          if (k.startsWith('id=eq.')) id = k.replace('id=eq.', '');
+        }
+      }
+      if (typeof id === 'string' && id.startsWith('eq.')) {
+        id = id.slice(3);
+      }
       if (!id) {
         res.status(400).json({ ok: false, error: 'id faltando.' });
         return;
       }
-      const row = body.row;
+      let row = body.row !== undefined ? body.row : body;
+      if (row && typeof row === 'object' && row.table !== undefined && row.row !== undefined) {
+        row = row.row;
+      }
       if (!row || typeof row !== 'object' || Array.isArray(row)) {
         res.status(400).json({ ok: false, error: 'row invalido.' });
         return;
@@ -92,7 +113,20 @@ module.exports = async function (req, res) {
 
     // ── DELETE ──────────────────────────────────────────────────────────────
     if (method === 'DELETE') {
-      const ids = Array.isArray(body.ids) ? body.ids : (body.id ? [body.id] : []);
+      let ids = Array.isArray(body.ids) ? body.ids : (body.id ? [body.id] : []);
+      if (ids.length === 0 && query.id) {
+        let qId = String(query.id);
+        if (qId.startsWith('eq.')) qId = qId.slice(3);
+        ids = [qId];
+      }
+      if (ids.length === 0 && typeof query === 'object') {
+        for (const k of Object.keys(query)) {
+          if (k.startsWith('id=eq.')) ids.push(k.replace('id=eq.', ''));
+          if (query[k] && typeof query[k] === 'string' && query[k].startsWith('eq.')) {
+            if (k === 'id') ids.push(query[k].replace('eq.', ''));
+          }
+        }
+      }
       if (ids.length === 0) {
         res.status(400).json({ ok: false, error: 'id(s) invalido(s).' });
         return;

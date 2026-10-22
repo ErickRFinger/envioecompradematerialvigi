@@ -1650,12 +1650,12 @@ async function login(username, password) {
 
     const db = (function () {
       function buildPath(table, ops) {
-        let path = table;
-        if (ops._select && ops._select !== '*') path += '?select=' + ops._select;
-        if (ops._order) { path += '&order=' + ops._order; if (ops._dir) path += '.' + ops._dir; }
-        if (ops._limit) path += '&limit=' + ops._limit;
-        if (ops._eq) path += '&' + ops._eq;
-        return path;
+        let params = 'table=' + encodeURIComponent(table);
+        if (ops._select && ops._select !== '*') params += '&select=' + ops._select;
+        if (ops._order) { params += '&order=' + ops._order; if (ops._dir) params += '.' + ops._dir; }
+        if (ops._limit) params += '&limit=' + ops._limit;
+        if (ops._eq) params += '&' + ops._eq;
+        return params;
       }
       function query(table) {
         const self = {
@@ -1671,7 +1671,7 @@ async function login(username, password) {
           then(resolve, reject) {
             try {
               const path = buildPath(self._table, self);
-              const url = '/api/transaction' + (path.includes('?') ? '&' : '?') + path;
+              const url = '/api/transaction?' + path;
               fetch(url, {
                 method: self._method,
                 headers: { 'Content-Type': 'application/json', ...(apiToken && { Authorization: 'Bearer ' + apiToken }) },
@@ -2313,7 +2313,10 @@ async function login(username, password) {
       const active = readValidDesktopSession();
       if (active && APP_USERS[active]) {
         currentUser = active;
-        persistDesktopSession(active);
+        // Reaproveita o token server-side emitido no login (evita novo round-trip).
+        const restoredToken = restoreDesktopToken();
+        apiToken = restoredToken || '';
+        persistDesktopSession(active, restoredToken || '');
         const loginEl = document.getElementById('view-login');
         if (loginEl) {
           loginEl.style.display = 'none';
@@ -2324,6 +2327,7 @@ async function login(username, password) {
         loadSupabaseCompras();
       } else {
         currentUser = null;
+        apiToken = '';
         const loginEl = document.getElementById('view-login');
         if (loginEl) {
           loginEl.classList.remove('hidden');
@@ -2419,11 +2423,13 @@ async function login(username, password) {
     const SESSION_KEY_DESKTOP = 'vigi_active_session';
     const SESSION_META_KEY = 'vigi_session_meta';
 
-    function persistDesktopSession(username) {
+    function persistDesktopSession(username, token) {
       try {
         sessionStorage.setItem(SESSION_KEY_DESKTOP, username);
         localStorage.setItem('vigi_auth_session', username);
-        localStorage.setItem(SESSION_META_KEY, JSON.stringify({ user: username, ts: Date.now() }));
+        const meta = { user: username, ts: Date.now() };
+        if (token) meta.token = token;
+        localStorage.setItem(SESSION_META_KEY, JSON.stringify(meta));
       } catch (e) { /* storage indisponível */ }
     }
 
@@ -2433,6 +2439,17 @@ async function login(username, password) {
         localStorage.removeItem('vigi_auth_session');
         localStorage.removeItem(SESSION_META_KEY);
       } catch (e) { /* ignore */ }
+    }
+
+    function restoreDesktopToken() {
+      try {
+        const raw = localStorage.getItem(SESSION_META_KEY);
+        if (!raw) return null;
+        const meta = JSON.parse(raw);
+        if (!meta || !meta.token) return null;
+        if (!meta.ts || Date.now() - meta.ts > SESSION_TTL_MS) return null;
+        return meta.token;
+      } catch (e) { return null; }
     }
 
     // Retorna o usuário de uma sessão válida ou null.
@@ -2496,10 +2513,20 @@ async function login(username, password) {
       const isValid = await verifyUserPassword(user, password);
 
       if (isValid) {
+        // Obtém token do servidor (proxy serverless)
+        let token = '';
+        try {
+          const loginRes = await login(username, password);
+          if (loginRes && loginRes.ok && loginRes.token) token = loginRes.token;
+        } catch (err) {
+          console.warn('Falha ao obter token server-side:', err);
+        }
+        apiToken = token;
+
         loginFailAttempts = 0;
         loginLockUntil = 0;
         currentUser = username;
-        persistDesktopSession(username);
+        persistDesktopSession(username, token);
         document.getElementById('view-login').style.display = 'none';
         applyUserRoleSettings();
         loadSupabaseShipments();
@@ -2524,6 +2551,7 @@ async function login(username, password) {
       if (confirm('Deseja realmente sair da conta atual?')) {
         clearDesktopSession();
         pendingSwitchUser = null;
+        apiToken = '';
         currentUser = null;
         const pwdInput = document.getElementById('desktop-login-password');
         if (pwdInput) pwdInput.value = '';
@@ -2747,10 +2775,14 @@ async function login(username, password) {
       // Troca efetivada
       currentUser = pendingSwitchUser;
       try {
-        sessionStorage.setItem('vigi_active_session', currentUser);
-        localStorage.setItem('vigi_auth_session', currentUser);
-        localStorage.setItem('vigi_session_meta', JSON.stringify({ user: currentUser, ts: Date.now() }));
-      } catch (e) { /* storage indisponível */ }
+        const switchLogin = await login(currentUser, password);
+        if (switchLogin && switchLogin.token) {
+          apiToken = switchLogin.token;
+        }
+      } catch (err) {
+        console.warn('Falha ao obter token no switch de usuário:', err);
+      }
+      persistDesktopSession(currentUser, apiToken);
       pendingSwitchUser = null;
       closeUserSwitchModal();
       applyUserRoleSettings();
@@ -2828,11 +2860,11 @@ async function login(username, password) {
 
     // 8. CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
     async function loadSupabaseShipments() {
-      if (!supabase) return;
+      if (!db) return;
       const userConfig = APP_USERS[currentUser];
 
       try {
-        let query = supabase
+        let query = db
           .from('shipments')
           .select('*, shipment_items(*)')
           .order('created_at', { ascending: false })
@@ -2994,9 +3026,9 @@ async function login(username, password) {
 
     // 8.1 CARREGAMENTO EM TEMPO REAL DE PEDIDOS DE COMPRA (SUPABASE)
     async function loadSupabaseCompras() {
-      if (!supabase) return;
+      if (!db) return;
       try {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from('compras')
           .select('*')
           .order('created_at', { ascending: false })
@@ -4042,10 +4074,10 @@ async function login(username, password) {
         showToast(`Pedido ${id} atualizado para: ${statusObj.nome}`);
 
         // Sincroniza status no Supabase
-        if (pedido.rawId && supabase) {
+        if (pedido.rawId && db) {
           const dbStatus = newStatus === 'chegou' ? 'recebido' : newStatus;
           try {
-            await supabase
+            await db
               .from('shipments')
               .update({ status: dbStatus })
               .eq('id', pedido.rawId);
@@ -4069,9 +4101,9 @@ async function login(username, password) {
         const label = newStatus === 'comprado' ? 'Comprado / Em Trânsito' : newStatus === 'emestoque' ? 'Disponível no Estoque Matriz' : 'Solicitado / Cotação';
         showToast(`Compra ${compra.id} atualizada para: ${label}!`, 'success');
 
-        if (supabase && compra.rawId) {
+        if (db && compra.rawId) {
           try {
-            const { error } = await supabase.from('compras').update({ status: newStatus }).eq('id', compra.rawId);
+            const { error } = await db.from('compras').update({ status: newStatus }).eq('id', compra.rawId);
             if (error) console.warn('Erro ao atualizar compra no Supabase:', error);
           } catch (err) {
             console.warn('Erro ao atualizar compra no Supabase:', err);
@@ -4094,9 +4126,9 @@ async function login(username, password) {
         renderAll();
         showToast(`Solicitação ${compra.id} removida com sucesso.`, 'info');
 
-        if (supabase && rawId) {
+        if (db && rawId) {
           try {
-            const { error } = await supabase.from('compras').delete().eq('id', rawId);
+            const { error } = await db.from('compras').delete().eq('id', rawId);
             if (error) console.warn('Erro ao excluir compra no Supabase:', error);
           } catch (err) {
             console.warn('Erro ao excluir compra no Supabase:', err);
@@ -4119,10 +4151,10 @@ async function login(username, password) {
         return;
       }
 
-      if (pedido.rawId && supabase) {
+      if (pedido.rawId && db) {
         try {
-          await supabase.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
-          const { error } = await supabase.from('shipments').delete().eq('id', pedido.rawId);
+          await db.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
+          const { error } = await db.from('shipments').delete().eq('id', pedido.rawId);
           if (error) throw error;
         } catch (err) {
           console.warn('Erro ao excluir no Supabase:', err);
@@ -4521,7 +4553,7 @@ async function login(username, password) {
           status: 'aguardando'
         };
 
-        const { data: shipData, error: shipError } = await supabase
+        const { data: shipData, error: shipError } = await db
           .from('shipments')
           .insert([shipmentPayload])
           .select();
@@ -4548,7 +4580,7 @@ async function login(username, password) {
           };
         });
 
-        await supabase.from('shipment_items').insert(itemsPayload);
+        await db.from('shipment_items').insert(itemsPayload);
 
         closeNewEnvioModal();
         showToast(`Solicitação #ENV-${newShip.id.slice(0, 6).toUpperCase()} criada com sucesso!`, 'success');
@@ -5013,9 +5045,9 @@ async function login(username, password) {
       renderPendingCompraItems();
       renderAll();
 
-      if (supabase && supabasePayloads.length > 0) {
+      if (supabasePayloads.length > 0) {
         try {
-          const { data, error } = await supabase.from('compras').insert(supabasePayloads).select();
+          const { data, error } = await db.from('compras').insert(supabasePayloads).select();
           if (error) throw error;
           if (data && Array.isArray(data)) {
             data.forEach(d => {
@@ -5571,9 +5603,9 @@ async function login(username, password) {
             };
           });
 
-          await supabase.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
+          await db.from('shipment_items').delete().eq('shipment_id', pedido.rawId);
           if (itemsPayload.length > 0) {
-            const { error: insErr } = await supabase.from('shipment_items').insert(itemsPayload);
+            const { error: insErr } = await db.from('shipment_items').insert(itemsPayload);
             if (insErr) throw insErr;
           }
 
@@ -5583,7 +5615,7 @@ async function login(username, password) {
             shipmentUpdates.status = advanceToStatus === 'chegou' ? 'recebido' : advanceToStatus;
             pedido.status = advanceToStatus;
           }
-          const { error: shipErr } = await supabase.from('shipments').update(shipmentUpdates).eq('id', pedido.rawId);
+          const { error: shipErr } = await db.from('shipments').update(shipmentUpdates).eq('id', pedido.rawId);
           if (shipErr) throw shipErr;
         }
 
@@ -6260,26 +6292,11 @@ async function login(username, password) {
       });
     }
 
-    // Supabase Realtime Listener (Shipments & Compras)
+    // Supabase Realtime Listener (Shipments & Compras) — substituído por polling (setInterval 15s)
+    // Mantido como no-op: o proxy serverless via /api/transaction + polling cuida da sincronia.
     function initRealtime() {
-      if (!supabase) return;
-      try {
-        supabase
-          .channel('vigi-matriz-realtime')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
-            loadSupabaseShipments();
-            lastSyncTimestamp = new Date();
-            updateSyncTimeUI();
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'compras' }, () => {
-            loadSupabaseCompras();
-            lastSyncTimestamp = new Date();
-            updateSyncTimeUI();
-          })
-          .subscribe();
-      } catch (err) {
-        console.warn('Realtime fallback:', err);
-      }
+      // Realtime desabilitado: polling em 15s (ver loadSupabaseShipments/Compras interval).
+      // O supabase channel foi removido para evitar uso direto do cliente Supabase no navegador.
     }
 
     setInterval(() => {

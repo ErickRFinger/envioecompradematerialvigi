@@ -25,8 +25,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome 6 Pro/Free Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <!-- Supabase JS CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     tailwind.config = {
@@ -1162,16 +1160,77 @@
   <div id="print-area" class="hidden p-4 text-black bg-white" style="display: none;"></div>
 
   <!-- ======================================================== -->
-  <!-- JAVASCRIPT ENGINE & SUPABASE SYNC -->
+  <!-- JAVASCRIPT ENGINE & SERVERLESS PROXY SYNC -->
   <!-- ======================================================== -->
   <script>
-    // 1. SUPABASE CONFIGURATION
-    const SUPABASE_URL = "https://hnfhrjgzeivzrcpumkyk.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI";
+    // 1. SERVERLESS PROXY CONFIGURATION
+    let apiToken = '';
 
-    var supabase = (window.supabase && window.supabase.createClient) 
-      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+    async function apiFetch(path, options = {}) {
+      const response = await fetch(path, {
+        method: options.method || 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(apiToken && { Authorization: 'Bearer ' + apiToken }),
+          ...options.headers,
+        },
+        body: options.body ? JSON.stringify(options.body) : undefined,
+      });
+      return response;
+    }
+
+    async function login(username, password) {
+      const res = await fetch('/api/login', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+      const data = await res.json();
+      if (res.ok && data.token) { apiToken = data.token; }
+      return data;
+    }
+
+    const db = (function () {
+      function buildPath(table, ops) {
+        let params = 'table=' + encodeURIComponent(table);
+        if (ops._select && ops._select !== '*') params += '&select=' + ops._select;
+        if (ops._order) { params += '&order=' + ops._order; if (ops._dir) params += '.' + ops._dir; }
+        if (ops._limit) params += '&limit=' + ops._limit;
+        if (ops._eq) params += '&' + ops._eq;
+        return params;
+      }
+      function query(table) {
+        const self = {
+          _table: table, _select: '*', _order: null, _dir: 'desc', _limit: null,
+          _eq: null, _method: 'GET', _body: null,
+          select(col) { this._select = col; return self; },
+          order(col, opts) { this._order = col; this._dir = (opts && opts.ascending !== undefined) ? (opts.ascending ? 'asc' : 'desc') : self._dir; return self; },
+          limit(n) { this._limit = n; return self; },
+          eq(col, val) { this._eq = col + '=eq.' + val; return self; },
+          insert(data) { this._method = 'POST'; this._body = JSON.stringify(typeof data === 'object' && !Array.isArray(data) ? [data] : data); return self; },
+          update(data) { this._method = 'PATCH'; this._body = JSON.stringify(data); return self; },
+          delete() { this._method = 'DELETE'; this._eq = null; return self; },
+          then(resolve, reject) {
+            try {
+              const path = buildPath(self._table, self);
+              const url = '/api/transaction?' + path;
+              fetch(url, {
+                method: self._method,
+                headers: { 'Content-Type': 'application/json', ...(apiToken && { Authorization: 'Bearer ' + apiToken }) },
+                body: self._body,
+              }).then(resp => {
+                if (!resp.ok) { return resp.json().then(e => { reject(new Error(e.message || e.error || 'HTTP ' + resp.status)); }); }
+                return resp.json();
+              }).then(data => {
+                if (self.ok === false || data.ok === false) { resolve({ data: null, error: data.error || data.message || 'Erro' }); }
+                else { resolve({ data: data.data || data, error: null }); }
+              }).catch(err => { reject(new Error(err.message || 'Rede')); });
+            } catch (e) { reject(new Error(e.message || 'Erro')); }
+          },
+        };
+        return self;
+      }
+      return { from: query };
+    })();
 
     // 1.1 CRIPTOGRAFIA & UTILITÁRIOS DE SEGURANÇA
     // ------------------------------------------------------------------
@@ -1928,12 +1987,14 @@
     const SESSION_KEY_MOBILE = 'vigi_mobile_session';
     const SESSION_META_KEY = 'vigi_session_meta';
 
-    function persistSession(username) {
+    function persistSession(username, token) {
       try {
         sessionStorage.setItem(SESSION_KEY_MOBILE, username);
         localStorage.setItem('vigi_mobile_user', username);
         localStorage.setItem('vigi_auth_session', username);
-        localStorage.setItem(SESSION_META_KEY, JSON.stringify({ user: username, ts: Date.now() }));
+        const meta = { user: username, ts: Date.now() };
+        if (token) meta.token = token;
+        localStorage.setItem(SESSION_META_KEY, JSON.stringify(meta));
         localStorage.setItem(STORAGE_MOBILE_LAST_ACTIVE, Date.now().toString());
       } catch (e) { /* modo privado / storage bloqueado: segue sem persistir */ }
     }
@@ -1946,6 +2007,17 @@
         localStorage.removeItem('vigi_mobile_session');
         localStorage.removeItem(SESSION_META_KEY);
       } catch (e) { /* ignore */ }
+    }
+
+    function restoreMobileToken() {
+      try {
+        const raw = localStorage.getItem(SESSION_META_KEY);
+        if (!raw) return null;
+        const meta = JSON.parse(raw);
+        if (!meta || !meta.token) return null;
+        if (!meta.ts || Date.now() - meta.ts > SESSION_TTL_MS) return null;
+        return meta.token;
+      } catch (e) { return null; }
     }
 
     // Retorna o usuário de uma sessão válida, ou null.
@@ -1996,7 +2068,10 @@
       const viewLogin = document.getElementById('view-login');
       if (targetUser && APP_USERS[targetUser]) {
         currentUser = targetUser;
-        persistSession(currentUser);
+        // Reaproveita o token server-side emitido no login (evita novo round-trip).
+        const restoredToken = restoreMobileToken();
+        apiToken = restoredToken || '';
+        persistSession(currentUser, restoredToken || '');
         if (viewLogin) {
           viewLogin.style.display = 'none';
           viewLogin.classList.add('hidden');
@@ -2013,6 +2088,7 @@
         }
       } else {
         currentUser = null;
+        apiToken = '';
         if (viewLogin) {
           viewLogin.style.display = 'flex';
           viewLogin.classList.remove('hidden');
@@ -2086,10 +2162,20 @@
       const isValid = await verifyUserPassword(user, password);
 
       if (isValid) {
+        // Obtém token do servidor (proxy serverless)
+        let token = '';
+        try {
+          const loginRes = await login(username, password);
+          if (loginRes && loginRes.ok && loginRes.token) token = loginRes.token;
+        } catch (err) {
+          console.warn('Falha ao obter token server-side:', err);
+        }
+        apiToken = token;
+
         mobileLoginFailAttempts = 0;
         mobileLoginLockUntil = 0;
         currentUser = username;
-        persistSession(username);
+        persistSession(username, token);
         const viewLogin = document.getElementById('view-login');
         if (viewLogin) {
           viewLogin.style.display = 'none';
@@ -3084,7 +3170,7 @@
           status: 'aguardando'
         };
 
-        const { data: shipData, error: shipError } = await supabase
+        const { data: shipData, error: shipError } = await db
           .from('shipments')
           .insert([shipmentPayload])
           .select();
@@ -3112,7 +3198,7 @@
           };
         });
 
-        const { data: itemsData, error: itemsError } = await supabase
+        const { data: itemsData, error: itemsError } = await db
           .from('shipment_items')
           .insert(itemsPayload)
           .select();
@@ -3368,7 +3454,7 @@
       }
 
       try {
-        let query = supabase
+        let query = db
           .from('shipments')
           .select('*, shipment_items(*)')
           .order('created_at', { ascending: false })
@@ -4038,7 +4124,7 @@
       }
 
       try {
-        const { error } = await supabase
+        const { error } = await db
           .from('shipments')
           .update({ status: newStatus })
           .eq('id', shipmentId);
@@ -4608,8 +4694,8 @@
       }
 
       try {
-        await supabase.from('shipment_items').delete().eq('shipment_id', shipmentId);
-        const { error } = await supabase.from('shipments').delete().eq('id', shipmentId);
+        await db.from('shipment_items').delete().eq('shipment_id', shipmentId);
+        const { error } = await db.from('shipments').delete().eq('id', shipmentId);
         if (error) throw error;
 
         showToast('Solicitação excluída do banco com sucesso!', 'success');
@@ -4637,9 +4723,9 @@
     }
 
     async function loadComprasFromSupabase() {
-      if (!supabase) return;
+      if (!db) return;
       try {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from('compras')
           .select('*')
           .order('created_at', { ascending: false })
@@ -5254,8 +5340,8 @@
       });
 
       try {
-        if (supabase && supabasePayloads.length > 0) {
-          const { error } = await supabase.from('compras').insert(supabasePayloads);
+        if (supabasePayloads.length > 0) {
+          const { error } = await db.from('compras').insert(supabasePayloads);
           if (error) throw error;
         }
 
@@ -5282,9 +5368,9 @@
     }
 
     async function advanceCompraStatusFromMobile(rawId, newStatus) {
-      if (!supabase || !rawId) return;
+      if (!rawId) return;
       try {
-        const { error } = await supabase.from('compras').update({ status: newStatus }).eq('id', rawId);
+        const { error } = await db.from('compras').update({ status: newStatus }).eq('id', rawId);
         if (error) throw error;
         const label = newStatus === 'comprado' ? 'Marcado como Comprado' : 'Confirmado no Estoque';
         showToast(`Status atualizado: ${label}!`, 'success');
@@ -5298,8 +5384,8 @@
     async function deleteCompraFromMobile(rawId, code) {
       if (!confirm(`Deseja realmente excluir permanentemente a requisição ${code} do banco de dados?`)) return;
       try {
-        if (supabase && rawId) {
-          const { error } = await supabase.from('compras').delete().eq('id', rawId);
+        if (rawId) {
+          const { error } = await db.from('compras').delete().eq('id', rawId);
           if (error) throw error;
         }
         showToast(`Requisição ${code} excluída com sucesso!`, 'info');
@@ -5311,21 +5397,10 @@
     }
 
     // 16. REALTIME LISTENER (ATUALIZAÇÃO INSTANTÂNEA DE ENVIOS E COMPRAS)
+    // Substituído por polling client-side (setInterval 15s abaixo).
     function initRealtime() {
-      if (!supabase) return;
-      try {
-        supabase
-          .channel('vigi-mobile-realtime')
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'shipments' }, () => {
-            loadShipmentsFromSupabase();
-          })
-          .on('postgres_changes', { event: '*', schema: 'public', table: 'compras' }, () => {
-            loadComprasFromSupabase();
-          })
-          .subscribe();
-      } catch (err) {
-        console.warn('Realtime fallback:', err);
-      }
+      // O supabase realtime foi removido: o proxy serverless via /api/transaction
+      // + polling de 15s cuidam da sincronia sem expor a chave anon no navegador.
     }
 
     // Polling a cada 20s
