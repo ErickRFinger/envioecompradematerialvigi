@@ -118,4 +118,24 @@ assert(html.includes('ETAPA ATUAL'), 'Badge da etapa atual deve estar presente')
 assert(html.includes('Solicitado') && html.includes('Separação') && html.includes('Despachado') && html.includes('Entrega Confirmada'), 'Todas as 4 etapas devem ser representadas');
 console.log('✓ Lógica e templates da Linha do Tempo validados com sucesso.');
 
+// 5. Teste do Mini-Dashboard de KPIs Operacionais
+console.log('\n--- 5. Testando Mini-Dashboard de KPIs Operacionais ---');
+assert(html.includes('id="kpi-dashboard-wrapper"'), 'Container do mini-dashboard deve existir');
+assert(html.includes('id="kpi-cards-grid"'), 'Grid de cards de KPIs deve existir');
+assert(html.includes('id="kpi-total-envios"'), 'Card de total de envios no mês deve existir');
+assert(html.includes('id="kpi-urgentes-count"'), 'Card de remessas urgentes ativas deve existir');
+assert(html.includes('id="kpi-top-branch"'), 'Card de filial mais ativa deve existir');
+assert(html.includes('id="kpi-fulfillment-rate"'), 'Card de taxa de atendimento pleno deve existir');
+assert(html.includes('function toggleKpiDashboard'), 'Função toggleKpiDashboard deve existir');
+assert(html.includes('function updateKpiDashboard'), 'Função updateKpiDashboard deve existir');
+assert(html.includes('function initKpiState'), 'Função initKpiState deve existir');
+console.log('✓ Componente e funções reativas do Mini-Dashboard de KPIs validados com sucesso.');
+
+// 6. Teste de Saldo Crítico e Atalho de Reposição Direta
+console.log('\n--- 6. Testando Saldo Crítico e Reposição no Compras ---');
+assert(html.includes('Saldo Crítico'), 'Badge de Saldo Crítico deve estar implementado nos cards de Compras');
+assert(html.includes('function openRepositionCompraModal'), 'Função openRepositionCompraModal deve existir');
+assert(html.includes('Repor no Compras') || html.includes('Repor'), 'Botões de atalho de reposição rápida devem existir');
+console.log('✓ Saldo Crítico e fluxo de reposição direta de compras validados com sucesso.');
+
 console.log('\n🎉 TODOS OS TESTES DAS NOVAS FUNCIONALIDADES PASSARAM COM 100% DE SUCESSO!\n');

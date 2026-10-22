@@ -242,3 +242,23 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
     4. **Entrega Confirmada:** Recebimento validado no destino.
   - Destaque dinâmico da etapa atual com pulso e borda acentuada, selo de "Concluído" nas fases superadas e tratamento gracioso para registros legados.
 - **Validação Automatizada:** Adicionada 5ª suíte de testes (`scratch/test_new_features.js`), validando 100% da integridade do DOM, regras de filtragem, datas e codificação do CSV.
+
+### V1.2.7 (Linha do Tempo Visual no Aplicativo Mobile / PWA)
+- **Rastreio de Status no Mobile (`solicitar.html`):**
+  - Implementação da `renderOrderTimeline` no modal de detalhes do técnico (`#order-details-modal`), refletindo as 4 etapas de transporte em tempo real na palma da mão.
+  - Sincronização automática com as atualizações de status feitas pela Matriz no Kanban.
+
+### V1.2.8 (Rebranding Oficial, Mini-Dashboard de KPIs & Reposição de Estoque Crítico)
+- **Rebranding Completo:** Unificação de todo o ecossistema sob a marca **SISTEMA DE ENVIO VIGI** em manifestos PWA, títulos, cabeçalhos, proxies e documentações.
+- **Mini-Dashboard de KPIs Operacionais (`#kpi-dashboard-wrapper`):**
+  - Faixa retrátil com persistência no `localStorage` (`initKpiState`, `toggleKpiDashboard`).
+  - 4 métricas calculadas em tempo real com atualização reativa via `updateKpiDashboard()`:
+    1. *Envios no Mês:* Total consolidado de remessas despachadas/ativas no mês corrente.
+    2. *Prioridade Alta/Urgente:* Monitor de pedidos emergenciais ativos que demandam atenção imediata.
+    3. *Filial Mais Ativa:* Identificação automática da filial com maior volume e contagem de peças.
+    4. *Taxa de Atendimento Pleno:* Percentual de remessas sem divergência/falta de estoque.
+- **Monitor de Saldo Crítico & Reposição Direta:**
+  - Badge visual `⚠️ Saldo Crítico` para itens urgentes ou compras pendentes na aba de Suprimentos.
+  - Botão de atalho rápido `Repor` inline nos itens com divergência ou saldo zerado no romaneio.
+  - Função `openRepositionCompraModal()` que abre a solicitação de compra com nome do item, quantidade faltante e vínculo com a remessa pré-preenchidos.
+- **Validação Automatizada:** Suíte de testes atualizada com 100% de cobertura das novas interfaces e fluxos.

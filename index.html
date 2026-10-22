@@ -756,6 +756,72 @@
 
       </div>
 
+      <!-- MINI-DASHBOARD DE KPIS OPERACIONAIS (FAIXA RETRÁTIL) -->
+      <div id="kpi-dashboard-wrapper" class="pt-2.5 border-t border-white/5 transition-all duration-300">
+        <div class="flex items-center justify-between pb-2">
+          <button type="button" onclick="toggleKpiDashboard()" class="text-[10px] font-bold text-slate-400 hover:text-white uppercase tracking-wider flex items-center gap-1.5 transition cursor-pointer">
+            <i class="fa-solid fa-chart-simple text-orange-400"></i>
+            <span>Indicadores Operacionais do Mês (KPIs)</span>
+            <i id="kpi-toggle-icon" class="fa-solid fa-chevron-up text-[9px] transition-transform"></i>
+          </button>
+          <span class="text-[10px] font-mono text-slate-500">Mês de Referência: <strong id="kpi-current-month" class="text-slate-300 uppercase">Outubro/2026</strong></span>
+        </div>
+        <div id="kpi-cards-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+          <!-- Card 1: Total de Envios no Mês -->
+          <div class="glass-surface p-3 rounded-2xl border border-white/5 bg-slate-950/60 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 text-sm shrink-0">
+              <i class="fa-solid fa-truck-ramp-box"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Envios no Mês</span>
+              <div class="flex items-baseline gap-1.5">
+                <span id="kpi-total-envios" class="text-base font-mono font-black text-white">0</span>
+                <span class="text-[10px] text-slate-500">remessas</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2: Remessas com Prioridade Urgente -->
+          <div class="glass-surface p-3 rounded-2xl border border-white/5 bg-slate-950/60 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 text-sm shrink-0">
+              <i class="fa-solid fa-bolt-lightning"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Prioridade Alta/Urgente</span>
+              <div class="flex items-baseline gap-1.5">
+                <span id="kpi-urgentes-count" class="text-base font-mono font-black text-rose-400">0</span>
+                <span class="text-[10px] text-slate-500">ativas</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 3: Filial Mais Ativa -->
+          <div class="glass-surface p-3 rounded-2xl border border-white/5 bg-slate-950/60 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 flex items-center justify-center text-blue-400 text-sm shrink-0">
+              <i class="fa-solid fa-building"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Filial Mais Ativa</span>
+              <div class="flex items-baseline gap-1.5 truncate">
+                <span id="kpi-top-branch" class="text-xs font-bold text-white truncate">—</span>
+                <span id="kpi-top-branch-pcs" class="text-[10px] font-mono text-blue-300"></span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 4: Taxa de Atendimento Pleno -->
+          <div class="glass-surface p-3 rounded-2xl border border-white/5 bg-slate-950/60 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-sm shrink-0">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <div class="min-w-0">
+              <span class="text-[10px] text-slate-400 font-bold block uppercase tracking-wider">Atendimento 100%</span>
+              <div class="flex items-baseline gap-1.5">
+                <span id="kpi-fulfillment-rate" class="text-base font-mono font-black text-emerald-400">100%</span>
+                <span id="kpi-divergence-note" class="text-[10px] text-slate-500">sem faltas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -3305,6 +3371,138 @@ async function login(username, password) {
       renderComprasKanban();
       updateHeaderBadges();
       updateStats();
+      updateKpiDashboard();
+    }
+
+    // =====================================================================
+    // NOVO: MINI-DASHBOARD DE KPIS OPERACIONAIS DA MATRIZ
+    // =====================================================================
+    let isKpiDashboardOpen = true;
+
+    function toggleKpiDashboard() {
+      const grid = document.getElementById('kpi-cards-grid');
+      const icon = document.getElementById('kpi-toggle-icon');
+      if (!grid) return;
+      isKpiDashboardOpen = !isKpiDashboardOpen;
+      if (isKpiDashboardOpen) {
+        grid.style.display = 'grid';
+        if (icon) icon.className = 'fa-solid fa-chevron-up text-[9px] transition-transform';
+      } else {
+        grid.style.display = 'none';
+        if (icon) icon.className = 'fa-solid fa-chevron-down text-[9px] transition-transform';
+      }
+      try { localStorage.setItem('vigi_kpi_open', isKpiDashboardOpen ? '1' : '0'); } catch(e) {}
+    }
+
+    function initKpiState() {
+      try {
+        const stored = localStorage.getItem('vigi_kpi_open');
+        if (stored === '0') {
+          isKpiDashboardOpen = true;
+          toggleKpiDashboard();
+        }
+      } catch(e) {}
+    }
+
+    function updateKpiDashboard() {
+      const totalEnviosEl = document.getElementById('kpi-total-envios');
+      const urgentesEl = document.getElementById('kpi-urgentes-count');
+      const topBranchEl = document.getElementById('kpi-top-branch');
+      const topBranchPcsEl = document.getElementById('kpi-top-branch-pcs');
+      const fulfillmentEl = document.getElementById('kpi-fulfillment-rate');
+      const monthEl = document.getElementById('kpi-current-month');
+
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentYear = now.getFullYear();
+
+      if (monthEl) {
+        monthEl.innerText = now.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+      }
+
+      if (!Array.isArray(pedidosEnvio) || pedidosEnvio.length === 0) {
+        if (totalEnviosEl) totalEnviosEl.innerText = '0';
+        if (urgentesEl) urgentesEl.innerText = '0';
+        if (topBranchEl) topBranchEl.innerText = 'Nenhuma';
+        if (topBranchPcsEl) topBranchPcsEl.innerText = '';
+        if (fulfillmentEl) fulfillmentEl.innerText = '100%';
+        return;
+      }
+
+      // 1. Envios do Mês Corrente
+      const monthlyShipments = pedidosEnvio.filter(p => {
+        const d = parseItemDate(p);
+        return d && d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      });
+
+      if (totalEnviosEl) totalEnviosEl.innerText = monthlyShipments.length;
+
+      // 2. Remessas Urgentes / Alta Prioridade Ativas
+      const activeUrgentes = pedidosEnvio.filter(p => {
+        const st = (p.status || '').toLowerCase();
+        const isActive = st !== 'chegou' && st !== 'recebido' && st !== 'entregue';
+        return isActive && isPedidoUrgente(p);
+      });
+      if (urgentesEl) urgentesEl.innerText = activeUrgentes.length;
+
+      // 3. Filial Mais Ativa (maior volume de peças solicitadas no mês)
+      const branchVolumes = {};
+      const targetPool = monthlyShipments.length > 0 ? monthlyShipments : pedidosEnvio;
+      targetPool.forEach(p => {
+        const branch = p.filial || 'Outros';
+        const pcs = (p.itens || []).reduce((sum, it) => sum + (it.qtd || 0), 0);
+        branchVolumes[branch] = (branchVolumes[branch] || 0) + pcs;
+      });
+
+      let topBranch = '—';
+      let maxPcs = 0;
+      Object.entries(branchVolumes).forEach(([b, pcs]) => {
+        if (pcs > maxPcs) {
+          maxPcs = pcs;
+          topBranch = b;
+        }
+      });
+
+      if (topBranchEl) {
+        const cleanBranch = topBranch.replace(/\s*\(.*?\)/, '');
+        topBranchEl.innerText = cleanBranch;
+        topBranchEl.title = topBranch;
+      }
+      if (topBranchPcsEl) {
+        topBranchPcsEl.innerText = maxPcs > 0 ? `(${maxPcs} un)` : '';
+      }
+
+      // 4. Taxa de Atendimento Pleno
+      let totalAssessed = 0;
+      let totalFullAttended = 0;
+      targetPool.forEach(p => {
+        totalAssessed++;
+        const hasDiv = (p.itens || []).some(it => it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal);
+        if (!hasDiv) totalFullAttended++;
+      });
+
+      const rate = totalAssessed > 0 ? Math.round((totalFullAttended / totalAssessed) * 100) : 100;
+      if (fulfillmentEl) {
+        fulfillmentEl.innerText = `${rate}%`;
+        fulfillmentEl.className = `text-base font-mono font-black ${rate >= 90 ? 'text-emerald-400' : rate >= 70 ? 'text-amber-400' : 'text-rose-400'}`;
+      }
+    }
+
+    // =====================================================================
+    // NOVO: REPOSIÇÃO DIRETA DE ESTOQUE MATRIZ A PARTIR DE DIVERGÊNCIAS
+    // =====================================================================
+    function openRepositionCompraModal(itemName, qtd, shipmentCode) {
+      openNewCompraModal();
+      setTimeout(() => {
+        const itemInput = document.getElementById('compra-item');
+        const qtdInput = document.getElementById('compra-qtd');
+        const obsInput = document.getElementById('compra-obs');
+        const urgSelect = document.getElementById('compra-urgencia');
+        if (itemInput) itemInput.value = itemName;
+        if (qtdInput) qtdInput.value = qtd || 1;
+        if (obsInput) obsInput.value = `Reposição de estoque urgente decorrente de falta na remessa ${shipmentCode || ''}`.trim();
+        if (urgSelect) urgSelect.value = 'Urgente';
+      }, 100);
     }
 
     function updateHeaderBadges() {
@@ -4273,7 +4471,14 @@ async function login(username, password) {
                 </span>
               </div>
             </div>
-            <div>${getUrgenciaBadge(compra.urgencia)}</div>
+            <div class="flex flex-col items-end gap-1">
+              ${getUrgenciaBadge(compra.urgencia)}
+              ${(isUrg || compra.status === 'solicitado') ? `
+                <span class="inline-flex items-center gap-1 text-[9px] font-black text-rose-300 bg-rose-500/20 border border-rose-500/40 px-2 py-0.5 rounded-md">
+                  <i class="fa-solid fa-triangle-exclamation text-rose-400"></i> Saldo Crítico
+                </span>
+              ` : ''}
+            </div>
           </div>
 
           <!-- Mini Pipeline Stepper -->
@@ -5647,12 +5852,18 @@ async function login(username, password) {
         const isDivergent = it.qtdOriginal !== undefined && it.qtd !== it.qtdOriginal;
         let diffBadge = '';
         if (it.qtd === 0) {
-          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-ban"></i> Zerado (Sem Estoque)</span>`;
+          diffBadge = `<div class="flex items-center gap-1.5 flex-wrap">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/15 border border-rose-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-ban"></i> Zerado</span>
+            <button type="button" onclick="openRepositionCompraModal('${escapeHtml(it.nome)}', ${it.qtdOriginal || 1}, '${pedido.id}')" title="Gerar solicitação de compra urgente deste material" class="inline-flex items-center gap-1 text-[9px] font-bold text-orange-300 hover:text-white bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 px-1.5 py-0.5 rounded transition cursor-pointer active:scale-95"><i class="fa-solid fa-cart-plus"></i> Repor</button>
+          </div>`;
         } else if (!isDivergent) {
           diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-check"></i> 100% Atendido</span>`;
         } else if (it.qtd < it.qtdOriginal) {
           const faltam = it.qtdOriginal - it.qtd;
-          diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-lg" title="Estoque insuficiente na matriz"><i class="fa-solid fa-triangle-exclamation"></i> Parcial (-${faltam} un)</span>`;
+          diffBadge = `<div class="flex items-center gap-1.5 flex-wrap">
+            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-300 bg-amber-500/20 border border-amber-500/40 px-2 py-0.5 rounded-lg" title="Estoque insuficiente na matriz"><i class="fa-solid fa-triangle-exclamation"></i> Parcial (-${faltam} un)</span>
+            <button type="button" onclick="openRepositionCompraModal('${escapeHtml(it.nome)}', ${faltam}, '${pedido.id}')" title="Gerar solicitação de compra urgente deste material" class="inline-flex items-center gap-1 text-[9px] font-bold text-orange-300 hover:text-white bg-orange-500/20 hover:bg-orange-500/30 border border-orange-500/40 px-1.5 py-0.5 rounded transition cursor-pointer active:scale-95"><i class="fa-solid fa-cart-plus"></i> Repor</button>
+          </div>`;
         } else {
           const extra = it.qtd - it.qtdOriginal;
           diffBadge = `<span class="inline-flex items-center gap-1 text-[10px] font-bold text-cyan-300 bg-cyan-500/20 border border-cyan-500/40 px-2 py-0.5 rounded-lg"><i class="fa-solid fa-plus"></i> Adicional (+${extra} un)</span>`;
@@ -5755,9 +5966,17 @@ async function login(username, password) {
                 </p>
               </div>
             </div>
-            <span class="font-mono text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-lg border border-amber-500/30">
-              ${diffTotal < 0 ? 'Falta de Estoque / Parcial' : 'Acréscimo Autorizado'}
-            </span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[10px] font-bold uppercase bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-lg border border-amber-500/30">
+                ${diffTotal < 0 ? 'Falta de Estoque / Parcial' : 'Acréscimo Autorizado'}
+              </span>
+              ${diffTotal < 0 ? `
+                <button type="button" onclick="openRepositionCompraModal('${escapeHtml(currentDetailItems.filter(i => i.qtd < i.qtdOriginal).map(i => i.nome).join(', '))}', ${Math.abs(diffTotal)}, '${pedido.id}')"
+                        class="px-2.5 py-1 rounded-lg bg-orange-600 hover:bg-orange-500 text-white font-bold text-[10px] shadow-md shadow-orange-600/30 flex items-center gap-1 transition active:scale-95 cursor-pointer">
+                  <i class="fa-solid fa-cart-plus"></i> Repor no Compras
+                </button>
+              ` : ''}
+            </div>
           </div>
         ` : ''}
 
@@ -6743,7 +6962,7 @@ async function login(username, password) {
     window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
     let modalMouseDownTarget = null;
 
-    ["modal-user-switch", "modal-new-envio", "modal-new-compra", "modal-card-details"].forEach(id => {
+    ["modal-user-switch", "modal-new-envio", "modal-new-compra", "modal-card-details", "modal-report-filter"].forEach(id => {
       const el = document.getElementById(id);
       if (el) {
         el.addEventListener("mousedown", (e) => {
@@ -6761,6 +6980,8 @@ async function login(username, password) {
               closeNewCompraModal();
             } else if (id === 'modal-user-switch') {
               closeUserSwitchModal();
+            } else if (id === 'modal-report-filter') {
+              closeReportFilterModal();
             } else {
               el.style.display = "none";
               el.classList.add("hidden");
@@ -6776,6 +6997,7 @@ async function login(username, password) {
       populateCatalogDatalist();
       checkDesktopAuth();
       initRealtime();
+      initKpiState();
     };
   </script>
 </body>
