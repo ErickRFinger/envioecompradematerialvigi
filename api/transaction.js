@@ -1,7 +1,7 @@
 /* =============================================================================
- * SISTEM ENVIO VIGI — /api/transaction
+ * SISTEMA DE ENVIO VIGI — /api/transaction
  * ----------------------------------------------------------------------------
- * Endpoint serverless de CRUD para as tabelas do SISTEM ENVIO VIGI
+ * Endpoint serverless de CRUD para as tabelas do SISTEMA DE ENVIO VIGI
  * (compras, shipments, shipment_items).
  *
  * Substitui a chamada direta do navegador com a anon key:

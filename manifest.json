@@ -1,7 +1,7 @@
 {
-  "name": "SISTEM ENVIO VIGI",
+  "name": "SISTEMA DE ENVIO VIGI",
   "short_name": "ENVIO VIGI",
-  "description": "SISTEM ENVIO VIGI - Sistema de Solicitação e Envio de Materiais para Filiais",
+  "description": "SISTEMA DE ENVIO VIGI - Sistema de Solicitação e Envio de Materiais para Filiais",
   "start_url": "/solicitar",
   "display": "standalone",
   "background_color": "#001736",

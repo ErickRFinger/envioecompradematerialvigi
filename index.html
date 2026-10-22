@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SISTEM ENVIO VIGI • Expedição & Logística</title>
+  <title>SISTEMA DE ENVIO VIGI • Expedição & Logística</title>
   
   <!-- Favicon & Touch Icons VIGI -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -279,7 +279,7 @@
         </div>
         <div>
           <h1 class="text-xl font-black text-white tracking-tight flex items-center justify-center gap-2">
-            SISTEM ENVIO VIGI <span class="text-orange-400 font-mono text-xs uppercase px-2.5 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 font-bold">EXPEDIÇÃO & COMPRAS</span>
+            SISTEMA DE ENVIO VIGI <span class="text-orange-400 font-mono text-xs uppercase px-2.5 py-0.5 rounded-full bg-orange-500/15 border border-orange-500/30 font-bold">EXPEDIÇÃO & COMPRAS</span>
           </h1>
           <p class="text-xs text-slate-400 font-medium mt-0.5">Almoxarifado Central • Matriz & Filiais PR</p>
         </div>
@@ -498,7 +498,7 @@
         <div>
           <div class="flex items-center gap-2.5">
             <h1 class="font-extrabold text-lg sm:text-xl tracking-tight text-white flex items-center gap-2">
-              SISTEM ENVIO VIGI <span class="text-[10px] font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-blue-500/20 text-orange-400 border border-orange-500/30">EXPEDIÇÃO & COMPRAS</span>
+              SISTEMA DE ENVIO VIGI <span class="text-[10px] font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-gradient-to-r from-orange-500/20 to-blue-500/20 text-orange-400 border border-orange-500/30">EXPEDIÇÃO & COMPRAS</span>
             </h1>
             <span id="supabase-status-badge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> Supabase Nuvem • <span id="sync-time-indicator" class="font-mono text-[10px] text-emerald-300">Ao vivo</span>
@@ -6105,7 +6105,7 @@ async function login(username, password) {
       const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: (pedido.status || 'Aguardando Separação') };
       const statusLabel = statusObj && statusObj.nome ? statusObj.nome.toUpperCase() : 'AGUARDANDO';
 
-      let msg = `📦 *SISTEM ENVIO VIGI - ROMANEIO ${pedido.id}*\n`;
+      let msg = `📦 *SISTEMA DE ENVIO VIGI - ROMANEIO ${pedido.id}*\n`;
       msg += `📍 *Filial Destino:* ${pedido.filial}\n`;
       msg += `👤 *Solicitante:* ${pedido.solicitante}\n`;
       msg += `🚨 *Status:* ${statusLabel}\n`;
@@ -6474,7 +6474,7 @@ async function login(username, password) {
         </td>
         <td class="header-info-cell">
           <h1 class="main-title">ROMANEIO OFICIAL DE CONFERÊNCIA & CARGA</h1>
-          <p class="sub-title">SISTEM ENVIO VIGI • Central de Suprimentos & Distribuição Regional PR</p>
+          <p class="sub-title">SISTEMA DE ENVIO VIGI • Central de Suprimentos & Distribuição Regional PR</p>
         </td>
         <td class="header-badge-cell">
           <div class="code-pill">${code}</div>

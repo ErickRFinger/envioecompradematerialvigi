@@ -1,7 +1,7 @@
 {
-  "name": "sistem-envio-vigi",
+  "name": "sistema-de-envio-vigi",
   "version": "1.0.0",
-  "description": "SISTEM ENVIO VIGI - Sistema de Gestão de Envios e Materiais VIGI",
+  "description": "SISTEMA DE ENVIO VIGI - Sistema de Gestão de Envios e Materiais VIGI",
   "scripts": {
     "deploy": "vercel --prod --yes",
     "test": "node scratch/test_tool_justifications.js && node scratch/test_security.js && node scratch/test_order_details_modal.js && node scratch/test_api_proxy.js && node scratch/test_new_features.js",

@@ -1,4 +1,4 @@
-# 📦 SISTEM ENVIO VIGI - Sistema de Gestão de Envios e Materiais
+# 📦 SISTEMA DE ENVIO VIGI - Sistema de Gestão de Envios e Materiais
 
 > **Resumo Executivo e Guia Técnico de Continuidade do Projeto**  
 > Desenvolvido para centralizar, rastrear e organizar as solicitações de materiais entre a **Matriz** e as filiais de **Francisco Beltrão**, **Palotina** e **Barracão** (Paraná).

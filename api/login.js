@@ -1,7 +1,7 @@
 /* =============================================================================
- * SISTEM ENVIO VIGI — /api/login
+ * SISTEMA DE ENVIO VIGI — /api/login
  * ----------------------------------------------------------------------------
- * Endpoint serverless de autenticacao segura para o SISTEM ENVIO VIGI.
+ * Endpoint serverless de autenticacao segura para o SISTEMA DE ENVIO VIGI.
  * Substitui a autenticacao puramente client-side (PBKDF2 no navegador) por
  * validacao no servidor.
  *

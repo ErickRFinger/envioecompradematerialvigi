@@ -1,5 +1,5 @@
 /**
- * Test Suite: SEGURANÇA DO SISTEM ENVIO VIGI
+ * Test Suite: SEGURANÇA DO SISTEMA DE ENVIO VIGI
  * Cobertura:
  *  1. Nenhuma senha em texto puro no bundle.
  *  2. Nenhum backdoor de autenticação via URL (?user= / ?u=).

@@ -1,5 +1,5 @@
 /* =============================================================================
- * TESTES DO PROXY SEGURO — SISTEM ENVIO VIGI
+ * TESTES DO PROXY SEGURO — SISTEMA DE ENVIO VIGI
  * ----------------------------------------------------------------------------
  * Executa as serverless functions localmente com req/res simulados e
  * sem acessar a rede.
@@ -60,7 +60,7 @@ process.env.SISTEM_USERS = JSON.stringify({
 
 async function run() {
   console.log('=========================================================');
-  console.log(' TESTES DO PROXY SEGURO — SISTEM ENVIO VIGI');
+  console.log(' TESTES DO PROXY SEGURO — SISTEMA DE ENVIO VIGI');
   console.log('=========================================================\n');
 
   console.log('[1] /api/login');

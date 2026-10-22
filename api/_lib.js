@@ -1,5 +1,5 @@
 /* =============================================================================
- * SISTEM ENVIO VIGI — Biblioteca do servidor (Serverless Functions)
+ * SISTEMA DE ENVIO VIGI — Biblioteca do servidor (Serverless Functions)
  * ----------------------------------------------------------------------------
  * POR QUE EXISTE ESTE ARQUIVO:
  *   A versao anterior do app falava DIRETAMENTE com o Supabase a partir do
