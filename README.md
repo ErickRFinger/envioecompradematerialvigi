@@ -262,3 +262,10 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   - Botão de atalho rápido `Repor` inline nos itens com divergência ou saldo zerado no romaneio.
   - Função `openRepositionCompraModal()` que abre a solicitação de compra com nome do item, quantidade faltante e vínculo com a remessa pré-preenchidos.
 - **Validação Automatizada:** Suíte de testes atualizada com 100% de cobertura das novas interfaces e fluxos.
+
+### V1.2.9 (Sincronização Resiliente de Compras & Recuperação de Pedidos na Nuvem)
+- **Recuperação e Sincronização Imediata de Pedidos de Compra:**
+  - Diagnóstico e resolução do gargalo onde requisições de compra registradas não sincronizavam com clientes móveis e desktop devido a variáveis de ambiente estritas do proxy serverless.
+  - Implementação de fallbacks canônicos em `api/_lib.js` para credenciais e chaves do Supabase, garantindo funcionamento ininterrupto mesmo sem injeção prévia de variáveis no painel da Vercel.
+  - **Camada Dual de Resiliência no `db` Shim (`index.html` e `solicitar.html`):** Em caso de falha de conexão, cold start ou erro HTTP do proxy serverless, o cliente automaticamente e transparentemente recorre à API REST direta do Supabase com tratamento de cabeçalho `Prefer: return=representation`.
+  - **Validação Completa de Dados:** Todos os 5 materiais de compra solicitados por Thiago (Caixinha de Passagem Vedada, Caixinha de Passagem Branca, Fita Dupla Face, Arame de Espinar e DVR Hikvision 8CH) plenamente recuperados e exibidos na esteira de compras para aquisição imediata.
