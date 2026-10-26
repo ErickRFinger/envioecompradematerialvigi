@@ -210,7 +210,7 @@ function auditProject() {
   // 1. Verifica status do CLINE_TASK.md
   if (fs.existsSync(CLINE_TASK_FILE)) {
     const taskContent = fs.readFileSync(CLINE_TASK_FILE, 'utf8');
-    const isCompleted = taskContent.includes('[CONCLUÍDO]');
+    const isCompleted = /> \*\*Status:\*\*.*\[CONCLUÍDO\]/i.test(taskContent);
     console.log(`📋 Status CLINE_TASK.md: ${isCompleted ? '✅ CONCLUÍDO' : '⏳ PENDENTE / EM ANDAMENTO'}`);
   } else {
     console.log('ℹ️  Nenhum CLINE_TASK.md ativo no momento.');
@@ -255,7 +255,8 @@ function showStatus() {
   let clineStatus = 'Sem tarefa pendente';
   if (fs.existsSync(CLINE_TASK_FILE)) {
     const task = fs.readFileSync(CLINE_TASK_FILE, 'utf8');
-    clineStatus = task.includes('[CONCLUÍDO]') ? 'Última tarefa Concluída' : 'Tarefa Pendente de Execução';
+    const isCompleted = /> \*\*Status:\*\*.*\[CONCLUÍDO\]/i.test(task);
+    clineStatus = isCompleted ? 'Última tarefa Concluída' : '⏳ Tarefa Pendente de Execução';
   }
   console.log(`👷 Frente 2 (Cline no IDE): Especialista de UI [${clineStatus}]`);
   console.log('🔬 Frente 3 (Gemini / IDE): Assistente Cirúrgico [PRONTO]');

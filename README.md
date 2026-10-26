@@ -324,3 +324,8 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   - **Auditoria de Qualidade (`npm run tri:audit`):** Verifica o relatório do Cline (`CLINE_RESPONSE.md`), inspeciona diffs do Git, executa os 8 testes automatizados (`npm test`) e valida sintaxe.
 - **Protocolo de Diretrizes Atualizado (`.clinerules` e `~/.clinerules`):** Cline agora opera ciente do seu papel como Frente 2 de UI, lendo `CLINE_TASK.md` de forma automática.
 - **Documentação Operacional:** Criado [`TRI_AGENT_GUIDE.md`](TRI_AGENT_GUIDE.md) detalhando o fluxo e os atalhos.
+
+### V1.2.17 (Badge de Conectividade em Tempo Real & Calibração do Orquestrador Tri-Agent)
+- **Badge Operacional no Header (`#badge-system-status`):** Indicador visual discreto em Dark Glassmorphism com ponto pulsante verde (`animate-ping`) no cabeçalho do `index.html`, conferindo feedback instantâneo de conectividade ativa com a nuvem e com o Supabase.
+- **Calibração do Tri-Agent Orchestrator (`scripts/tri-agent.js`):** Ajuste de expressão regular para detecção cirúrgica de status pendente vs concluído em `CLINE_TASK.md`, garantindo leitura fidedigna no painel `tri:status` e na auditoria `tri:audit`.
+- **Validação Integrada das 3 Frentes:** Ciclo de despacho, execução, resposta e auditoria ponta a ponta 100% validado com todas as 8 suítes de testes automatizados verdes.
