@@ -1230,7 +1230,7 @@
                 if (self._eq) p += '&' + self._eq;
                 return p;
               })();
-              const directKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI';
+              const directKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjcyODkxNCwiZXhwIjoyMDg4MzA0OTE0fQ.lG8gV39uSSStfgbSUnBJkGogYdn-zYh3ffUdsjj_xWE';
 
               function fallbackDirect() {
                 const hdrs = {
@@ -1244,8 +1244,13 @@
                   headers: hdrs,
                   body: self._body
                 }).then(r => r.json()).then(data => {
-                  resolve({ data: Array.isArray(data) ? data : (data && typeof data === 'object' ? data : []), error: null });
-                }).catch(err => reject(err));
+                  const res = { data: Array.isArray(data) ? data : (data && typeof data === 'object' ? data : []), error: null };
+                  resolve(res);
+                  return res;
+                }).catch(err => {
+                  reject(err);
+                  throw err;
+                });
               }
 
               fetch(url, {
@@ -1256,7 +1261,8 @@
                 if (!resp.ok) { return fallbackDirect(); }
                 return resp.json();
               }).then(data => {
-                if (!data || self.ok === false || data.ok === false) { return fallbackDirect(); }
+                if (data === undefined) return;
+                if (!data || data.ok === false) { return fallbackDirect(); }
                 else { resolve({ data: data.data || data, error: null }); }
               }).catch(err => { fallbackDirect(); });
             } catch (e) { reject(new Error(e.message || 'Erro')); }
@@ -1666,6 +1672,8 @@
     let myShipments = [];
     let lastCreatedOrder = null;
     let adminFilterBranch = "todas";
+    // Proteção contra race condition de polling ("bounce-back" para aguardando)
+    const pendingMobileStatusUpdates = new Map(); // shipmentId -> { status, timestamp }
 
     function isAdmin() {
       if (!currentUser || !APP_USERS[currentUser]) return false;
@@ -3525,6 +3533,23 @@
         if (error) throw error;
 
         if (data) {
+          // Protege contra race condition de polling de ordens recém-movimentadas no mobile
+          data.forEach(item => {
+            if (pendingMobileStatusUpdates.has(item.id)) {
+              const pending = pendingMobileStatusUpdates.get(item.id);
+              if (Date.now() - pending.timestamp < 60000) {
+                const dbExpected = pending.status === 'chegou' ? 'recebido' : pending.status;
+                if (item.status !== dbExpected) {
+                  item.status = dbExpected;
+                } else {
+                  pendingMobileStatusUpdates.delete(item.id);
+                }
+              } else {
+                pendingMobileStatusUpdates.delete(item.id);
+              }
+            }
+          });
+
           myShipments = data;
           try {
             localStorage.setItem('vigi_cached_shipments', JSON.stringify(data));
@@ -4225,10 +4250,15 @@
         return;
       }
 
+      if (shipmentId) {
+        pendingMobileStatusUpdates.set(shipmentId, { status: newStatus, timestamp: Date.now() });
+      }
+
       try {
+        const dbStatus = newStatus === 'chegou' ? 'recebido' : newStatus;
         const { error } = await db
           .from('shipments')
-          .update({ status: newStatus })
+          .update({ status: dbStatus })
           .eq('id', shipmentId);
 
         if (error) throw error;

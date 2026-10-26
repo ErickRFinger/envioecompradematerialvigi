@@ -1840,7 +1840,7 @@ async function login(username, password) {
                 if (self._eq) p += '&' + self._eq;
                 return p;
               })();
-              const directKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3Mjg5MTQsImV4cCI6MjA4ODMwNDkxNH0.qWKErHq6vCPRWdDfrnngY8fPiJ05VR586U0GzZ3vmrI';
+              const directKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhuZmhyamd6ZWl2enJjcHVta3lrIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjcyODkxNCwiZXhwIjoyMDg4MzA0OTE0fQ.lG8gV39uSSStfgbSUnBJkGogYdn-zYh3ffUdsjj_xWE';
 
               function fallbackDirect() {
                 const hdrs = {
@@ -1854,8 +1854,13 @@ async function login(username, password) {
                   headers: hdrs,
                   body: self._body
                 }).then(r => r.json()).then(data => {
-                  resolve({ data: Array.isArray(data) ? data : (data && typeof data === 'object' ? data : []), error: null });
-                }).catch(err => reject(err));
+                  const res = { data: Array.isArray(data) ? data : (data && typeof data === 'object' ? data : []), error: null };
+                  resolve(res);
+                  return res;
+                }).catch(err => {
+                  reject(err);
+                  throw err;
+                });
               }
 
               fetch(url, {
@@ -1866,7 +1871,8 @@ async function login(username, password) {
                 if (!resp.ok) { return fallbackDirect(); }
                 return resp.json();
               }).then(data => {
-                if (!data || self.ok === false || data.ok === false) { return fallbackDirect(); }
+                if (data === undefined) return;
+                if (!data || data.ok === false) { return fallbackDirect(); }
                 else { resolve({ data: data.data || data, error: null }); }
               }).catch(err => { fallbackDirect(); });
             } catch (e) { reject(new Error(e.message || 'Erro')); }
@@ -2253,6 +2259,8 @@ async function login(username, password) {
     // 4. ESTADO DA SESSÃO & DADOS
     let currentUser = null; // NÃO ENTRA LOGADO DIRETO!
     let pedidosEnvio = JSON.parse(localStorage.getItem('vigi_pedidos_envio_v2')) || [];
+    // Proteção contra race condition de polling ("bounce-back" para aguardando)
+    const pendingStatusUpdates = new Map(); // rawId -> { status, timestamp }
     let storedCompras = null;
     try {
       storedCompras = JSON.parse(localStorage.getItem('vigi_pedidos_compra_v2'));
@@ -3180,6 +3188,22 @@ async function login(username, password) {
 
             let st = row.status || 'aguardando';
             if (st === 'recebido') st = 'chegou';
+
+            // Proteção contra race condition de polling: se a ordem foi movimentada recentemente
+            // no cliente (há menos de 60s), preserva a fase nova até confirmação do Supabase
+            if (pendingStatusUpdates.has(row.id)) {
+              const pending = pendingStatusUpdates.get(row.id);
+              if (Date.now() - pending.timestamp < 60000) {
+                const dbExpected = pending.status === 'chegou' ? 'recebido' : pending.status;
+                if (row.status !== dbExpected) {
+                  st = pending.status;
+                } else {
+                  pendingStatusUpdates.delete(row.id);
+                }
+              } else {
+                pendingStatusUpdates.delete(row.id);
+              }
+            }
 
             const parsedItens = (row.shipment_items || []).map(it => {
               const orig = (originalMap && originalMap[it.product_name] !== undefined)
@@ -4684,6 +4708,7 @@ async function login(username, password) {
 
       const pedido = pedidosEnvio.find(p => p.id === id);
       if (pedido) {
+        const oldStatus = pedido.status;
         pedido.status = newStatus;
         playNotificationChime('action');
         saveState();
@@ -4691,14 +4716,26 @@ async function login(username, password) {
         const statusObj = ENVIOS_COLUNAS.find(c => c.id === newStatus);
         showToast(`Pedido ${id} atualizado para: ${statusObj.nome}`);
 
+        // Protege contra sobrescrita por polling (60s de proteção ativa)
+        if (pedido.rawId) {
+          pendingStatusUpdates.set(pedido.rawId, { status: newStatus, timestamp: Date.now() });
+        }
+
         // Sincroniza status no Supabase
         if (pedido.rawId && db) {
           const dbStatus = newStatus === 'chegou' ? 'recebido' : newStatus;
           try {
-            await db
+            const res = await db
               .from('shipments')
               .update({ status: dbStatus })
               .eq('id', pedido.rawId);
+
+            if (res && res.error) {
+              console.warn('Erro ao atualizar status no Supabase:', res.error);
+              showToast('Aviso: falha temporária ao sincronizar com o banco.', 'warning');
+            } else {
+              pendingStatusUpdates.set(pedido.rawId, { status: newStatus, timestamp: Date.now() });
+            }
           } catch (err) {
             console.warn('Erro ao atualizar status no Supabase:', err);
           }
@@ -6368,6 +6405,9 @@ async function login(username, password) {
           if (advanceToStatus) {
             shipmentUpdates.status = advanceToStatus === 'chegou' ? 'recebido' : advanceToStatus;
             pedido.status = advanceToStatus;
+            if (pedido.rawId) {
+              pendingStatusUpdates.set(pedido.rawId, { status: advanceToStatus, timestamp: Date.now() });
+            }
           }
           const { error: shipErr } = await db.from('shipments').update(shipmentUpdates).eq('id', pedido.rawId);
           if (shipErr) throw shipErr;

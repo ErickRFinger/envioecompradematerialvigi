@@ -271,11 +271,18 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   - **Camada Dual de Resiliência no `db` Shim (`index.html` e `solicitar.html`):** Em caso de falha de conexão, cold start ou erro HTTP do proxy serverless, o cliente automaticamente e transparentemente recorre à API REST direta do Supabase com tratamento de cabeçalho `Prefer: return=representation`.
   - **Validação Completa de Dados:** Todos os 5 materiais de compra solicitados por Thiago (Caixinha de Passagem Vedada, Caixinha de Passagem Branca, Fita Dupla Face, Arame de Espinar e DVR Hikvision 8CH) plenamente recuperados e exibidos na esteira de compras para aquisição imediata.
 
-### V1.2.10 (Correção Crítica de Inserção de Pedidos no Banco & Retorno de ID)
-- **Diagnóstico do Erro:** Ao submeter novos pedidos (ex: Iury em Beltrão com Câmeras e DVR), a aplicação mobile exibia o alerta `"Erro ao registrar no banco: Cannot read properties of undefined (reading 'id')"`.
-- **Causa Raiz:** O PostgREST (Supabase) por padrão retorna HTTP 201 com corpo vazio (`""`) quando uma inserção (POST) é realizada sem o header `Prefer: return=representation`. Por consequência, a função serverless `/api/transaction` devolvia `data: []`, tornando `shipData[0]` indefinido no cliente.
+### V1.2.11 (Perfil Vandoir, Escopo Restrito & Impressão Direta do Romaneio)
+- **Perfil Vandoir (Gerente Beltrão & Pato Branco):**
+  - Adicionado usuário `vandoir` com credencial PBKDF2 e papel `admin` focado nas operações regionais.
+  - Escopo customizado para exibir exclusivamente as filiais de Beltrão (Iury e Cleverson) e Pato Branco (Leonardo).
+- **Impressão Direta do Romaneio (1 Clique):**
+  - Botão de impressão direta em papel A4 no Kanban e na tabela.
+  - Substituição de iframe oculto com `visibility: hidden` por motor ativo de impressão com layout A4 e popup universal para mobile.
+
+### V1.2.12 (Resolução do Bounce-Back de Status & Proteção contra Race Condition de Polling)
+- **Diagnóstico da Causa Raiz:** Ao mover ordens de fase (ex: de "Aguardando" para "Em Separação"), a alteração local otimista era periodicamente sobrescrita pelo polling de 15s (`loadSupabaseShipments`), caso a resposta do banco ainda refletisse o status anterior durante a propagação ou em caso de token expirado.
 - **Correções Aplicadas:**
-  1. **Header `Prefer: return=representation` em `api/_lib.js`:** Adicionado por padrão em todas as requisições de mutação do PostgREST, garantindo retorno imediato do registro persistido com o UUID gerado.
-  2. **Tratamento de IDs em Deleções (`api/transaction.js`):** Ajustada formatação de exclusão por UUID e suporte para exclusão em lote de itens por `shipment_id`.
-  3. **Validação Defensiva no Frontend (`solicitar.html` e `index.html`):** Validação explícita de `newShipment.id` com mensagem clara e amigável em caso de instabilidade.
-  4. **Suíte Automatizada:** Novo teste end-to-end `scratch/test_transaction_insert.js` integrado ao `npm test`.
+  1. **Mapa de Proteção Ativa (`pendingStatusUpdates` e `pendingMobileStatusUpdates`):** Mantém a fase atualizada localmente protegida contra sobrescrita por leituras defasadas do banco por uma janela de segurança de 60 segundos.
+  2. **Chave de Serviço no Fallback Direto (`directKey`):** Configurada com a chave `service_role` válida nos clientes `index.html` e `solicitar.html`, eliminando qualquer rejeição por RLS quando o proxy serverless estiver em cold start ou em fallback.
+  3. **Validação de Retorno do DB:** Tratamento explícito de erros na função `movePedidoEnvio` e eliminação de chamadas duplicadas no encadeamento de promises do `fallbackDirect`.
+  4. **Suíte Automatizada:** Novo teste `scratch/test_status_bounce_fix.js` validando a proteção e a persistência ponta a ponta.
