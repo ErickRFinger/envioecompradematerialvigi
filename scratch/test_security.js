@@ -176,6 +176,7 @@ const U = expr => g(desk.ctx, expr);
 assert.strictEqual(await U(`verifyUserPassword(APP_USERS["erick"], ${JSON.stringify(SENHA_ADMIN)})`), true, 'senha correta de admin deve ser aceita');
 assert.strictEqual(await U(`verifyUserPassword(APP_USERS["deivid"], ${JSON.stringify(SENHA_ADMIN)})`), true, 'senha correta de deivid (admin) deve ser aceita');
 assert.strictEqual(await U(`verifyUserPassword(APP_USERS["gabriely"], ${JSON.stringify(SENHA_ADMIN)})`), true, 'senha correta de gabriely (admin) deve ser aceita');
+assert.strictEqual(await U(`verifyUserPassword(APP_USERS["vandoir"], ${JSON.stringify(SENHA_ADMIN)})`), true, 'senha correta de vandoir (admin) deve ser aceita');
 assert.strictEqual(await U('verifyUserPassword(APP_USERS["erick"], "errada")'), false, 'senha errada deve ser rejeitada');
 assert.strictEqual(await U(`verifyUserPassword(APP_USERS["beltrao1"], ${JSON.stringify(SENHA_FILIAL)})`), true, 'senha correta de filial deve ser aceita');
 assert.strictEqual(await U(`verifyUserPassword(APP_USERS["beltrao1"], ${JSON.stringify(SENHA_ADMIN)})`), false, 'senha de admin NÃO pode abrir perfil de filial');

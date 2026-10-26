@@ -26,6 +26,7 @@ async function testAllBranches() {
     { username: 'smo1', name: 'Terceiros SMO', role: 'solicitante', branch: 'SMO' },
     { username: 'deivid', name: 'Deivid', role: 'admin', branch: 'MATRIZ' },
     { username: 'gabriely', name: 'Gabriely', role: 'admin', branch: 'MATRIZ' },
+    { username: 'vandoir', name: 'Vandoir', role: 'admin', branch: 'FRANCISCO BELTRAO PR' },
     { username: 'thiago', name: 'Thiago', role: 'admin', branch: 'MATRIZ' },
     { username: 'erick', name: 'Erick', role: 'admin', branch: 'MATRIZ' }
   ];

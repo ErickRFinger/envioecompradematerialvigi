@@ -171,6 +171,7 @@ assert.strictEqual(mobileCtx.canUserRequestTools('thiago'), true, 'Admin Thiago 
 assert.strictEqual(mobileCtx.canUserRequestTools('erick'), true, 'Admin Erick DEVE ter permissão de ferramentas');
 assert.strictEqual(mobileCtx.canUserRequestTools('deivid'), true, 'Admin Deivid DEVE ter permissão de ferramentas');
 assert.strictEqual(mobileCtx.canUserRequestTools('gabriely'), true, 'Admin Gabriely DEVE ter permissão de ferramentas');
+assert.strictEqual(mobileCtx.canUserRequestTools('vandoir'), true, 'Admin Vandoir DEVE ter permissão de ferramentas');
 
 // Bloqueados: Cleverson, Leonardo e SMO
 assert.strictEqual(mobileCtx.canUserRequestTools('beltrao2'), false, 'Cleverson (beltrao2) NÃO PODE ter permissão de ferramentas');
@@ -298,6 +299,7 @@ assert.strictEqual(desktopCtx.canUserRequestTools('palotina1'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('thiago'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('deivid'), true);
 assert.strictEqual(desktopCtx.canUserRequestTools('gabriely'), true);
+assert.strictEqual(desktopCtx.canUserRequestTools('vandoir'), true);
 
 assert.strictEqual(desktopCtx.canUserRequestTools('beltrao2'), false);
 assert.strictEqual(desktopCtx.canUserRequestTools('cleverson'), false);

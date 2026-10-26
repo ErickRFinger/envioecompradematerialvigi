@@ -384,6 +384,13 @@
               </span>
               <i class="fa-solid fa-crown text-[10px] text-orange-400"></i>
             </button>
+            <button type="button" onclick="setQuickLogin('vandoir')" id="mobile-quick-vandoir" data-user="vandoir" class="mobile-quick-card p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold text-xs hover:bg-amber-500/20 active:scale-95 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5 truncate">
+                <span class="w-2 h-2 rounded-full bg-amber-400 shrink-0"></span>
+                <span class="truncate">Vandoir</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-amber-400"></i>
+            </button>
           </div>
           <p class="text-[10px] text-orange-400/80 italic text-center pt-1">
             <i class="fa-solid fa-shield-halved text-[9px] mr-1"></i> Acesso admin completo: visualização de todas as filiais e exclusão de ordens
@@ -1278,6 +1285,7 @@
       "thiago":    { salt: "4e49d100904f73e12e2f1740a0174f7b", hash: "b22d49405229b5f0301b63fa8511325329fb911dc275520b7f895d8ae5701d7e" },
       "deivid":    { salt: "84f4da00575802bd31ddc75957e7fc4f", hash: "9dc537a9fa49dce138b8a9d2e1113ba2b0216cf91293efe25bd1427fd5eb1b80" },
       "gabriely":  { salt: "f9914a72325f891227fa2961168e2ab4", hash: "060c0e1ec87faf389268cb3dd54bb468567ce98bc243aa7452c05884458edb3b" },
+      "vandoir":   { salt: "41f10e539f989183b8d9462179affd4a", hash: "e395728ad5590423f10c65304dd8204c7c7fe80f7adc7b3c4b65420c37fa346e" },
       "beltrao1":  { salt: "c69c8c773552ddb436b6b24d72e2a9b0", hash: "cbce7c8233bac9b2d3f805a95ef44109e299435e21403dc9f06ca8e80b7b0afe" },
       "beltrao2":  { salt: "7092129315c1d9a3e9d75c11072e6532", hash: "cb663dae2103ff11fe7fa1c6f9be300ae6a74bf42e683dd90ddf07ebda03a709" },
       "palotina1": { salt: "e8239a667adba7a6c85df2102652a020", hash: "6b627bb57e59874bfd1451540cff741d42463c7eeac8e8a1ba614b1305da0071" },
@@ -1404,6 +1412,16 @@
         dbBranch: "MATRIZ",
         email: "gabriely@vigi.com.br",
         avatar: "GA"
+      },
+      "vandoir": {
+        username: "vandoir",
+        name: "Vandoir",
+        role: "admin",
+        filial: "Beltrão (Iury e Cleverson)",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        email: "vandoir@vigi.com.br",
+        avatar: "VA",
+        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)"]
       },
 
       // --- FILIAIS / OPERADORES REGIONAIS (credencial definida por PBKDF2) ---
@@ -3578,7 +3596,13 @@
 
       // Filtro por filial se for admin ou filial
       let filtered = myShipments || [];
-      if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
+      if (userConfig && userConfig.scopedFiliais && Array.isArray(userConfig.scopedFiliais)) {
+        filtered = filtered.filter(s => {
+          const b = (s.branch_name || "").toUpperCase();
+          const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
+          return b.includes('BELTRAO') || txt.includes('iury') || txt.includes('cleverson');
+        });
+      } else if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
         filtered = filtered.filter(s => {
           const b = (s.branch_name || "").toUpperCase();
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();

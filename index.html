@@ -367,6 +367,16 @@
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-orange-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-orange-400"></i></span>
             </button>
+            <button type="button" onclick="selectQuickUserDesktop('vandoir')" id="quick-card-vandoir" data-user="vandoir" class="quick-user-card p-3 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-800 text-slate-300 font-bold text-xs transition-all duration-200 flex items-center justify-between cursor-pointer group">
+              <div class="flex items-center gap-2 truncate">
+                <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-amber-500/30">VA</div>
+                <div class="text-left truncate">
+                  <span class="block truncate text-white">Vandoir</span>
+                  <span class="text-[10px] text-amber-400 font-semibold block">Gerente Beltrão</span>
+                </div>
+              </div>
+              <span class="quick-status-icon text-slate-500 group-hover:text-amber-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-amber-400"></i></span>
+            </button>
           </div>
         </div>
 
@@ -1251,6 +1261,13 @@
               </span>
               <i class="fa-solid fa-crown text-[10px]"></i>
             </button>
+            <button onclick="switchCurrentUser('vandoir')" id="switch-btn-vandoir" class="p-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 text-amber-300 font-bold hover:bg-amber-500/20 transition flex items-center justify-between cursor-pointer">
+              <span class="flex items-center gap-1.5">
+                <span>Vandoir</span>
+                <span class="active-user-badge hidden text-[10px] text-emerald-400 font-black">✓</span>
+              </span>
+              <i class="fa-solid fa-crown text-[10px] text-amber-400"></i>
+            </button>
           </div>
         </div>
 
@@ -1878,6 +1895,7 @@ async function login(username, password) {
       "thiago":    { salt: "4e49d100904f73e12e2f1740a0174f7b", hash: "b22d49405229b5f0301b63fa8511325329fb911dc275520b7f895d8ae5701d7e" },
       "deivid":    { salt: "84f4da00575802bd31ddc75957e7fc4f", hash: "9dc537a9fa49dce138b8a9d2e1113ba2b0216cf91293efe25bd1427fd5eb1b80" },
       "gabriely":  { salt: "f9914a72325f891227fa2961168e2ab4", hash: "060c0e1ec87faf389268cb3dd54bb468567ce98bc243aa7452c05884458edb3b" },
+      "vandoir":   { salt: "41f10e539f989183b8d9462179affd4a", hash: "e395728ad5590423f10c65304dd8204c7c7fe80f7adc7b3c4b65420c37fa346e" },
       "beltrao1":  { salt: "c69c8c773552ddb436b6b24d72e2a9b0", hash: "cbce7c8233bac9b2d3f805a95ef44109e299435e21403dc9f06ca8e80b7b0afe" },
       "beltrao2":  { salt: "7092129315c1d9a3e9d75c11072e6532", hash: "cb663dae2103ff11fe7fa1c6f9be300ae6a74bf42e683dd90ddf07ebda03a709" },
       "palotina1": { salt: "e8239a667adba7a6c85df2102652a020", hash: "6b627bb57e59874bfd1451540cff741d42463c7eeac8e8a1ba614b1305da0071" },
@@ -1998,6 +2016,16 @@ async function login(username, password) {
         filial: "Todas as Filiais",
         dbBranch: "MATRIZ",
         avatar: "GA"
+      },
+      "vandoir": {
+        username: "vandoir",
+        name: "Vandoir",
+        role: "admin",
+        filial: "Beltrão (Iury e Cleverson)",
+        dbBranch: "FRANCISCO BELTRAO PR",
+        avatar: "VA",
+        email: "vandoir@vigi.com.br",
+        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)"]
       },
 
       // --- FILIAIS / OPERADORES REGIONAIS (credencial definida por PBKDF2) ---
@@ -2749,13 +2777,32 @@ async function login(username, password) {
       const filialLockedMsg = document.getElementById('modal-filial-locked-msg');
 
       if (u.role === 'admin') {
-        roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-orange-400"></i> Gestão Geral`;
-        roleIndicator.innerText = `🛡️ Administrador (${u.name}) • Acesso Total & Exclusão`;
-        roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30';
-        pipelineDesc.innerText = 'Arraste os cards entre as colunas para atualizar a fase de separação, romaneio e transporte.';
+        const isScopedManager = u.scopedFiliais && Array.isArray(u.scopedFiliais);
+        if (isScopedManager) {
+          roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-amber-400"></i> Gerente Beltrão`;
+          roleIndicator.innerText = `🛡️ Admin Gerencial (${u.name}) • Beltrão (Iury e Cleverson)`;
+          roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30';
+          pipelineDesc.innerText = 'Acompanhamento exclusivo das solicitações de Francisco Beltrão (Cleverson e Iury).';
+        } else {
+          roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-orange-400"></i> Gestão Geral`;
+          roleIndicator.innerText = `🛡️ Administrador (${u.name}) • Acesso Total & Exclusão`;
+          roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-orange-500/15 text-orange-300 border border-orange-500/30';
+          pipelineDesc.innerText = 'Arraste os cards entre as colunas para atualizar a fase de separação, romaneio e transporte.';
+        }
         branchFilters.style.display = 'flex';
         if (deleteModalBtn) deleteModalBtn.style.display = 'inline-flex';
         if (filialLockedMsg) filialLockedMsg.style.display = 'none';
+
+        // Customização dos botões de filtro de filial para Gerente com escopo (Vandoir)
+        ['palotina', 'barracao', 'pato', 'smo'].forEach(f => {
+          const btn = document.getElementById(`filter-btn-${f}`);
+          if (btn) btn.style.display = isScopedManager ? 'none' : '';
+        });
+        const btnTodas = document.getElementById('filter-btn-todas');
+        if (btnTodas && typeof btnTodas.querySelector === 'function') {
+          const label = btnTodas.querySelector('span:first-child');
+          if (label) label.innerText = isScopedManager ? 'Todas (Beltrão)' : 'Todas';
+        }
       } else {
         roleBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] text-amber-400"></i> ${u.filial}`;
         roleIndicator.innerText = `📍 Filial (${u.filial}) • Acesso Restrito`;
@@ -3052,7 +3099,14 @@ async function login(username, password) {
         if (data) {
           // Detecta novos pedidos aguardando para tocar o alerta sonoro e notificar o almoxarifado
           if (!isInitialShipmentLoad) {
-            const newOrders = data.filter(s => (s.status === 'aguardando' || !s.status) && !knownShipmentIds.has(s.id));
+            let newOrders = data.filter(s => (s.status === 'aguardando' || !s.status) && !knownShipmentIds.has(s.id));
+            if (userConfig && userConfig.scopedFiliais && Array.isArray(userConfig.scopedFiliais)) {
+              newOrders = newOrders.filter(s => {
+                const b = (s.branch_name || '').toUpperCase();
+                const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
+                return b.includes('BELTRAO') || txt.includes('iury') || txt.includes('cleverson');
+              });
+            }
             if (newOrders.length > 0) {
               playNotificationChime('new_order');
               const firstNew = newOrders[0];
@@ -3177,6 +3231,11 @@ async function login(username, password) {
               itens: parsedItens
             };
           });
+
+          // Se o usuário tem escopo restrito de filiais (ex: Vandoir - Gerente Beltrão: apenas Iury e Cleverson)
+          if (userConfig && userConfig.scopedFiliais && Array.isArray(userConfig.scopedFiliais)) {
+            pedidosEnvio = pedidosEnvio.filter(p => userConfig.scopedFiliais.includes(p.filial));
+          }
 
           saveState();
           renderAll();
@@ -5003,6 +5062,8 @@ async function login(username, password) {
         document.getElementById('req-solicitante').value = u.name;
         if (!isAdmin()) {
           selectModalFilial(u.filial);
+        } else if (u.scopedFiliais) {
+          selectModalFilial('Beltrão (Iury)');
         }
       }
       

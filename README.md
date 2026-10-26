@@ -114,6 +114,7 @@ O sistema passou por uma auditoria completa de segurança:
 - **`klaus`** (`klaus@vigi.com.br`) • Cleverson Klaus • Role: `admin` • Acesso a ferramentas: **Sim**
 - **`deivid`** (`deivid@vigi.com.br`) • Deivid • Role: `admin` • Acesso a ferramentas: **Sim**
 - **`gabriely`** (`gabriely@vigi.com.br`) • Gabriely • Role: `admin` • Acesso a ferramentas: **Sim**
+- **`vandoir`** (`vandoir@vigi.com.br`) • Vandoir • Role: `admin` (Gerente Beltrão na Matriz) • Escopo: Exclusivo Francisco Beltrão (Cleverson e Iury) • Acesso a ferramentas: **Sim**
 
 #### 📍 Operadores de Filiais (Apenas Solicitar & Rastrear Própria Filial • Sem Exclusão):
 - **`beltrao1` / `iury`** • Iury (Beltrão) • Role: `filial` • **Acesso a Ferramentas: SIM (com justificativa)**
