@@ -293,3 +293,15 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   1. **Ajuste Amplo de CSP no `vercel.json`:** Inclusão de `https://cdnjs.cloudflare.com` e `https://cdn.jsdelivr.net` nas diretivas `style-src`, `font-src`, `script-src` e `connect-src`, além de `data:` e `blob:` para mídias e impressão de romaneios em iframe.
   2. **Resiliência Estrutural de Botões (`index.html`):** Adicionadas dimensões mínimas explícitas (`min-w-[32px]`, `shrink-0`, `justify-center`) e rótulos de acessibilidade nos botões de ação rápida (imprimir romaneio, excluir, etc.), impedindo qualquer colapso geométrico mesmo em conexões lentas.
   3. **Validação 100% da Suíte de Testes:** Todas as 8 suítes de testes automatizados (`npm test`) executadas e aprovadas com sucesso.
+
+### V1.2.14 (Tema Claro Nativo & Carga Progressiva/Infinita ao Rolar a Tela)
+- **Carga de Pedidos Antigos por Scroll / Giro da Rodinha (Infinite Scroll):**
+  - **Kanban Desktop:** Cada coluna passa a renderizar inicialmente um lote leve (10 cards mais recentes). Ao girar a rodinha do mouse ou scrollar a tela até o final, observadores `IntersectionObserver` e listeners passivos de `wheel`/`scroll` carregam os pedidos mais antigos progressivamente.
+  - **Tabela Desktop:** Paginação em cascata iniciada em 25 registros, expandindo dinamicamente com indicador visual inline e flutuante (`#infinite-scroll-pill`).
+  - **Busca Remota sob Demanda:** Ao atingir o final da memória local, o sistema consulta automaticamente o Supabase para carregar remessas mais antigas (`.lt('created_at', oldestDate).limit(40)`).
+  - **Mobile PWA (`solicitar.html`):** Histórico de solicitações concluídas e ordens ativas com carga contínua ao rolar para baixo.
+- **Tema Claro Completo (Light Theme Nativo):**
+  - Botão de alternância instantânea entre Tema Claro e Escuro (`#btn-theme-toggle` com ícones sol/lua) nos cabeçalhos desktop e mobile.
+  - Script no `<head>` com leitura imediata do `localStorage.getItem('vigi_theme')`, prevenindo FOUC (flash de tema).
+  - Folha de estilo completa para o Tema Claro com paleta Slate/Light moderna, superfícies de cartão em branco puro, sombras suaves e alto contraste para leitura à luz do dia.
+- **Auditoria Automatizada:** Testes de persistência, segurança, integridade de tags HTML e sintaxe JS executados com 100% de sucesso.

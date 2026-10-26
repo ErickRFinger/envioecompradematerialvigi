@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>SISTEMA DE ENVIO VIGI • Solicitação de Materiais</title>
+
+  <!-- Early Theme Detector (Evita FOUC / Piscar de Tema) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('vigi_theme');
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        }
+      } catch(e) {}
+    })();
+  </script>
   
   <!-- Favicon & Touch Icons VIGI -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -189,6 +205,141 @@
       clip: rect(0, 0, 0, 0);
       white-space: nowrap;
       border-width: 0;
+    }
+
+    /* ========================================================
+       TEMA CLARO (LIGHT THEME) MOBILE COMPLETO
+       ======================================================== */
+    html.light body,
+    html:not(.dark) body {
+      background-color: #f1f5f9 !important;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.95) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(253, 95, 0, 0.1) 0px, transparent 55%),
+        radial-gradient(at 50% 50%, rgba(241, 245, 249, 0.9) 0px, transparent 100%) !important;
+      color: #0f172a !important;
+    }
+
+    html.light .glass-nav,
+    html:not(.dark) .glass-nav {
+      background: rgba(255, 255, 255, 0.97) !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    html.light .glass-bottom-bar,
+    html:not(.dark) .glass-bottom-bar {
+      background: rgba(255, 255, 255, 0.97) !important;
+      border-top: 1px solid #e2e8f0 !important;
+      box-shadow: 0 -4px 16px rgba(15, 23, 42, 0.08) !important;
+    }
+
+    html.light .glass-card,
+    html:not(.dark) .glass-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 14px -2px rgba(15, 23, 42, 0.06) !important;
+    }
+
+    html.light .bg-slate-950,
+    html:not(.dark) .bg-slate-950,
+    html.light .bg-slate-950\/90,
+    html:not(.dark) .bg-slate-950\/90,
+    html.light .bg-slate-950\/80,
+    html:not(.dark) .bg-slate-950\/80,
+    html.light .bg-slate-900,
+    html:not(.dark) .bg-slate-900,
+    html.light .bg-slate-900\/80,
+    html:not(.dark) .bg-slate-900\/80,
+    html.light .bg-slate-900\/60,
+    html:not(.dark) .bg-slate-900\/60,
+    html.light .bg-slate-900\/40,
+    html:not(.dark) .bg-slate-900\/40,
+    html.light .bg-slate-800,
+    html:not(.dark) .bg-slate-800 {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    html.light input,
+    html:not(.dark) input,
+    html.light select,
+    html:not(.dark) select,
+    html.light textarea,
+    html:not(.dark) textarea {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light input:focus,
+    html:not(.dark) input:focus,
+    html.light select:focus,
+    html:not(.dark) select:focus,
+    html.light textarea:focus,
+    html:not(.dark) textarea:focus {
+      background-color: #ffffff !important;
+      border-color: #fd5f00 !important;
+    }
+
+    html.light .text-white,
+    html:not(.dark) .text-white {
+      color: #0f172a !important;
+    }
+    html.light .text-slate-100,
+    html:not(.dark) .text-slate-100,
+    html.light .text-slate-200,
+    html:not(.dark) .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.light .text-slate-300,
+    html:not(.dark) .text-slate-300 {
+      color: #334155 !important;
+    }
+    html.light .text-slate-400,
+    html:not(.dark) .text-slate-400 {
+      color: #64748b !important;
+    }
+    html.light .text-slate-500,
+    html:not(.dark) .text-slate-500 {
+      color: #64748b !important;
+    }
+
+    html.light button[class*="from-orange"],
+    html:not(.dark) button[class*="from-orange"],
+    html.light button[class*="from-blue"],
+    html:not(.dark) button[class*="from-blue"],
+    html.light button[class*="from-emerald"],
+    html:not(.dark) button[class*="from-emerald"],
+    html.light [class*="bg-gradient-to-r"] .text-white,
+    html:not(.dark) [class*="bg-gradient-to-r"] .text-white,
+    html.light button[class*="from-orange"] *,
+    html:not(.dark) button[class*="from-orange"] *,
+    html.light button[class*="from-emerald"] *,
+    html:not(.dark) button[class*="from-emerald"] *,
+    html.light .bg-orange-600,
+    html:not(.dark) .bg-orange-600,
+    html.light .bg-emerald-600,
+    html:not(.dark) .bg-emerald-600,
+    html.light [class*="bg-orange-600"] *,
+    html:not(.dark) [class*="bg-orange-600"] *,
+    html.light [class*="bg-emerald-600"] *,
+    html:not(.dark) [class*="bg-emerald-600"] * {
+      color: #ffffff !important;
+    }
+
+    html.light .border-white\/10,
+    html:not(.dark) .border-white\/10,
+    html.light .border-white\/5,
+    html:not(.dark) .border-white\/5,
+    html.light .border-white\/20,
+    html:not(.dark) .border-white\/20 {
+      border-color: #e2e8f0 !important;
+    }
+
+    html.light #view-login,
+    html:not(.dark) #view-login {
+      background-color: #f1f5f9 !important;
     }
 
     @media print {
@@ -469,6 +620,11 @@
         <span id="header-user-avatar" class="w-4 h-4 rounded-full bg-orange-500/20 text-orange-400 text-[9px] flex items-center justify-center font-black">U</span>
         <span id="header-user-name" class="truncate max-w-[90px]">usuario</span>
       </div>
+      <!-- BOTÃO ALTERNAR TEMA CLARO / ESCURO -->
+      <button onclick="toggleTheme()" id="btn-theme-toggle" title="Alternar entre Tema Claro e Escuro" 
+              class="w-8 h-8 rounded-xl bg-slate-950 border border-white/10 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shrink-0" aria-label="Alternar Tema Claro/Escuro">
+        <i class="fa-solid fa-sun text-xs" id="theme-icon"></i>
+      </button>
       <a href="index.html" title="Abrir Painel Matriz / Desktop" class="w-8 h-8 rounded-xl bg-slate-950 border border-white/10 text-orange-400 hover:text-white flex items-center justify-center text-xs transition active:scale-95">
         <i class="fa-solid fa-desktop"></i>
       </a>
@@ -3599,6 +3755,35 @@
     // Controle de cards expandidos na lista mobile
     const expandedOrderIds = new Set();
 
+    let mobileHistoryLimit = 10;
+    let mobileActiveLimit = 15;
+
+    function loadMoreMobileHistory() {
+      mobileHistoryLimit += 10;
+      renderTrackingOrders();
+    }
+
+    function loadMoreMobileActive() {
+      mobileActiveLimit += 10;
+      renderTrackingOrders();
+    }
+
+    // Scroll listener no mobile para carregar mais antigos conforme for girando/scrollando
+    let mobileScrollThrottle = null;
+    window.addEventListener('scroll', () => {
+      if (mobileScrollThrottle) return;
+      mobileScrollThrottle = setTimeout(() => {
+        mobileScrollThrottle = null;
+        if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 350) {
+          const finishedTotal = (myShipments || []).filter(s => s.status === 'recebido' || s.status === 'chegou').length;
+          if (mobileHistoryLimit < finishedTotal) {
+            mobileHistoryLimit += 10;
+            renderTrackingOrders();
+          }
+        }
+      }, 150);
+    }, { passive: true });
+
     function toggleOrderItemsExpand(orderId) {
       if (expandedOrderIds.has(orderId)) {
         expandedOrderIds.delete(orderId);
@@ -3700,9 +3885,18 @@
           </div>
         `;
       } else {
-        activeOrders.forEach(order => {
+        const visibleActive = activeOrders.slice(0, mobileActiveLimit);
+        visibleActive.forEach(order => {
           trackingList.appendChild(createOrderTrackingCard(order, false));
         });
+        if (activeOrders.length > mobileActiveLimit) {
+          const rem = activeOrders.length - mobileActiveLimit;
+          const loader = document.createElement('div');
+          loader.className = 'p-3 text-center rounded-2xl border border-dashed border-white/10 bg-slate-900/40 text-xs text-slate-400 cursor-pointer hover:text-orange-400 transition';
+          loader.onclick = loadMoreMobileActive;
+          loader.innerHTML = `<i class="fa-solid fa-arrow-down mr-1 text-orange-400"></i><span>Carregar mais pedidos ativos (+${rem})</span>`;
+          trackingList.appendChild(loader);
+        }
       }
 
       if (finishedOrders.length === 0) {
@@ -3713,9 +3907,18 @@
           </div>
         `;
       } else {
-        finishedOrders.forEach(order => {
+        const visibleFinished = finishedOrders.slice(0, mobileHistoryLimit);
+        visibleFinished.forEach(order => {
           historyList.appendChild(createOrderTrackingCard(order, true));
         });
+        if (finishedOrders.length > mobileHistoryLimit) {
+          const rem = finishedOrders.length - mobileHistoryLimit;
+          const loader = document.createElement('div');
+          loader.className = 'p-3 text-center rounded-2xl border border-dashed border-white/10 bg-slate-900/40 text-xs text-slate-400 cursor-pointer hover:text-orange-400 transition';
+          loader.onclick = loadMoreMobileHistory;
+          loader.innerHTML = `<i class="fa-solid fa-arrow-down mr-1 text-orange-400"></i><span>Carregar pedidos mais antigos (+${rem})</span>`;
+          historyList.appendChild(loader);
+        }
       }
     }
 
@@ -5686,7 +5889,53 @@
       }
     });
 
+    // ========================================================
+    // TEMA CLARO / ESCURO MOBILE (LIGHT / DARK THEME)
+    // ========================================================
+    function initTheme() {
+      const saved = localStorage.getItem('vigi_theme') || 'dark';
+      applyTheme(saved);
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.contains('light');
+      const newTheme = isLight ? 'dark' : 'light';
+      applyTheme(newTheme);
+      try {
+        localStorage.setItem('vigi_theme', newTheme);
+      } catch (e) {}
+      showToast(newTheme === 'light' ? '☀️ Tema Claro ativado' : '🌙 Tema Escuro ativado', 'info');
+    }
+
+    function applyTheme(theme) {
+      const isLight = theme === 'light';
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      const themeBtn = document.getElementById('btn-theme-toggle');
+
+      if (isLight) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-moon text-indigo-500 text-xs';
+        }
+        if (themeBtn) {
+          themeBtn.title = 'Alternar para Tema Escuro';
+        }
+      } else {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-sun text-amber-400 text-xs';
+        }
+        if (themeBtn) {
+          themeBtn.title = 'Alternar para Tema Claro';
+        }
+      }
+    }
+
     window.onload = function() {
+      initTheme();
       checkAuth();
       initMobileCatalog();
       loadMobileCartFromStorage();

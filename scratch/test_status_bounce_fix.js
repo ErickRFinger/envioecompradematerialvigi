@@ -81,14 +81,16 @@ console.log('✓ Limpeza do mapa realizada com sucesso após banco confirmar');
 console.log('\n--- 3. TESTANDO CONEXÃO REAL AO SUPABASE (UPDATE DE TESTE) ---');
 
 (async () => {
-  const realShipmentId = '42a57c5d-4ac1-4e73-855b-acd0c04eeb38';
-  
-  // Confere status atual
-  const checkRes = await fetch(`https://hnfhrjgzeivzrcpumkyk.supabase.co/rest/v1/shipments?id=eq.${realShipmentId}&select=id,status`, {
+  // Busca um pedido real no banco para teste de atualização e reversão
+  const checkRes = await fetch(`https://hnfhrjgzeivzrcpumkyk.supabase.co/rest/v1/shipments?select=id,status&limit=1`, {
     headers: { apikey: serviceRoleKey, Authorization: 'Bearer ' + serviceRoleKey }
   });
   const checkData = await checkRes.json();
-  console.log(`Status atual do pedido do Erick (${realShipmentId}):`, checkData[0] ? checkData[0].status : 'não encontrado');
+  assert(checkData && checkData.length > 0, 'Deve haver ao menos 1 remessa no banco');
+  const targetShipment = checkData[0];
+  const realShipmentId = targetShipment.id;
+  const originalStatus = targetShipment.status;
+  console.log(`Status atual do pedido (${realShipmentId}):`, originalStatus);
 
   // Atualiza para 'separando'
   const updateRes = await fetch(`https://hnfhrjgzeivzrcpumkyk.supabase.co/rest/v1/shipments?id=eq.${realShipmentId}`, {
@@ -105,6 +107,17 @@ console.log('\n--- 3. TESTANDO CONEXÃO REAL AO SUPABASE (UPDATE DE TESTE) ---')
   const updated = await updateRes.json();
   assert.strictEqual(updated[0].status, 'separando', 'Status gravado com sucesso como separando');
   console.log(`✓ Pedido oficial #${realShipmentId.slice(0, 6).toUpperCase()} confirmado como 'separando' no banco de dados!`);
+
+  // Restaura status original para preservar estado
+  await fetch(`https://hnfhrjgzeivzrcpumkyk.supabase.co/rest/v1/shipments?id=eq.${realShipmentId}`, {
+    method: 'PATCH',
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: 'Bearer ' + serviceRoleKey,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ status: originalStatus })
+  });
 
   console.log('\n=========================================================');
   console.log(' TODOS OS TESTES DE PERSISTÊNCIA PASSARAM COM SUCESSO! 🚀');

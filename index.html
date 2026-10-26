@@ -4,6 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SISTEMA DE ENVIO VIGI • Expedição & Logística</title>
+
+  <!-- Early Theme Detector (Evita FOUC / Piscar de Tema) -->
+  <script>
+    (function() {
+      try {
+        var savedTheme = localStorage.getItem('vigi_theme');
+        if (savedTheme === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+        } else {
+          document.documentElement.classList.add('dark');
+          document.documentElement.classList.remove('light');
+        }
+      } catch(e) {}
+    })();
+  </script>
   
   <!-- Favicon & Touch Icons VIGI -->
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -229,6 +245,214 @@
     }
     ::-webkit-scrollbar-thumb:hover { background: #fd5f00; }
 
+    /* ========================================================
+       TEMA CLARO (LIGHT THEME) COMPLETO & ELEGANTE
+       ======================================================== */
+    html.light body,
+    html:not(.dark) body {
+      background-color: #f1f5f9 !important;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.95) 0px, transparent 60%),
+        radial-gradient(at 100% 0%, rgba(253, 95, 0, 0.1) 0px, transparent 50%),
+        radial-gradient(at 50% 30%, rgba(241, 245, 249, 0.9) 0px, transparent 80%),
+        radial-gradient(at 85% 90%, rgba(226, 232, 240, 0.8) 0px, transparent 55%),
+        radial-gradient(at 15% 85%, rgba(253, 95, 0, 0.08) 0px, transparent 45%) !important;
+      color: #0f172a !important;
+    }
+
+    html.light .glass-header-nav,
+    html:not(.dark) .glass-header-nav {
+      background: rgba(255, 255, 255, 0.97) !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08) !important;
+    }
+
+    html.light .glass-surface,
+    html:not(.dark) .glass-surface {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
+    }
+
+    html.light .glass-surface-card,
+    html:not(.dark) .glass-surface-card {
+      background: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 16px -3px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+    }
+    html.light .glass-surface-card:hover,
+    html:not(.dark) .glass-surface-card:hover {
+      border-color: #fd5f00 !important;
+      box-shadow: 0 12px 28px -5px rgba(253, 95, 0, 0.2), inset 0 1px 0 #ffffff !important;
+    }
+
+    html.light .bg-slate-950,
+    html:not(.dark) .bg-slate-950,
+    html.light .bg-slate-950\/90,
+    html:not(.dark) .bg-slate-950\/90,
+    html.light .bg-slate-950\/80,
+    html:not(.dark) .bg-slate-950\/80,
+    html.light .bg-slate-950\/70,
+    html:not(.dark) .bg-slate-950\/70,
+    html.light .bg-slate-950\/60,
+    html:not(.dark) .bg-slate-950\/60,
+    html.light .bg-slate-900,
+    html:not(.dark) .bg-slate-900,
+    html.light .bg-slate-900\/80,
+    html:not(.dark) .bg-slate-900\/80,
+    html.light .bg-slate-900\/60,
+    html:not(.dark) .bg-slate-900\/60,
+    html.light .bg-slate-900\/50,
+    html:not(.dark) .bg-slate-900\/50,
+    html.light .bg-slate-900\/40,
+    html:not(.dark) .bg-slate-900\/40,
+    html.light .bg-slate-800,
+    html:not(.dark) .bg-slate-800 {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
+    html.light #view-login,
+    html:not(.dark) #view-login {
+      background-color: #f1f5f9 !important;
+    }
+
+    html.light .quick-user-card,
+    html:not(.dark) .quick-user-card {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #0f172a !important;
+    }
+    html.light .quick-user-card:hover,
+    html:not(.dark) .quick-user-card:hover {
+      background-color: #fff7ed !important;
+      border-color: #fd5f00 !important;
+    }
+
+    html.light button.bg-slate-950,
+    html:not(.dark) button.bg-slate-950,
+    html.light button.bg-slate-900,
+    html:not(.dark) button.bg-slate-900,
+    html.light a.bg-slate-900,
+    html:not(.dark) a.bg-slate-900,
+    html.light a.bg-slate-950,
+    html:not(.dark) a.bg-slate-950 {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #1e293b !important;
+    }
+    html.light button.bg-slate-950:hover,
+    html:not(.dark) button.bg-slate-950:hover,
+    html.light button.bg-slate-900:hover,
+    html:not(.dark) button.bg-slate-900:hover,
+    html.light a.bg-slate-900:hover,
+    html:not(.dark) a.bg-slate-900:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+
+    html.light input,
+    html:not(.dark) input,
+    html.light select,
+    html:not(.dark) select,
+    html.light textarea,
+    html:not(.dark) textarea {
+      background-color: #ffffff !important;
+      color: #0f172a !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light input:focus,
+    html:not(.dark) input:focus,
+    html.light select:focus,
+    html:not(.dark) select:focus,
+    html.light textarea:focus,
+    html:not(.dark) textarea:focus {
+      background-color: #ffffff !important;
+      border-color: #fd5f00 !important;
+    }
+    html.light ::placeholder,
+    html:not(.dark) ::placeholder {
+      color: #94a3b8 !important;
+    }
+
+    html.light .text-white,
+    html:not(.dark) .text-white {
+      color: #0f172a !important;
+    }
+    html.light .text-slate-100,
+    html:not(.dark) .text-slate-100,
+    html.light .text-slate-200,
+    html:not(.dark) .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.light .text-slate-300,
+    html:not(.dark) .text-slate-300 {
+      color: #334155 !important;
+    }
+    html.light .text-slate-400,
+    html:not(.dark) .text-slate-400 {
+      color: #64748b !important;
+    }
+    html.light .text-slate-500,
+    html:not(.dark) .text-slate-500 {
+      color: #64748b !important;
+    }
+
+    /* Manter texto branco dentro de botões com gradientes ou cores sólidas */
+    html.light button[class*="from-orange"],
+    html:not(.dark) button[class*="from-orange"],
+    html.light button[class*="from-blue"],
+    html:not(.dark) button[class*="from-blue"],
+    html.light button[class*="from-emerald"],
+    html:not(.dark) button[class*="from-emerald"],
+    html.light [class*="bg-gradient-to-r"] .text-white,
+    html:not(.dark) [class*="bg-gradient-to-r"] .text-white,
+    html.light button[class*="from-orange"] *,
+    html:not(.dark) button[class*="from-orange"] *,
+    html.light button[class*="from-blue"] *,
+    html:not(.dark) button[class*="from-blue"] *,
+    html.light button[class*="from-emerald"] *,
+    html:not(.dark) button[class*="from-emerald"] *,
+    html.light .bg-orange-600,
+    html:not(.dark) .bg-orange-600,
+    html.light .bg-emerald-600,
+    html:not(.dark) .bg-emerald-600,
+    html.light .bg-blue-600,
+    html:not(.dark) .bg-blue-600,
+    html.light [class*="bg-orange-600"] *,
+    html:not(.dark) [class*="bg-orange-600"] *,
+    html.light [class*="bg-emerald-600"] *,
+    html:not(.dark) [class*="bg-emerald-600"] * {
+      color: #ffffff !important;
+    }
+
+    html.light .border-white\/10,
+    html:not(.dark) .border-white\/10,
+    html.light .border-white\/5,
+    html:not(.dark) .border-white\/5,
+    html.light .border-white\/20,
+    html:not(.dark) .border-white\/20,
+    html.light .border-white\/\[0\.06\],
+    html:not(.dark) .border-white\/\[0\.06\] {
+      border-color: #e2e8f0 !important;
+    }
+
+    html.light ::-webkit-scrollbar-track,
+    html:not(.dark) ::-webkit-scrollbar-track {
+      background: #f1f5f9 !important;
+    }
+    html.light ::-webkit-scrollbar-thumb,
+    html:not(.dark) ::-webkit-scrollbar-thumb {
+      background: #cbd5e1 !important;
+      border-color: #f1f5f9 !important;
+    }
+    html.light ::-webkit-scrollbar-thumb:hover,
+    html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+      background: #fd5f00 !important;
+    }
+
     @media print {
       html, body {
         background: #ffffff !important;
@@ -265,6 +489,12 @@
   <div id="toast-container" role="status" aria-live="polite" aria-atomic="true" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm"></div>
   <!-- Anunciador para leitores de tela (atualizações dinâmicas do painel) -->
   <div id="sr-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Indicador Flutuante de Carga de Pedidos Antigos (Scroll / Giro da Rodinha) -->
+  <div id="infinite-scroll-pill" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 px-4 py-2.5 rounded-2xl bg-slate-950/95 border border-orange-500/40 text-orange-400 text-xs font-bold shadow-2xl flex items-center gap-2 backdrop-blur pointer-events-none transition-all">
+    <i class="fa-solid fa-circle-notch fa-spin text-orange-400"></i>
+    <span>Carregando pedidos mais antigos...</span>
+  </div>
 
   <!-- ======================================================== -->
   <!-- 0. TELA DE LOGIN OBRIGATÓRIA (NÃO ENTRA LOGADO DIRETO) -->
@@ -564,6 +794,12 @@
           <i class="fa-solid fa-mobile-screen-button text-orange-400"></i>
           <span class="hidden xl:inline">Portal Mobile</span>
         </a>
+
+        <!-- Botão Alternar Tema Claro / Escuro -->
+        <button onclick="toggleTheme()" id="btn-theme-toggle" title="Alternar entre Tema Claro e Escuro" 
+                class="w-10 h-10 rounded-xl bg-slate-950 hover:bg-slate-900 border border-white/10 hover:border-amber-400/40 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shrink-0" aria-label="Alternar Tema Claro/Escuro">
+          <i class="fa-solid fa-sun text-sm" id="theme-icon"></i>
+        </button>
 
         <!-- Botão Nova Solicitação -->
         <button onclick="openNewEnvioModal()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none transition transform active:scale-95 shadow-lg shadow-orange-600/20 cursor-pointer">
@@ -3086,7 +3322,199 @@ async function login(username, password) {
       }
     }
 
-    // 8. CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
+    // ========================================================
+    // TEMA CLARO / ESCURO (LIGHT / DARK THEME)
+    // ========================================================
+    function initTheme() {
+      const saved = localStorage.getItem('vigi_theme') || 'dark';
+      applyTheme(saved);
+    }
+
+    function toggleTheme() {
+      const isLight = document.documentElement.classList.contains('light');
+      const newTheme = isLight ? 'dark' : 'light';
+      applyTheme(newTheme);
+      try {
+        localStorage.setItem('vigi_theme', newTheme);
+      } catch (e) {}
+      showToast(newTheme === 'light' ? '☀️ Tema Claro ativado' : '🌙 Tema Escuro ativado', 'info');
+    }
+
+    function applyTheme(theme) {
+      const isLight = theme === 'light';
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      const themeBtn = document.getElementById('btn-theme-toggle');
+
+      if (isLight) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-moon text-indigo-500 text-sm';
+        }
+        if (themeBtn) {
+          themeBtn.title = 'Alternar para Tema Escuro';
+        }
+      } else {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        if (themeIcon) {
+          themeIcon.className = 'fa-solid fa-sun text-amber-400 text-sm';
+        }
+        if (themeBtn) {
+          themeBtn.title = 'Alternar para Tema Claro';
+        }
+      }
+    }
+
+    // ========================================================
+    // CONTROLE DE CARGA INFINITA & PAGINAÇÃO DINÂMICA (ON WHEEL/SCROLL)
+    // ========================================================
+    const KANBAN_PAGE_SIZE = 10;
+    let colDisplayLimits = { aguardando: 10, separando: 10, coleta: 10, enviado: 10, chegou: 10 };
+    const TABLE_PAGE_SIZE = 25;
+    let tableDisplayLimit = 25;
+
+    let isFetchingOlderShipments = false;
+    let reachedEndOfAllShipments = false;
+
+    function showInfiniteScrollIndicator(show) {
+      const pill = document.getElementById('infinite-scroll-pill');
+      if (pill) {
+        if (show) pill.classList.remove('hidden');
+        else pill.classList.add('hidden');
+      }
+    }
+
+    // 8. PARSEADOR CANÔNICO DE SHIPMENTS DO SUPABASE
+    function parseShipmentRow(row) {
+      let filial = "Francisco Beltrão";
+      const b = (row.branch_name || "").toUpperCase();
+      const txt = `${row.notes || ''} ${row.sender_name || ''}`.toLowerCase();
+      if (b.includes("PALOTINA") || (row.notes || "").toUpperCase().includes("PALOTINA") || txt.includes("adilson") || txt.includes("palotina")) {
+        filial = "Palotina (Adilson)";
+      } else if (b.includes("BARRACAO") || txt.includes("barracao") || txt.includes("giseli")) {
+        filial = "Barracão (Giseli)";
+      } else if (b.includes("SMO") || b.includes("TERCEIROS") || txt.includes("smo") || txt.includes("terceiros")) {
+        filial = "Terceiros SMO";
+      } else if (b.includes("PATO") || (row.notes || "").toUpperCase().includes("PATO") || txt.includes("leonardo")) {
+        filial = "Pato Branco";
+      } else {
+        if (txt.includes('cleverson') || txt.includes('beltrao2') || txt.includes('beltrao 2')) {
+          filial = "Beltrão (Cleverson)";
+        } else if (txt.includes('iury') || txt.includes('iuri') || txt.includes('beltrao1') || txt.includes('beltrao 1')) {
+          filial = "Beltrão (Iury)";
+        } else {
+          filial = "Beltrão (Iury)";
+        }
+      }
+
+      let rawNotes = row.notes || "";
+      let cleanObs = rawNotes;
+
+      let urgencia = "Normal";
+      if (cleanObs.includes("[URGENTE]")) { urgencia = "Urgente"; cleanObs = cleanObs.replace("[URGENTE]", "").trim(); }
+      else if (cleanObs.includes("[ALTA]")) { urgencia = "Alta"; cleanObs = cleanObs.replace("[ALTA]", "").trim(); }
+      else if (cleanObs.includes("[NORMAL]")) { cleanObs = cleanObs.replace("[NORMAL]", "").trim(); }
+
+      let originalMap = {};
+      const origMatch = cleanObs.match(/\[ORIG:(.*?)\]/);
+      if (origMatch) {
+        try { originalMap = JSON.parse(origMatch[1]); } catch (e) {}
+        cleanObs = cleanObs.replace(origMatch[0], "").trim();
+      }
+
+      let ajusteHistorico = "";
+      const ajMatch = cleanObs.match(/\[AJUSTE:(.*?)\]/);
+      if (ajMatch) {
+        ajusteHistorico = ajMatch[1];
+        cleanObs = cleanObs.replace(ajMatch[0], "").trim();
+      }
+
+      let toolJustMap = {};
+      const justMatch = cleanObs.match(/\[JUSTIFICATIVAS:(.*?)\]/);
+      if (justMatch) {
+        try { toolJustMap = JSON.parse(justMatch[1]); } catch (e) {}
+        cleanObs = cleanObs.replace(justMatch[0], "").trim();
+      }
+      cleanObs = cleanObs.replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim();
+
+      const dateObj = new Date(row.created_at);
+      const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      let st = row.status || 'aguardando';
+      if (st === 'recebido') st = 'chegou';
+
+      // Proteção contra race condition de polling: se a ordem foi movimentada recentemente
+      // no cliente (há menos de 60s), preserva a fase nova até confirmação do Supabase
+      if (pendingStatusUpdates.has(row.id)) {
+        const pending = pendingStatusUpdates.get(row.id);
+        if (Date.now() - pending.timestamp < 60000) {
+          const dbExpected = pending.status === 'chegou' ? 'recebido' : pending.status;
+          if (row.status !== dbExpected) {
+            st = pending.status;
+          } else {
+            pendingStatusUpdates.delete(row.id);
+          }
+        } else {
+          pendingStatusUpdates.delete(row.id);
+        }
+      }
+
+      const parsedItens = (row.shipment_items || []).map(it => {
+        const orig = (originalMap && originalMap[it.product_name] !== undefined)
+          ? originalMap[it.product_name]
+          : (it.quantity || 1);
+        return {
+          id: it.id,
+          productId: it.product_id,
+          categoria: it.product_category || 'OUTROS',
+          nome: it.product_name,
+          qtd: it.quantity || 1,
+          qtdOriginal: orig,
+          justificativa: toolJustMap[it.product_name] || null,
+          checked: false
+        };
+      });
+
+      // Se algum item estava no pedido original mas foi zerado (não consta em shipment_items)
+      if (originalMap && typeof originalMap === 'object') {
+        Object.keys(originalMap).forEach(origNome => {
+          const found = parsedItens.find(it => it.nome.toLowerCase() === origNome.toLowerCase());
+          if (!found && originalMap[origNome] > 0) {
+            parsedItens.push({
+              id: null,
+              productId: null,
+              categoria: 'OUTROS',
+              nome: origNome,
+              qtd: 0,
+              qtdOriginal: originalMap[origNome],
+              justificativa: toolJustMap[origNome] || null,
+              checked: false
+            });
+          }
+        });
+      }
+
+      return {
+        id: 'ENV-' + row.id.slice(0, 6).toUpperCase(),
+        rawId: row.id,
+        filial: filial,
+        solicitante: row.sender_name || 'Técnico',
+        urgencia: urgencia,
+        data: dataStr,
+        created_at: row.created_at || null,
+        obs: cleanObs,
+        rawNotes: rawNotes,
+        originalMap: originalMap,
+        ajusteHistorico: ajusteHistorico,
+        toolJustMap: toolJustMap,
+        status: st,
+        itens: parsedItens
+      };
+    }
+
+    // 8.1 CARREGAMENTO EM TEMPO REAL DO SUPABASE (COM RBAC)
     async function loadSupabaseShipments() {
       if (!db) return;
       const userConfig = APP_USERS[currentUser];
@@ -3127,136 +3555,7 @@ async function login(username, password) {
           isInitialShipmentLoad = false;
           knownShipmentIds = new Set(data.map(s => s.id));
 
-          pedidosEnvio = data.map(row => {
-            let filial = "Francisco Beltrão";
-            const b = (row.branch_name || "").toUpperCase();
-            const txt = `${row.notes || ''} ${row.sender_name || ''}`.toLowerCase();
-            if (b.includes("PALOTINA") || (row.notes || "").toUpperCase().includes("PALOTINA") || txt.includes("adilson") || txt.includes("palotina")) {
-              filial = "Palotina (Adilson)";
-            } else if (b.includes("BARRACAO") || txt.includes("barracao") || txt.includes("giseli")) {
-              filial = "Barracão (Giseli)";
-            } else if (b.includes("SMO") || b.includes("TERCEIROS") || txt.includes("smo") || txt.includes("terceiros")) {
-              filial = "Terceiros SMO";
-            } else if (b.includes("PATO") || (row.notes || "").toUpperCase().includes("PATO") || txt.includes("leonardo")) {
-              filial = "Pato Branco";
-            } else {
-              if (txt.includes('cleverson') || txt.includes('beltrao2') || txt.includes('beltrao 2')) {
-                filial = "Beltrão (Cleverson)";
-              } else if (txt.includes('iury') || txt.includes('iuri') || txt.includes('beltrao1') || txt.includes('beltrao 1')) {
-                filial = "Beltrão (Iury)";
-              } else {
-                filial = "Beltrão (Iury)";
-              }
-            }
-
-            let rawNotes = row.notes || "";
-            let cleanObs = rawNotes;
-
-            let urgencia = "Normal";
-            if (cleanObs.includes("[URGENTE]")) { urgencia = "Urgente"; cleanObs = cleanObs.replace("[URGENTE]", "").trim(); }
-            else if (cleanObs.includes("[ALTA]")) { urgencia = "Alta"; cleanObs = cleanObs.replace("[ALTA]", "").trim(); }
-            else if (cleanObs.includes("[NORMAL]")) { cleanObs = cleanObs.replace("[NORMAL]", "").trim(); }
-
-            let originalMap = {};
-            const origMatch = cleanObs.match(/\[ORIG:(.*?)\]/);
-            if (origMatch) {
-              try {
-                originalMap = JSON.parse(origMatch[1]);
-              } catch (e) {}
-              cleanObs = cleanObs.replace(origMatch[0], "").trim();
-            }
-
-            let ajusteHistorico = "";
-            const ajMatch = cleanObs.match(/\[AJUSTE:(.*?)\]/);
-            if (ajMatch) {
-              ajusteHistorico = ajMatch[1];
-              cleanObs = cleanObs.replace(ajMatch[0], "").trim();
-            }
-
-            let toolJustMap = {};
-            const justMatch = cleanObs.match(/\[JUSTIFICATIVAS:(.*?)\]/);
-            if (justMatch) {
-              try {
-                toolJustMap = JSON.parse(justMatch[1]);
-              } catch (e) {}
-              cleanObs = cleanObs.replace(justMatch[0], "").trim();
-            }
-            cleanObs = cleanObs.replace(/\n*⚠️ JUSTIFICATIVAS DE FERRAMENTAS:[\s\S]*$/g, '').trim();
-
-            const dateObj = new Date(row.created_at);
-            const dataStr = dateObj.toLocaleDateString('pt-BR') + ' ' + dateObj.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-            let st = row.status || 'aguardando';
-            if (st === 'recebido') st = 'chegou';
-
-            // Proteção contra race condition de polling: se a ordem foi movimentada recentemente
-            // no cliente (há menos de 60s), preserva a fase nova até confirmação do Supabase
-            if (pendingStatusUpdates.has(row.id)) {
-              const pending = pendingStatusUpdates.get(row.id);
-              if (Date.now() - pending.timestamp < 60000) {
-                const dbExpected = pending.status === 'chegou' ? 'recebido' : pending.status;
-                if (row.status !== dbExpected) {
-                  st = pending.status;
-                } else {
-                  pendingStatusUpdates.delete(row.id);
-                }
-              } else {
-                pendingStatusUpdates.delete(row.id);
-              }
-            }
-
-            const parsedItens = (row.shipment_items || []).map(it => {
-              const orig = (originalMap && originalMap[it.product_name] !== undefined)
-                ? originalMap[it.product_name]
-                : (it.quantity || 1);
-              return {
-                id: it.id,
-                productId: it.product_id,
-                categoria: it.product_category || 'OUTROS',
-                nome: it.product_name,
-                qtd: it.quantity || 1,
-                qtdOriginal: orig,
-                justificativa: toolJustMap[it.product_name] || null,
-                checked: false
-              };
-            });
-
-            // Se algum item estava no pedido original mas foi zerado (não consta em shipment_items)
-            if (originalMap && typeof originalMap === 'object') {
-              Object.keys(originalMap).forEach(origNome => {
-                const found = parsedItens.find(it => it.nome.toLowerCase() === origNome.toLowerCase());
-                if (!found && originalMap[origNome] > 0) {
-                  parsedItens.push({
-                    id: null,
-                    productId: null,
-                    categoria: 'OUTROS',
-                    nome: origNome,
-                    qtd: 0,
-                    qtdOriginal: originalMap[origNome],
-                    justificativa: toolJustMap[origNome] || null,
-                    checked: false
-                  });
-                }
-              });
-            }
-
-            return {
-              id: 'ENV-' + row.id.slice(0, 6).toUpperCase(),
-              rawId: row.id,
-              filial: filial,
-              solicitante: row.sender_name || 'Técnico',
-              urgencia: urgencia,
-              data: dataStr,
-              created_at: row.created_at || null,
-              obs: cleanObs,
-              rawNotes: rawNotes,
-              originalMap: originalMap,
-              ajusteHistorico: ajusteHistorico,
-              toolJustMap: toolJustMap,
-              status: st,
-              itens: parsedItens
-            };
-          });
+          pedidosEnvio = data.map(parseShipmentRow);
 
           // Se o usuário tem escopo restrito de filiais (ex: Vandoir - Gerente Beltrão: apenas Iury e Cleverson)
           if (userConfig && userConfig.scopedFiliais && Array.isArray(userConfig.scopedFiliais)) {
@@ -3268,6 +3567,77 @@ async function login(username, password) {
         }
       } catch (err) {
         console.warn('Erro ao sincronizar com Supabase:', err);
+      }
+    }
+
+    // 8.2 CARREGAMENTO DE PEDIDOS MAIS ANTIGOS (INFINITE SCROLL / GIRO DA RODINHA)
+    async function loadOlderShipmentsFromSupabase() {
+      if (isFetchingOlderShipments || reachedEndOfAllShipments || !db) return;
+      if (!pedidosEnvio || pedidosEnvio.length === 0) return;
+
+      // Localiza a menor data ISO entre os pedidos carregados
+      let oldestDateIso = null;
+      pedidosEnvio.forEach(p => {
+        if (p.created_at) {
+          if (!oldestDateIso || p.created_at < oldestDateIso) {
+            oldestDateIso = p.created_at;
+          }
+        }
+      });
+
+      if (!oldestDateIso) return;
+
+      isFetchingOlderShipments = true;
+      showInfiniteScrollIndicator(true);
+
+      try {
+        const userConfig = APP_USERS[currentUser];
+        let query = db
+          .from('shipments')
+          .select('*, shipment_items(*)')
+          .order('created_at', { ascending: false })
+          .lt('created_at', oldestDateIso)
+          .limit(40);
+
+        if (userConfig && userConfig.role === 'filial') {
+          query = query.eq('branch_name', userConfig.dbBranch);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          reachedEndOfAllShipments = true;
+        } else {
+          const existingIds = new Set(pedidosEnvio.map(p => p.rawId));
+          const newOlderList = [];
+          data.forEach(row => {
+            if (!existingIds.has(row.id)) {
+              newOlderList.push(parseShipmentRow(row));
+              knownShipmentIds.add(row.id);
+            }
+          });
+
+          if (newOlderList.length === 0) {
+            reachedEndOfAllShipments = true;
+          } else {
+            pedidosEnvio = pedidosEnvio.concat(newOlderList);
+            if (userConfig && userConfig.scopedFiliais && Array.isArray(userConfig.scopedFiliais)) {
+              pedidosEnvio = pedidosEnvio.filter(p => userConfig.scopedFiliais.includes(p.filial));
+            }
+            // Expande limites para exibir os novos registros mais antigos de forma transparente
+            ENVIOS_COLUNAS.forEach(col => {
+              colDisplayLimits[col.id] = (colDisplayLimits[col.id] || KANBAN_PAGE_SIZE) + KANBAN_PAGE_SIZE;
+            });
+            tableDisplayLimit += TABLE_PAGE_SIZE;
+            renderAll();
+          }
+        }
+      } catch (err) {
+        console.warn('Erro ao carregar mais remessas antigas:', err);
+      } finally {
+        isFetchingOlderShipments = false;
+        showInfiniteScrollIndicator(false);
       }
     }
 
@@ -3769,9 +4139,26 @@ async function login(username, password) {
         return matchFilial && matchSearch;
       });
 
-      filtered.forEach(pedido => {
-        const colContainer = document.getElementById(`cards-${pedido.status}`);
+      ENVIOS_COLUNAS.forEach((col, colIndex) => {
+        const colContainer = document.getElementById(`cards-${col.id}`);
         if (!colContainer) return;
+
+        const colItems = filtered.filter(p => p.status === col.id);
+        const limit = colDisplayLimits[col.id] || KANBAN_PAGE_SIZE;
+        const visibleItems = colItems.slice(0, limit);
+
+        if (colItems.length === 0) {
+          colContainer.innerHTML = `
+            <div class="h-44 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-2xl text-slate-500">
+              <i class="fa-regular fa-folder-open text-xl mb-2 opacity-40"></i>
+              <span class="text-xs font-medium">Nenhum pedido nesta fase</span>
+              <span class="text-[10px] text-slate-600 mt-0.5">${adminPerm ? 'Arraste cards para cá' : 'Aguardando atualização da Matriz'}</span>
+            </div>
+          `;
+          return;
+        }
+
+        visibleItems.forEach(pedido => {
 
         const totalItens = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
         const totalSolicitado = pedido.itens.reduce((acc, cur) => acc + (cur.qtdOriginal !== undefined ? cur.qtdOriginal : cur.qtd), 0);
@@ -3990,20 +4377,27 @@ async function login(username, password) {
         colContainer.appendChild(card);
       });
 
-      // Empty states for columns
-      ENVIOS_COLUNAS.forEach(col => {
-        const colContainer = document.getElementById(`cards-${col.id}`);
-        if (colContainer && colContainer.children.length === 0) {
-          colContainer.innerHTML = `
-            <div class="h-44 flex flex-col items-center justify-center text-center p-4 border border-dashed border-white/10 rounded-2xl text-slate-500">
-              <i class="fa-regular fa-folder-open text-xl mb-2 opacity-40"></i>
-              <span class="text-xs font-medium">Nenhum pedido nesta fase</span>
-              <span class="text-[10px] text-slate-600 mt-0.5">${adminPerm ? 'Arraste cards para cá' : 'Aguardando atualização da Matriz'}</span>
-            </div>
-          `;
-        }
-      });
-    }
+      // Se houver mais pedidos antigos nesta coluna além do limite visível
+      if (colItems.length > limit) {
+        const remaining = colItems.length - limit;
+        const loader = document.createElement('div');
+        loader.id = `loader-col-${col.id}`;
+        loader.dataset.colId = col.id;
+        loader.className = 'kanban-infinite-loader p-3 text-center rounded-2xl border border-dashed border-white/10 bg-slate-900/40 hover:bg-slate-900/80 cursor-pointer transition text-xs text-slate-400 hover:text-orange-400 group';
+        loader.onclick = () => loadMoreForColumn(col.id);
+        loader.innerHTML = `
+          <div class="flex items-center justify-center gap-2 font-bold">
+            <i class="fa-solid fa-arrow-down-long group-hover:translate-y-0.5 transition-transform text-orange-400"></i>
+            <span>Carregar mais antigos (+${remaining})</span>
+          </div>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Gire a rodinha do mouse ou clique</span>
+        `;
+        colContainer.appendChild(loader);
+      }
+    });
+
+    setupKanbanInfiniteScrollObservers();
+  }
 
     // 13. MODO TABELA
     function renderEnviosTable() {
@@ -4047,7 +4441,10 @@ async function login(username, password) {
         return;
       }
 
-      filtered.forEach(pedido => {
+      const limit = tableDisplayLimit || TABLE_PAGE_SIZE;
+      const visibleRows = filtered.slice(0, limit);
+
+      visibleRows.forEach(pedido => {
         const statusObj = ENVIOS_COLUNAS.find(c => c.id === pedido.status) || { nome: pedido.status };
         const totalItens = pedido.itens.reduce((acc, cur) => acc + cur.qtd, 0);
 
@@ -4095,6 +4492,110 @@ async function login(username, password) {
         `;
         tbody.appendChild(tr);
       });
+
+      if (filtered.length > limit) {
+        const remaining = filtered.length - limit;
+        const moreTr = document.createElement('tr');
+        moreTr.className = 'hover:bg-slate-900/60 transition cursor-pointer';
+        moreTr.onclick = () => {
+          tableDisplayLimit += TABLE_PAGE_SIZE;
+          renderEnviosTable();
+          checkAndFetchOlderShipments();
+        };
+        moreTr.innerHTML = `
+          <td colspan="8" class="text-center py-4 text-xs font-bold text-orange-400 hover:underline">
+            <i class="fa-solid fa-arrow-down mr-1.5"></i> Rolar para carregar remessas mais antigas (+${remaining})
+          </td>
+        `;
+        tbody.appendChild(moreTr);
+      }
+    }
+
+    // ========================================================
+    // OBSERVADORES DE SCROLL & INTERAÇÃO DA RODINHA (ON WHEEL / SCROLL)
+    // ========================================================
+    let kanbanScrollObserver = null;
+    function setupKanbanInfiniteScrollObservers() {
+      if (kanbanScrollObserver) kanbanScrollObserver.disconnect();
+      if (!('IntersectionObserver' in window)) return;
+
+      kanbanScrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const colId = entry.target.dataset.colId;
+            if (colId) {
+              loadMoreForColumn(colId);
+            }
+          }
+        });
+      }, { rootMargin: '250px' });
+
+      document.querySelectorAll('.kanban-infinite-loader').forEach(el => {
+        kanbanScrollObserver.observe(el);
+      });
+    }
+
+    function loadMoreForColumn(colId) {
+      colDisplayLimits[colId] = (colDisplayLimits[colId] || KANBAN_PAGE_SIZE) + KANBAN_PAGE_SIZE;
+      renderEnviosKanban();
+      checkAndFetchOlderShipments();
+    }
+
+    let wheelThrottleTimer = null;
+    window.addEventListener('wheel', (e) => {
+      if (e.deltaY > 0) {
+        if (wheelThrottleTimer) return;
+        wheelThrottleTimer = setTimeout(() => {
+          wheelThrottleTimer = null;
+          checkScrollToLoadMore();
+        }, 120);
+      }
+    }, { passive: true });
+
+    window.addEventListener('scroll', () => {
+      if (wheelThrottleTimer) return;
+      wheelThrottleTimer = setTimeout(() => {
+        wheelThrottleTimer = null;
+        checkScrollToLoadMore();
+      }, 150);
+    }, { passive: true });
+
+    function checkScrollToLoadMore() {
+      const scrollY = window.scrollY || window.pageYOffset;
+      const viewportHeight = window.innerHeight;
+      const docHeight = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+
+      if (scrollY + viewportHeight >= docHeight - 450) {
+        let expandedAny = false;
+        ENVIOS_COLUNAS.forEach(col => {
+          const colItems = pedidosEnvio.filter(p => p.status === col.id);
+          const curLimit = colDisplayLimits[col.id] || KANBAN_PAGE_SIZE;
+          if (colItems.length > curLimit) {
+            colDisplayLimits[col.id] = curLimit + KANBAN_PAGE_SIZE;
+            expandedAny = true;
+          }
+        });
+
+        if (tableDisplayLimit < pedidosEnvio.length) {
+          tableDisplayLimit += TABLE_PAGE_SIZE;
+          expandedAny = true;
+        }
+
+        if (expandedAny) {
+          renderEnviosKanban();
+          renderEnviosTable();
+        }
+
+        checkAndFetchOlderShipments();
+      }
+    }
+
+    function checkAndFetchOlderShipments() {
+      if (isFetchingOlderShipments || reachedEndOfAllShipments) return;
+      const maxColLimit = Math.max(...Object.values(colDisplayLimits));
+      if (maxColLimit >= pedidosEnvio.length - 10) {
+        loadOlderShipmentsFromSupabase();
+      }
     }
 
     // Exportar Tabela de Envios / Compras para CSV / Excel
@@ -7214,6 +7715,7 @@ async function login(username, password) {
     });
 
     window.onload = function() {
+      initTheme();
       initCatalogUI();
       populateCatalogDatalist();
       checkDesktopAuth();
