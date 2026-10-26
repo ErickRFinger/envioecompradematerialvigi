@@ -2789,6 +2789,8 @@
       }
       renderCheckoutList();
       const m = document.getElementById('modal-checkout');
+      window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+      window.modalOpenedTimestamps['modal-checkout'] = Date.now();
       m.style.display = 'flex';
       m.classList.remove('hidden');
     }
@@ -3063,6 +3065,8 @@
       checkoutModal.classList.add('hidden');
 
       const confModal = document.getElementById('modal-conferencia');
+      window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+      window.modalOpenedTimestamps['modal-conferencia'] = Date.now();
       confModal.style.display = 'flex';
       confModal.classList.remove('hidden');
     }
@@ -3299,6 +3303,8 @@
 
     // 11. MODAL DE SUCESSO & WHATSAPP
     function openSuccessModal(order) {
+      window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+      window.modalOpenedTimestamps['modal-success'] = Date.now();
       document.getElementById('success-code').innerText = `#ENV-${order.id.slice(0, 6).toUpperCase()}`;
       document.getElementById('success-branch').innerText = order.filial;
       const totalPcs = order.itens.reduce((a, b) => a + b.qtd, 0);
@@ -5319,6 +5325,8 @@
     function openMobileNewCompraModal() {
       const el = document.getElementById('modal-mobile-new-compra');
       if (!el) return;
+      window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+      window.modalOpenedTimestamps['modal-mobile-new-compra'] = Date.now();
       el.style.display = 'flex';
       el.classList.remove('hidden');
 

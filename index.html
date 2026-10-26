@@ -2811,6 +2811,8 @@ async function login(username, password) {
     function openUserSwitchModal() {
       const el = document.getElementById('modal-user-switch');
       if (el) {
+        window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+        window.modalOpenedTimestamps['modal-user-switch'] = Date.now();
         el.classList.remove('hidden');
         el.style.display = 'flex';
       }
@@ -5006,6 +5008,8 @@ async function login(username, password) {
       
       const el = document.getElementById('modal-new-envio');
       if (el) {
+        window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+        window.modalOpenedTimestamps['modal-new-envio'] = Date.now();
         el.classList.remove('hidden');
         el.style.display = 'flex';
       }
@@ -5437,6 +5441,8 @@ async function login(username, password) {
       }
       const el = document.getElementById('modal-new-compra');
       if (!el) return;
+      window.modalOpenedTimestamps = window.modalOpenedTimestamps || {};
+      window.modalOpenedTimestamps['modal-new-compra'] = Date.now();
       el.style.display = 'flex';
       el.classList.remove('hidden');
 
