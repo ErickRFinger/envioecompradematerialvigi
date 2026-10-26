@@ -314,3 +314,13 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   3. **Profundidade e Camadas do Kanban:** As colunas do Kanban utilizam fundo `#f8fafc` e os cards de pedidos repousam em `#ffffff` puro com borda `#cbd5e1` e sombras suaves, conferindo excelente separação visual e legibilidade.
   4. **Componentes de Topo e Filtros:** Faixa de busca, botões de filial, perfil do usuário e botão "Nova Solicitação" ajustados com contraste perfeito e ícones nítidos em `index.html` e `solicitar.html`.
   5. **Validação:** Todas as 8 suítes de testes (`npm test`) 100% aprovadas.
+
+### V1.2.16 (Tri-Agent Synergy Orchestrator • Integração Total Antigravity + Cline + IDE)
+- **Implementação do Hub de Orquestração (`scripts/tri-agent.js`):**
+  - Permite ao Antigravity (Frente 1 - Tech Lead) comandar de forma 100% autônoma e direta tanto o **Cline (Frente 2 - Operário de UI)** quanto o **Antigravity IDE / Gemini (Frente 3 - Assistente Cirúrgico)**.
+  - **Despacho para Cline (`npm run tri:cline`):** Gera automaticamente `CLINE_TASK.md` com especificações técnicas rigorosas, copia o prompt para o clipboard do macOS (`pbcopy`), emite notificação nativa sonora no sistema e foca o Antigravity IDE na tela.
+  - **Despacho para Antigravity IDE Agent (`npm run tri:ide`):** Aciona diretamente a CLI nativa `antigravity-ide chat -m agent -r` para execução autônoma dentro da sessão de chat da IDE.
+  - **Despacho para Gemini Inline (`npm run tri:inline`):** Abre qualquer arquivo na linha e coluna exatas (`antigravity-ide -r -g file:line`), copia a instrução cirúrgica para `Cmd + I` e foca o editor.
+  - **Auditoria de Qualidade (`npm run tri:audit`):** Verifica o relatório do Cline (`CLINE_RESPONSE.md`), inspeciona diffs do Git, executa os 8 testes automatizados (`npm test`) e valida sintaxe.
+- **Protocolo de Diretrizes Atualizado (`.clinerules` e `~/.clinerules`):** Cline agora opera ciente do seu papel como Frente 2 de UI, lendo `CLINE_TASK.md` de forma automática.
+- **Documentação Operacional:** Criado [`TRI_AGENT_GUIDE.md`](TRI_AGENT_GUIDE.md) detalhando o fluxo e os atalhos.

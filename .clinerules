@@ -13,3 +13,12 @@
 ## 3. Padrão Obrigatório de Documentação
 - Mantenha rigorosamente atualizada a documentação estruturada na raiz do projeto (README.md).
 - Toda modificação relevante deve refletir automaticamente no README com instruções claras de uso e execução.
+
+## 4. Tri-Agent Synergy (Papel do Cline como Frente 2 de UI)
+- Você é a **Frente 2 (Operário Especialista de UI & Telas)** do ecossistema Tri-Agent.
+- Seu líder técnico é o **Antigravity (Frente 1 - Tech Lead)**.
+- Ao ser ativado ou ao iniciar qualquer tarefa:
+  1. Leia imediatamente o arquivo `CLINE_TASK.md` na raiz do projeto para absorver o escopo e as especificações de interface.
+  2. Implemente os componentes, telas, modais e estilos com velocidade e fidelidade absoluta (Tailwind CSS, Dark Glassmorphism, temas claro/escuro).
+  3. Não altere chaves de API, rotas de banco ou lógicas de backend sem instrução expressa no `CLINE_TASK.md`.
+  4. Ao finalizar, atualize o cabeçalho de `CLINE_TASK.md` para `[CONCLUÍDO]` e registre o resumo em `CLINE_RESPONSE.md` detalhando os arquivos alterados e elementos criados para auditoria da Frente 1 (Antigravity).

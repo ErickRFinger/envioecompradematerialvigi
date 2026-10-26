@@ -3,6 +3,11 @@
   "version": "1.0.0",
   "description": "SISTEMA DE ENVIO VIGI - Sistema de Gestão de Envios e Materiais VIGI",
   "scripts": {
+    "tri:cline": "node scripts/tri-agent.js cline",
+    "tri:ide": "node scripts/tri-agent.js ide",
+    "tri:inline": "node scripts/tri-agent.js inline",
+    "tri:audit": "node scripts/tri-agent.js audit",
+    "tri:status": "node scripts/tri-agent.js status",
     "deploy": "vercel --prod --yes",
     "test": "node scratch/test_tool_justifications.js && node scratch/test_security.js && node scratch/test_order_details_modal.js && node scratch/test_api_proxy.js && node scratch/test_new_features.js && node scratch/test_transaction_insert.js && node scratch/test_all_filiais_submit.js && node scratch/test_status_bounce_fix.js",
     "test:bounce": "node scratch/test_status_bounce_fix.js",
