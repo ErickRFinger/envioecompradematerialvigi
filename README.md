@@ -305,3 +305,12 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   - Script no `<head>` com leitura imediata do `localStorage.getItem('vigi_theme')`, prevenindo FOUC (flash de tema).
   - Folha de estilo completa para o Tema Claro com paleta Slate/Light moderna, superfícies de cartão em branco puro, sombras suaves e alto contraste para leitura à luz do dia.
 - **Auditoria Automatizada:** Testes de persistência, segurança, integridade de tags HTML e sintaxe JS executados com 100% de sucesso.
+
+### V1.2.15 (Correção de Alto Contraste e Tipografia do Tema Claro)
+- **Diagnóstico da Causa Raiz:** A regra CSS utilitária `[class*="bg-orange-600"] *` configurada para manter o texto branco dentro de botões laranjas realizou um match de substring indesejado com a classe `selection:bg-orange-600` presente na tag `<body>`. Isso forçou todos os elementos descendentes da página para `color: #ffffff !important;`, provocando o efeito de tela esbranquiçada / texto branco sobre fundo branco quando o Tema Claro era ativado. Além disso, títulos de colunas e badges utilizavam tons pastel claros (`text-amber-300`, `text-blue-300`, etc.) sem contraste no modo claro.
+- **Correções Aplicadas:**
+  1. **Remoção de Seletor Substring Genérico:** Substituição da regra wildcard por alvos cirúrgicos (`button.bg-gradient-to-r`, botões primários reais), eliminando qualquer colisão com seletores de seleção do Tailwind.
+  2. **Paleta de Alto Contraste para Status e Badges:** Títulos de colunas, contadores e badges no modo claro agora utilizam tons escuros e ricos (Âmbar-800, Azul-800, Roxo-800, Ciano-800 e Esmeralda-800) sobre fundos suaves com bordas bem demarcadas.
+  3. **Profundidade e Camadas do Kanban:** As colunas do Kanban utilizam fundo `#f8fafc` e os cards de pedidos repousam em `#ffffff` puro com borda `#cbd5e1` e sombras suaves, conferindo excelente separação visual e legibilidade.
+  4. **Componentes de Topo e Filtros:** Faixa de busca, botões de filial, perfil do usuário e botão "Nova Solicitação" ajustados com contraste perfeito e ícones nítidos em `index.html` e `solicitar.html`.
+  5. **Validação:** Todas as 8 suítes de testes (`npm test`) 100% aprovadas.

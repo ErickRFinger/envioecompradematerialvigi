@@ -246,210 +246,434 @@
     ::-webkit-scrollbar-thumb:hover { background: #fd5f00; }
 
     /* ========================================================
-       TEMA CLARO (LIGHT THEME) COMPLETO & ELEGANTE
+       TEMA CLARO (LIGHT THEME) NATIVO, PROFISSIONAL & ALTO CONTRASTE
        ======================================================== */
-    html.light body,
-    html:not(.dark) body {
+    html.light body {
       background-color: #f1f5f9 !important;
       background-image: 
-        radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.95) 0px, transparent 60%),
-        radial-gradient(at 100% 0%, rgba(253, 95, 0, 0.1) 0px, transparent 50%),
-        radial-gradient(at 50% 30%, rgba(241, 245, 249, 0.9) 0px, transparent 80%),
-        radial-gradient(at 85% 90%, rgba(226, 232, 240, 0.8) 0px, transparent 55%),
-        radial-gradient(at 15% 85%, rgba(253, 95, 0, 0.08) 0px, transparent 45%) !important;
+        radial-gradient(at 0% 0%, rgba(226, 232, 240, 0.8) 0px, transparent 60%),
+        radial-gradient(at 100% 0%, rgba(253, 95, 0, 0.05) 0px, transparent 50%),
+        radial-gradient(at 50% 50%, rgba(241, 245, 249, 0.9) 0px, transparent 80%),
+        radial-gradient(at 85% 90%, rgba(226, 232, 240, 0.7) 0px, transparent 55%) !important;
       color: #0f172a !important;
     }
 
-    html.light .glass-header-nav,
-    html:not(.dark) .glass-header-nav {
-      background: rgba(255, 255, 255, 0.97) !important;
-      border-bottom: 1px solid #e2e8f0 !important;
-      box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.08) !important;
+    /* Tipografia de Alto Contraste */
+    html.light h1,
+    html.light h2,
+    html.light h3,
+    html.light h4,
+    html.light h5,
+    html.light h6 {
+      color: #0f172a !important;
+    }
+    html.light .text-white {
+      color: #0f172a !important;
+    }
+    html.light .text-slate-100,
+    html.light .text-slate-200 {
+      color: #1e293b !important;
+    }
+    html.light .text-slate-300 {
+      color: #334155 !important;
+    }
+    html.light .text-slate-400,
+    html.light .text-slate-500,
+    html.light .text-slate-600 {
+      color: #475569 !important;
     }
 
-    html.light .glass-surface,
-    html:not(.dark) .glass-surface {
-      background: #ffffff !important;
+    /* Cores de Status e Badges em Alto Contraste para Fundo Claro */
+    /* 1. Aguardando / Amarelo & Âmbar */
+    html.light .text-amber-300,
+    html.light .text-amber-400,
+    html.light .text-amber-300\/80 {
+      color: #9a3412 !important;
+    }
+    html.light .bg-amber-500\/10,
+    html.light .bg-amber-500\/15,
+    html.light .bg-amber-500\/20,
+    html.light .bg-amber-500\/25,
+    html.light .bg-amber-500\/30 {
+      background-color: #fef3c7 !important;
+      border-color: #fcd34d !important;
+      color: #92400e !important;
+    }
+    html.light .border-amber-500\/20,
+    html.light .border-amber-500\/30,
+    html.light .border-amber-500\/40,
+    html.light .border-amber-500\/50 {
+      border-color: #fcd34d !important;
+    }
+
+    /* 2. Em Separação / Azul */
+    html.light .text-blue-300,
+    html.light .text-blue-400,
+    html.light .text-blue-300\/80 {
+      color: #1e40af !important;
+    }
+    html.light .bg-blue-500\/10,
+    html.light .bg-blue-500\/15,
+    html.light .bg-blue-500\/20,
+    html.light .bg-blue-500\/25,
+    html.light .bg-blue-500\/30 {
+      background-color: #dbeafe !important;
+      border-color: #93c5fd !important;
+      color: #1e40af !important;
+    }
+    html.light .border-blue-500\/20,
+    html.light .border-blue-500\/30,
+    html.light .border-blue-500\/40,
+    html.light .border-blue-500\/50 {
+      border-color: #93c5fd !important;
+    }
+
+    /* 3. Pronto Coleta / Roxo */
+    html.light .text-purple-300,
+    html.light .text-purple-400,
+    html.light .text-purple-300\/80 {
+      color: #6b21a8 !important;
+    }
+    html.light .bg-purple-500\/10,
+    html.light .bg-purple-500\/15,
+    html.light .bg-purple-500\/20,
+    html.light .bg-purple-500\/25,
+    html.light .bg-purple-500\/30 {
+      background-color: #f3e8ff !important;
+      border-color: #d8b4fe !important;
+      color: #6b21a8 !important;
+    }
+    html.light .border-purple-500\/20,
+    html.light .border-purple-500\/30,
+    html.light .border-purple-500\/40,
+    html.light .border-purple-500\/50 {
+      border-color: #d8b4fe !important;
+    }
+
+    /* 4. Em Rota / Ciano */
+    html.light .text-cyan-300,
+    html.light .text-cyan-400,
+    html.light .text-cyan-300\/80 {
+      color: #0e7490 !important;
+    }
+    html.light .bg-cyan-500\/10,
+    html.light .bg-cyan-500\/15,
+    html.light .bg-cyan-500\/20,
+    html.light .bg-cyan-500\/25,
+    html.light .bg-cyan-500\/30 {
+      background-color: #cffafe !important;
+      border-color: #67e8f9 !important;
+      color: #0e7490 !important;
+    }
+    html.light .border-cyan-500\/20,
+    html.light .border-cyan-500\/30,
+    html.light .border-cyan-500\/40,
+    html.light .border-cyan-500\/50 {
+      border-color: #67e8f9 !important;
+    }
+
+    /* 5. Entregue / Esmeralda */
+    html.light .text-emerald-300,
+    html.light .text-emerald-400,
+    html.light .text-emerald-300\/80 {
+      color: #065f46 !important;
+    }
+    html.light .bg-emerald-500\/10,
+    html.light .bg-emerald-500\/15,
+    html.light .bg-emerald-500\/20,
+    html.light .bg-emerald-500\/25,
+    html.light .bg-emerald-500\/30 {
+      background-color: #d1fae5 !important;
+      border-color: #6ee7b7 !important;
+      color: #065f46 !important;
+    }
+    html.light .border-emerald-500\/20,
+    html.light .border-emerald-500\/30,
+    html.light .border-emerald-500\/40,
+    html.light .border-emerald-500\/50 {
+      border-color: #6ee7b7 !important;
+    }
+
+    /* Amarelo, Laranja & Rosa */
+    html.light .text-yellow-300,
+    html.light .text-yellow-400 {
+      color: #854d0e !important;
+    }
+    html.light .bg-yellow-500\/15,
+    html.light .bg-yellow-500\/20,
+    html.light .bg-yellow-500\/30 {
+      background-color: #fef9c3 !important;
+      border-color: #fde047 !important;
+      color: #854d0e !important;
+    }
+
+    html.light .text-orange-300,
+    html.light .text-orange-400 {
+      color: #c2410c !important;
+    }
+    html.light .bg-orange-500\/10,
+    html.light .bg-orange-500\/15,
+    html.light .bg-orange-500\/20 {
+      background-color: #fff7ed !important;
+      border-color: #fed7aa !important;
+      color: #c2410c !important;
+    }
+
+    html.light .text-rose-300,
+    html.light .text-rose-400 {
+      color: #9f1239 !important;
+    }
+    html.light .bg-rose-500\/10,
+    html.light .bg-rose-500\/15,
+    html.light .bg-rose-500\/20 {
+      background-color: #ffe4e6 !important;
+      border-color: #fecdd3 !important;
+      color: #9f1239 !important;
+    }
+
+    /* Cabeçalho & Navegação */
+    html.light .glass-header-nav {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+    }
+    html.light .glass-header-nav .bg-\[\#001738\]\/95 {
+      background-color: #ffffff !important;
       border-color: #e2e8f0 !important;
+    }
+    html.light #desktop-user-name {
+      color: #0f172a !important;
+    }
+    html.light #desktop-user-role-badge {
+      color: #ea580c !important;
+    }
+    html.light .glass-header-nav .bg-slate-950\/80 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light #tab-btn-compras {
+      color: #475569 !important;
+    }
+    html.light #tab-btn-compras:hover {
+      color: #0f172a !important;
+    }
+    html.light #badge-count-compras {
+      background-color: #e2e8f0 !important;
+      color: #334155 !important;
+    }
+    html.light button#btn-theme-toggle {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #4338ca !important;
+    }
+    html.light button#btn-theme-toggle:hover {
+      background-color: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
+    }
+    html.light .glass-header-nav button[onclick="openNewEnvioModal()"] {
+      background: linear-gradient(135deg, #fd5f00, #ea580c) !important;
+      box-shadow: 0 4px 14px rgba(253, 95, 0, 0.3) !important;
+    }
+    html.light .glass-header-nav button[onclick="openNewEnvioModal()"] span.bg-slate-950 {
+      background: transparent !important;
+      color: #ffffff !important;
+    }
+    html.light .glass-header-nav button[onclick="openNewEnvioModal()"] span.bg-slate-950 * {
+      color: #ffffff !important;
+    }
+
+    /* Painel de Métricas e Filtros */
+    html.light section.bg-slate-950\/60 {
+      background-color: #ffffff !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+    }
+    html.light #kpi-cards-grid .glass-surface,
+    html.light section.bg-slate-950\/60 .glass-surface {
+      background-color: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light #desktop-branch-filters-container {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light #desktop-branch-filters-container button.text-slate-400 {
+      color: #475569 !important;
+    }
+    html.light #desktop-branch-filters-container button.text-slate-400:hover {
+      color: #0f172a !important;
+      background-color: #e2e8f0 !important;
+    }
+    html.light #filter-search {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light #filter-search::placeholder {
+      color: #94a3b8 !important;
+    }
+    html.light #filter-urgencia-btn,
+    html.light button[onclick="openReportFilterModal()"] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+    }
+
+    /* Colunas do Kanban */
+    html.light #kanban-view-container > div.glass-surface {
+      background-color: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.05) !important;
+    }
+    html.light #kanban-view-container .h-44 {
+      background-color: #ffffff !important;
+      border: 2px dashed #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light #kanban-view-container .h-44 i,
+    html.light #kanban-view-container .h-44 span {
+      color: #64748b !important;
+    }
+
+    /* Cards de Pedido do Kanban */
+    html.light .glass-surface-card {
+      background: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #0f172a !important;
+      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light .glass-surface-card:hover {
+      border-color: #fd5f00 !important;
+      box-shadow: 0 10px 24px -4px rgba(253, 95, 0, 0.18), inset 0 1px 0 #ffffff !important;
+    }
+    html.light .glass-surface-card .bg-slate-950\/70,
+    html.light .glass-surface-card .bg-slate-950\/80 {
+      background-color: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+    }
+    html.light .glass-surface-card li {
+      border-bottom-color: #e2e8f0 !important;
+    }
+    html.light .glass-surface-card li span {
+      color: #0f172a !important;
+    }
+    html.light .glass-surface-card li span.line-through {
+      color: #94a3b8 !important;
+    }
+    html.light .glass-surface-card li .bg-slate-900 {
+      background-color: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #c2410c !important;
+    }
+
+    /* Botões dentro do card (Romaneio, Print, Zap, Voltar) */
+    html.light .glass-surface-card button.bg-slate-900 {
+      background-color: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light .glass-surface-card button.bg-slate-900:hover {
+      background-color: #f1f5f9 !important;
+      color: #0f172a !important;
+    }
+    html.light .glass-surface-card .bg-slate-800 {
+      background-color: #cbd5e1 !important;
+    }
+
+    /* Tabela de Expedição em Modo Claro */
+    html.light table tbody tr {
+      border-bottom-color: #e2e8f0 !important;
+    }
+    html.light table tbody tr:hover {
+      background-color: #f1f5f9 !important;
+    }
+    html.light table td {
+      color: #0f172a !important;
+    }
+    html.light table th {
+      color: #475569 !important;
+      border-bottom-color: #cbd5e1 !important;
+    }
+    html.light .divide-white\/5 > * {
+      border-color: #e2e8f0 !important;
+    }
+
+    /* Preserva texto branco apenas nos botões de CTA primários / gradientes reais */
+    html.light button.bg-gradient-to-r,
+    html.light a.bg-gradient-to-r,
+    html.light button.bg-gradient-to-r *,
+    html.light a.bg-gradient-to-r * {
+      color: #ffffff !important;
+    }
+
+    /* Superfícies Gerais, Modais e Formulários */
+    html.light .glass-surface:not(#kanban-view-container > div) {
+      background: #ffffff !important;
+      border-color: #cbd5e1 !important;
       color: #0f172a !important;
       box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.05) !important;
     }
-
-    html.light .glass-surface-card,
-    html:not(.dark) .glass-surface-card {
-      background: #ffffff !important;
+    html.light .bg-slate-950,
+    html.light .bg-slate-950\/90,
+    html.light .bg-slate-950\/80,
+    html.light .bg-slate-950\/70,
+    html.light .bg-slate-950\/60,
+    html.light .bg-slate-900,
+    html.light .bg-slate-900\/80,
+    html.light .bg-slate-900\/60,
+    html.light .bg-slate-900\/50,
+    html.light .bg-slate-900\/40,
+    html.light .bg-slate-800 {
+      background-color: #f8fafc !important;
       border-color: #e2e8f0 !important;
       color: #0f172a !important;
-      box-shadow: 0 4px 16px -3px rgba(15, 23, 42, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
     }
-    html.light .glass-surface-card:hover,
-    html:not(.dark) .glass-surface-card:hover {
-      border-color: #fd5f00 !important;
-      box-shadow: 0 12px 28px -5px rgba(253, 95, 0, 0.2), inset 0 1px 0 #ffffff !important;
-    }
-
-    html.light .bg-slate-950,
-    html:not(.dark) .bg-slate-950,
-    html.light .bg-slate-950\/90,
-    html:not(.dark) .bg-slate-950\/90,
-    html.light .bg-slate-950\/80,
-    html:not(.dark) .bg-slate-950\/80,
-    html.light .bg-slate-950\/70,
-    html:not(.dark) .bg-slate-950\/70,
-    html.light .bg-slate-950\/60,
-    html:not(.dark) .bg-slate-950\/60,
-    html.light .bg-slate-900,
-    html:not(.dark) .bg-slate-900,
-    html.light .bg-slate-900\/80,
-    html:not(.dark) .bg-slate-900\/80,
-    html.light .bg-slate-900\/60,
-    html:not(.dark) .bg-slate-900\/60,
-    html.light .bg-slate-900\/50,
-    html:not(.dark) .bg-slate-900\/50,
-    html.light .bg-slate-900\/40,
-    html:not(.dark) .bg-slate-900\/40,
-    html.light .bg-slate-800,
-    html:not(.dark) .bg-slate-800 {
-      background-color: #f8fafc !important;
-      color: #0f172a !important;
+    html.light .border-white\/5,
+    html.light .border-white\/10,
+    html.light .border-white\/20,
+    html.light .border-white\/\[0\.06\] {
+      border-color: #e2e8f0 !important;
     }
 
-    html.light #view-login,
-    html:not(.dark) #view-login {
+    html.light #view-login {
       background-color: #f1f5f9 !important;
     }
-
-    html.light .quick-user-card,
-    html:not(.dark) .quick-user-card {
+    html.light .quick-user-card {
       background-color: #ffffff !important;
-      border-color: #e2e8f0 !important;
+      border-color: #cbd5e1 !important;
       color: #0f172a !important;
     }
-    html.light .quick-user-card:hover,
-    html:not(.dark) .quick-user-card:hover {
+    html.light .quick-user-card:hover {
       background-color: #fff7ed !important;
       border-color: #fd5f00 !important;
     }
 
-    html.light button.bg-slate-950,
-    html:not(.dark) button.bg-slate-950,
-    html.light button.bg-slate-900,
-    html:not(.dark) button.bg-slate-900,
-    html.light a.bg-slate-900,
-    html:not(.dark) a.bg-slate-900,
-    html.light a.bg-slate-950,
-    html:not(.dark) a.bg-slate-950 {
-      background-color: #ffffff !important;
-      border-color: #cbd5e1 !important;
-      color: #1e293b !important;
-    }
-    html.light button.bg-slate-950:hover,
-    html:not(.dark) button.bg-slate-950:hover,
-    html.light button.bg-slate-900:hover,
-    html:not(.dark) button.bg-slate-900:hover,
-    html.light a.bg-slate-900:hover,
-    html:not(.dark) a.bg-slate-900:hover {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-    }
-
     html.light input,
-    html:not(.dark) input,
     html.light select,
-    html:not(.dark) select,
-    html.light textarea,
-    html:not(.dark) textarea {
+    html.light textarea {
       background-color: #ffffff !important;
       color: #0f172a !important;
       border-color: #cbd5e1 !important;
     }
     html.light input:focus,
-    html:not(.dark) input:focus,
     html.light select:focus,
-    html:not(.dark) select:focus,
-    html.light textarea:focus,
-    html:not(.dark) textarea:focus {
+    html.light textarea:focus {
       background-color: #ffffff !important;
       border-color: #fd5f00 !important;
+      box-shadow: 0 0 0 2px rgba(253, 95, 0, 0.2) !important;
     }
-    html.light ::placeholder,
-    html:not(.dark) ::placeholder {
+    html.light ::placeholder {
       color: #94a3b8 !important;
     }
 
-    html.light .text-white,
-    html:not(.dark) .text-white {
-      color: #0f172a !important;
-    }
-    html.light .text-slate-100,
-    html:not(.dark) .text-slate-100,
-    html.light .text-slate-200,
-    html:not(.dark) .text-slate-200 {
-      color: #1e293b !important;
-    }
-    html.light .text-slate-300,
-    html:not(.dark) .text-slate-300 {
-      color: #334155 !important;
-    }
-    html.light .text-slate-400,
-    html:not(.dark) .text-slate-400 {
-      color: #64748b !important;
-    }
-    html.light .text-slate-500,
-    html:not(.dark) .text-slate-500 {
-      color: #64748b !important;
-    }
-
-    /* Manter texto branco dentro de botões com gradientes ou cores sólidas */
-    html.light button[class*="from-orange"],
-    html:not(.dark) button[class*="from-orange"],
-    html.light button[class*="from-blue"],
-    html:not(.dark) button[class*="from-blue"],
-    html.light button[class*="from-emerald"],
-    html:not(.dark) button[class*="from-emerald"],
-    html.light [class*="bg-gradient-to-r"] .text-white,
-    html:not(.dark) [class*="bg-gradient-to-r"] .text-white,
-    html.light button[class*="from-orange"] *,
-    html:not(.dark) button[class*="from-orange"] *,
-    html.light button[class*="from-blue"] *,
-    html:not(.dark) button[class*="from-blue"] *,
-    html.light button[class*="from-emerald"] *,
-    html:not(.dark) button[class*="from-emerald"] *,
-    html.light .bg-orange-600,
-    html:not(.dark) .bg-orange-600,
-    html.light .bg-emerald-600,
-    html:not(.dark) .bg-emerald-600,
-    html.light .bg-blue-600,
-    html:not(.dark) .bg-blue-600,
-    html.light [class*="bg-orange-600"] *,
-    html:not(.dark) [class*="bg-orange-600"] *,
-    html.light [class*="bg-emerald-600"] *,
-    html:not(.dark) [class*="bg-emerald-600"] * {
-      color: #ffffff !important;
-    }
-
-    html.light .border-white\/10,
-    html:not(.dark) .border-white\/10,
-    html.light .border-white\/5,
-    html:not(.dark) .border-white\/5,
-    html.light .border-white\/20,
-    html:not(.dark) .border-white\/20,
-    html.light .border-white\/\[0\.06\],
-    html:not(.dark) .border-white\/\[0\.06\] {
-      border-color: #e2e8f0 !important;
-    }
-
-    html.light ::-webkit-scrollbar-track,
-    html:not(.dark) ::-webkit-scrollbar-track {
+    html.light ::-webkit-scrollbar-track {
       background: #f1f5f9 !important;
     }
-    html.light ::-webkit-scrollbar-thumb,
-    html:not(.dark) ::-webkit-scrollbar-thumb {
+    html.light ::-webkit-scrollbar-thumb {
       background: #cbd5e1 !important;
       border-color: #f1f5f9 !important;
     }
-    html.light ::-webkit-scrollbar-thumb:hover,
-    html:not(.dark) ::-webkit-scrollbar-thumb:hover {
+    html.light ::-webkit-scrollbar-thumb:hover {
       background: #fd5f00 !important;
     }
 
