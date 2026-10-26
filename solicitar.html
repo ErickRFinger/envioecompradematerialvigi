@@ -1417,11 +1417,11 @@
         username: "vandoir",
         name: "Vandoir",
         role: "admin",
-        filial: "Beltrão (Iury e Cleverson)",
+        filial: "Beltrão e Pato Branco",
         dbBranch: "FRANCISCO BELTRAO PR",
         email: "vandoir@vigi.com.br",
         avatar: "VA",
-        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)"]
+        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)", "Pato Branco"]
       },
 
       // --- FILIAIS / OPERADORES REGIONAIS (credencial definida por PBKDF2) ---
@@ -3600,7 +3600,7 @@
         filtered = filtered.filter(s => {
           const b = (s.branch_name || "").toUpperCase();
           const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
-          return b.includes('BELTRAO') || txt.includes('iury') || txt.includes('cleverson');
+          return b.includes('BELTRAO') || b.includes('PATO') || txt.includes('iury') || txt.includes('cleverson') || txt.includes('leonardo') || txt.includes('pato');
         });
       } else if (userConfig && userConfig.role === 'admin' && adminFilterBranch !== 'todas') {
         filtered = filtered.filter(s => {

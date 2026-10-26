@@ -14,8 +14,8 @@ async function testVandoir() {
   const sysUsers = lib.systemUsers();
   assert.ok(sysUsers.vandoir, 'vandoir deve constar em systemUsers');
   assert.strictEqual(sysUsers.vandoir.role, 'admin', 'vandoir deve ter papel admin');
-  assert.deepStrictEqual(sysUsers.vandoir.scopedFiliais, ['Beltrão (Iury)', 'Beltrão (Cleverson)']);
-  console.log('✓ Perfil do Vandoir configurado no servidor como Admin com escopo [Iury, Cleverson].');
+  assert.deepStrictEqual(sysUsers.vandoir.scopedFiliais, ['Beltrão (Iury)', 'Beltrão (Cleverson)', 'Pato Branco']);
+  console.log('✓ Perfil do Vandoir configurado no servidor como Admin com escopo [Iury, Cleverson, Leonardo (Pato Branco)].');
 
   // 2. Verificação de senha PBKDF2
   console.log('\n--- 2. Verificando autenticação PBKDF2 ---');
@@ -63,10 +63,11 @@ async function testVandoir() {
 
   const vandoirConfig = sysUsers.vandoir;
   const filteredForVandoir = mockAllShipments.filter(p => vandoirConfig.scopedFiliais.includes(p.filial));
-  assert.strictEqual(filteredForVandoir.length, 2, 'Vandoir deve ver exatamente 2 pedidos');
+  assert.strictEqual(filteredForVandoir.length, 3, 'Vandoir deve ver exatamente 3 pedidos (Iury, Cleverson, Leonardo/Pato)');
   assert.strictEqual(filteredForVandoir[0].filial, 'Beltrão (Iury)');
   assert.strictEqual(filteredForVandoir[1].filial, 'Beltrão (Cleverson)');
-  console.log('✓ Filtro de escopo do index.html isolou rigorosamente apenas Iury e Cleverson!');
+  assert.strictEqual(filteredForVandoir[2].filial, 'Pato Branco');
+  console.log('✓ Filtro de escopo do index.html isolou rigorosamente Iury, Cleverson e Leonardo (Pato Branco)!');
 
   // 5. Teste em solicitar.html (Mobile)
   console.log('\n--- 5. Testando filtro de escopo no solicitar.html ---');

@@ -372,7 +372,7 @@
                 <div class="w-7 h-7 rounded-lg bg-amber-500/20 text-amber-400 font-black flex items-center justify-center text-[10px] shrink-0 border border-amber-500/30">VA</div>
                 <div class="text-left truncate">
                   <span class="block truncate text-white">Vandoir</span>
-                  <span class="text-[10px] text-amber-400 font-semibold block">Gerente Beltrão</span>
+                  <span class="text-[10px] text-amber-400 font-semibold block">Gerente Beltrão & Pato</span>
                 </div>
               </div>
               <span class="quick-status-icon text-slate-500 group-hover:text-amber-400 transition text-xs"><i class="fa-solid fa-crown text-[10px] text-amber-400"></i></span>
@@ -2021,11 +2021,11 @@ async function login(username, password) {
         username: "vandoir",
         name: "Vandoir",
         role: "admin",
-        filial: "Beltrão (Iury e Cleverson)",
+        filial: "Beltrão e Pato Branco",
         dbBranch: "FRANCISCO BELTRAO PR",
         avatar: "VA",
         email: "vandoir@vigi.com.br",
-        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)"]
+        scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)", "Pato Branco"]
       },
 
       // --- FILIAIS / OPERADORES REGIONAIS (credencial definida por PBKDF2) ---
@@ -2779,10 +2779,10 @@ async function login(username, password) {
       if (u.role === 'admin') {
         const isScopedManager = u.scopedFiliais && Array.isArray(u.scopedFiliais);
         if (isScopedManager) {
-          roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-amber-400"></i> Gerente Beltrão`;
-          roleIndicator.innerText = `🛡️ Admin Gerencial (${u.name}) • Beltrão (Iury e Cleverson)`;
+          roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-amber-400"></i> Gerente Beltrão & Pato`;
+          roleIndicator.innerText = `🛡️ Admin Gerencial (${u.name}) • Beltrão (Iury/Cleverson) & Pato Branco (Leonardo)`;
           roleIndicator.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30';
-          pipelineDesc.innerText = 'Acompanhamento exclusivo das solicitações de Francisco Beltrão (Cleverson e Iury).';
+          pipelineDesc.innerText = 'Acompanhamento exclusivo das solicitações de Francisco Beltrão (Cleverson e Iury) e Pato Branco (Leonardo).';
         } else {
           roleBadge.innerHTML = `<i class="fa-solid fa-crown text-[9px] text-orange-400"></i> Gestão Geral`;
           roleIndicator.innerText = `🛡️ Administrador (${u.name}) • Acesso Total & Exclusão`;
@@ -2794,14 +2794,16 @@ async function login(username, password) {
         if (filialLockedMsg) filialLockedMsg.style.display = 'none';
 
         // Customização dos botões de filtro de filial para Gerente com escopo (Vandoir)
-        ['palotina', 'barracao', 'pato', 'smo'].forEach(f => {
+        ['palotina', 'barracao', 'smo'].forEach(f => {
           const btn = document.getElementById(`filter-btn-${f}`);
           if (btn) btn.style.display = isScopedManager ? 'none' : '';
         });
+        const btnPato = document.getElementById('filter-btn-pato');
+        if (btnPato) btnPato.style.display = '';
         const btnTodas = document.getElementById('filter-btn-todas');
         if (btnTodas && typeof btnTodas.querySelector === 'function') {
           const label = btnTodas.querySelector('span:first-child');
-          if (label) label.innerText = isScopedManager ? 'Todas (Beltrão)' : 'Todas';
+          if (label) label.innerText = isScopedManager ? 'Todas (Beltrão / Pato)' : 'Todas';
         }
       } else {
         roleBadge.innerHTML = `<i class="fa-solid fa-location-dot text-[9px] text-amber-400"></i> ${u.filial}`;
@@ -3104,7 +3106,7 @@ async function login(username, password) {
               newOrders = newOrders.filter(s => {
                 const b = (s.branch_name || '').toUpperCase();
                 const txt = `${s.notes || ''} ${s.sender_name || ''}`.toLowerCase();
-                return b.includes('BELTRAO') || txt.includes('iury') || txt.includes('cleverson');
+                return b.includes('BELTRAO') || b.includes('PATO') || txt.includes('iury') || txt.includes('cleverson') || txt.includes('leonardo') || txt.includes('pato');
               });
             }
             if (newOrders.length > 0) {

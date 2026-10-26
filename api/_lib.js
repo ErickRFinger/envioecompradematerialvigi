@@ -50,7 +50,7 @@ const DEFAULT_SYSTEM_USERS = {
   "thiago":    { username: "thiago", name: "Thiago", role: "admin", filial: "Todas as Filiais", dbBranch: "MATRIZ", email: "thiago@vigi.com.br" },
   "deivid":    { username: "deivid", name: "Deivid", role: "admin", filial: "Todas as Filiais", dbBranch: "MATRIZ", email: "deivid@vigi.com.br" },
   "gabriely":  { username: "gabriely", name: "Gabriely", role: "admin", filial: "Todas as Filiais", dbBranch: "MATRIZ", email: "gabriely@vigi.com.br" },
-  "vandoir":   { username: "vandoir", name: "Vandoir", role: "admin", filial: "Beltrão (Iury e Cleverson)", dbBranch: "FRANCISCO BELTRAO PR", email: "vandoir@vigi.com.br", scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)"] },
+  "vandoir":   { username: "vandoir", name: "Vandoir", role: "admin", filial: "Beltrão e Pato Branco", dbBranch: "FRANCISCO BELTRAO PR", email: "vandoir@vigi.com.br", scopedFiliais: ["Beltrão (Iury)", "Beltrão (Cleverson)", "Pato Branco"] },
   "beltrao1":  { username: "beltrao1", name: "Iury", role: "solicitante", filial: "Francisco Beltrão", dbBranch: "BELTRAO" },
   "beltrao2":  { username: "beltrao2", name: "Cleverson", role: "solicitante", filial: "Francisco Beltrão", dbBranch: "BELTRAO" },
   "palotina1": { username: "palotina1", name: "Adilson", role: "solicitante", filial: "Palotina", dbBranch: "PALOTINA" },
