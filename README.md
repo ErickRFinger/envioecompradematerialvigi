@@ -286,3 +286,10 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   2. **Chave de Serviço no Fallback Direto (`directKey`):** Configurada com a chave `service_role` válida nos clientes `index.html` e `solicitar.html`, eliminando qualquer rejeição por RLS quando o proxy serverless estiver em cold start ou em fallback.
   3. **Validação de Retorno do DB:** Tratamento explícito de erros na função `movePedidoEnvio` e eliminação de chamadas duplicadas no encadeamento de promises do `fallbackDirect`.
   4. **Suíte Automatizada:** Novo teste `scratch/test_status_bounce_fix.js` validando a proteção e a persistência ponta a ponta.
+
+### V1.2.13 (Restauração Completa de Ícones, Botões e Estilos via CSP)
+- **Diagnóstico da Causa Raiz:** O cabeçalho de Content Security Policy (CSP) em `vercel.json` restringia estritamente as diretivas `style-src` e `font-src`, bloqueando a folha de estilos `all.min.css` e as fontes woff2 do FontAwesome hospedadas em `cdnjs.cloudflare.com`. Isso causava a quebra generalizada de todos os ícones da aplicação (botões de impressão, lixeira, setas, badges e WhatsApp) que colapsavam ou renderizavam como caixas vazias.
+- **Correções Aplicadas:**
+  1. **Ajuste Amplo de CSP no `vercel.json`:** Inclusão de `https://cdnjs.cloudflare.com` e `https://cdn.jsdelivr.net` nas diretivas `style-src`, `font-src`, `script-src` e `connect-src`, além de `data:` e `blob:` para mídias e impressão de romaneios em iframe.
+  2. **Resiliência Estrutural de Botões (`index.html`):** Adicionadas dimensões mínimas explícitas (`min-w-[32px]`, `shrink-0`, `justify-center`) e rótulos de acessibilidade nos botões de ação rápida (imprimir romaneio, excluir, etc.), impedindo qualquer colapso geométrico mesmo em conexões lentas.
+  3. **Validação 100% da Suíte de Testes:** Todas as 8 suítes de testes automatizados (`npm test`) executadas e aprovadas com sucesso.
