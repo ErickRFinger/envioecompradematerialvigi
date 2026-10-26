@@ -269,3 +269,12 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
   - Implementação de fallbacks canônicos em `api/_lib.js` para credenciais e chaves do Supabase, garantindo funcionamento ininterrupto mesmo sem injeção prévia de variáveis no painel da Vercel.
   - **Camada Dual de Resiliência no `db` Shim (`index.html` e `solicitar.html`):** Em caso de falha de conexão, cold start ou erro HTTP do proxy serverless, o cliente automaticamente e transparentemente recorre à API REST direta do Supabase com tratamento de cabeçalho `Prefer: return=representation`.
   - **Validação Completa de Dados:** Todos os 5 materiais de compra solicitados por Thiago (Caixinha de Passagem Vedada, Caixinha de Passagem Branca, Fita Dupla Face, Arame de Espinar e DVR Hikvision 8CH) plenamente recuperados e exibidos na esteira de compras para aquisição imediata.
+
+### V1.2.10 (Correção Crítica de Inserção de Pedidos no Banco & Retorno de ID)
+- **Diagnóstico do Erro:** Ao submeter novos pedidos (ex: Iury em Beltrão com Câmeras e DVR), a aplicação mobile exibia o alerta `"Erro ao registrar no banco: Cannot read properties of undefined (reading 'id')"`.
+- **Causa Raiz:** O PostgREST (Supabase) por padrão retorna HTTP 201 com corpo vazio (`""`) quando uma inserção (POST) é realizada sem o header `Prefer: return=representation`. Por consequência, a função serverless `/api/transaction` devolvia `data: []`, tornando `shipData[0]` indefinido no cliente.
+- **Correções Aplicadas:**
+  1. **Header `Prefer: return=representation` em `api/_lib.js`:** Adicionado por padrão em todas as requisições de mutação do PostgREST, garantindo retorno imediato do registro persistido com o UUID gerado.
+  2. **Tratamento de IDs em Deleções (`api/transaction.js`):** Ajustada formatação de exclusão por UUID e suporte para exclusão em lote de itens por `shipment_id`.
+  3. **Validação Defensiva no Frontend (`solicitar.html` e `index.html`):** Validação explícita de `newShipment.id` com mensagem clara e amigável em caso de instabilidade.
+  4. **Suíte Automatizada:** Novo teste end-to-end `scratch/test_transaction_insert.js` integrado ao `npm test`.

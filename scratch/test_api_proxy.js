@@ -160,7 +160,7 @@ async function run() {
       headers: { authorization: 'Bearer ' + adminToken },
       body: { table: 'shipments', id: 'uuid-456' }
     }, res);
-    check('DELETE exclui id correto', lastFetchPath.includes('id=in.(eq.uuid-456)'));
+    check('DELETE exclui id correto', lastFetchPath.includes('uuid-456') && (lastFetchPath.includes('id=eq.') || lastFetchPath.includes('id=in.')));
   }
 
   console.log('\n---------------------------------------------------------');

@@ -5106,7 +5106,10 @@ async function login(username, password) {
 
         if (shipError) throw shipError;
 
-        const newShip = shipData[0];
+        const newShip = (Array.isArray(shipData) && shipData.length > 0) ? shipData[0] : (shipData && shipData.id ? shipData : null);
+        if (!newShip || !newShip.id) {
+          throw new Error('Falha ao obter confirmação da solicitação no banco de dados. Tente novamente.');
+        }
 
         const itemsPayload = cartKeys.map(nome => {
           let catNome = "OUTROS";

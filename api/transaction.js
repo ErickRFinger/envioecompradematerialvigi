@@ -113,6 +113,14 @@ module.exports = async function (req, res) {
 
     // ── DELETE ──────────────────────────────────────────────────────────────
     if (method === 'DELETE') {
+      if (table === lib.TABLES.ITEMS && (query.shipment_id || body.shipment_id)) {
+        let sId = String(query.shipment_id || body.shipment_id);
+        if (sId.startsWith('eq.')) sId = sId.slice(3);
+        const path = table + '?shipment_id=eq.' + encodeURIComponent(sId);
+        const data = await lib.sbFetch(path, { method: 'DELETE' });
+        res.status(200).json({ ok: true, data: Array.isArray(data) ? data : [] });
+        return;
+      }
       let ids = Array.isArray(body.ids) ? body.ids : (body.id ? [body.id] : []);
       if (ids.length === 0 && query.id) {
         let qId = String(query.id);
@@ -127,12 +135,14 @@ module.exports = async function (req, res) {
           }
         }
       }
-      if (ids.length === 0) {
+      const cleanIds = ids.map(s => String(s).replace(/^eq\./, '')).filter(Boolean);
+      if (cleanIds.length === 0) {
         res.status(400).json({ ok: false, error: 'id(s) invalido(s).' });
         return;
       }
-      const inClause = ids.map((s) => 'eq.' + encodeURIComponent(s)).join(',');
-      const path = table + '?id=in.(' + inClause + ')';
+      const path = cleanIds.length === 1
+        ? table + '?id=eq.' + encodeURIComponent(cleanIds[0])
+        : table + '?id=in.(' + cleanIds.map(s => encodeURIComponent(s)).join(',') + ')';
       const data = await lib.sbFetch(path, { method: 'DELETE' });
       res.status(200).json({ ok: true, data: Array.isArray(data) ? data : [] });
       return;

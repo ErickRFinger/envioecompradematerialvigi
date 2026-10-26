@@ -281,7 +281,12 @@ async function sbFetch(path, options) {
     method: opts.method || 'GET',
     body: opts.body,
     headers: Object.assign(
-      { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+      { 
+        apikey: key, 
+        Authorization: `Bearer ${key}`, 
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
       opts.headers || {}
     )
   });

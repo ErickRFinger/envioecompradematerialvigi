@@ -3205,7 +3205,10 @@
 
         if (shipError) throw shipError;
 
-        const newShipment = shipData[0];
+        const newShipment = (Array.isArray(shipData) && shipData.length > 0) ? shipData[0] : (shipData && shipData.id ? shipData : null);
+        if (!newShipment || !newShipment.id) {
+          throw new Error('Falha ao obter confirmação do pedido no banco de dados. Tente novamente.');
+        }
 
         // 2. Inserir itens em shipment_items
         const itemsPayload = itemsKeys.map(nome => {
