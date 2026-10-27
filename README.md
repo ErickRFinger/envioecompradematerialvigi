@@ -329,3 +329,18 @@ Não é necessário instalar nenhum ambiente ou servidor Node.js para testar o p
 - **Badge Operacional no Header (`#badge-system-status`):** Indicador visual discreto em Dark Glassmorphism com ponto pulsante verde (`animate-ping`) no cabeçalho do `index.html`, conferindo feedback instantâneo de conectividade ativa com a nuvem e com o Supabase.
 - **Calibração do Tri-Agent Orchestrator (`scripts/tri-agent.js`):** Ajuste de expressão regular para detecção cirúrgica de status pendente vs concluído em `CLINE_TASK.md`, garantindo leitura fidedigna no painel `tri:status` e na auditoria `tri:audit`.
 - **Validação Integrada das 3 Frentes:** Ciclo de despacho, execução, resposta e auditoria ponta a ponta 100% validado com todas as 8 suítes de testes automatizados verdes.
+
+### V1.2.18 (Aprimoramento Visual de Botões, Logos e Modo Claro Premium)
+- **Identidade Visual e Tratamento de Logos (`vigi-logo.png` e `vigi1.png`):**
+  - Análise colorimétrica e estrutural das logos oficiais (marinho `#00204a`, branco `#ffffff` e laranja `#e04000` / `#fd5f00`).
+  - Criação de molduras e cartões em degradê marinho (`bg-gradient-to-b from-[#001738] to-[#002252] border border-orange-500/35 shadow-xl`) no cabeçalho desktop (`index.html`), cabeçalho mobile (`solicitar.html`) e telas de login/autenticação.
+  - Assegurada visibilidade perfeita tanto no Modo Escuro quanto no Modo Claro, impedindo que tipografias brancas ou elementos marinhos fiquem invisíveis contra fundos contrastantes.
+- **Micro-interações e Contraste Definitivo de Botões:**
+  - Diagnóstico e correção do seletor `html.light .text-white` que forçava textos em botões coloridos (`bg-orange-600`, `bg-emerald-600`, etc.) para cinza escuro.
+  - Implementação de regras de isolamento garantindo que todo botão (`button.text-white`, `a.text-white`, botões primários e de ação) preserve texto branco puro (`#ffffff !important`) nítido com foco e hover ativo.
+  - Ajuste refinado dos botões de ação do Kanban e da Tabela (Romaneio, Impressão A4, WhatsApp "Zap", Voltar e Excluir) com paletas personalizadas, bordas sutis e estados ativos táteis.
+  - Botões de filtro por filial (`branch-filter-btn`) atualizados com classes dedicadas e transição suave sem texto branco sobre branco no hover.
+- **Modo Claro (Light Theme) Refinado Ponta a Ponta:**
+  - Suavização de cartões, colunas e barras de navegação com paleta Slate e sombras suaves.
+  - Barra de carrinho flutuante (`#floating-cart-bar`), faixa de ações e rodapé mobile (`solicitar.html`) calibrados com contraste ideal e botões steppers táteis de 44px.
+- **Validação Automatizada de Regressão:** Todas as 8 suítes de testes (`npm test`) executadas e 100% aprovadas.

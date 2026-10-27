@@ -267,7 +267,16 @@
     html.light h6 {
       color: #0f172a !important;
     }
-    html.light .text-white {
+    /* Textos genéricos text-white adaptam-se para escuro, preservando botões e badges */
+    html.light p.text-white,
+    html.light h1.text-white,
+    html.light h2.text-white,
+    html.light h3.text-white,
+    html.light h4.text-white,
+    html.light h5.text-white,
+    html.light h6.text-white,
+    html.light span.text-white:not([class*="bg-"]):not(button *):not(a *),
+    html.light div.text-white:not([class*="bg-"]):not([class*="shadow"]):not(button *):not(a *) {
       color: #0f172a !important;
     }
     html.light .text-slate-100,
@@ -435,17 +444,28 @@
     html.light .glass-header-nav {
       background: rgba(255, 255, 255, 0.98) !important;
       border-bottom: 1px solid #e2e8f0 !important;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04) !important;
     }
     html.light .glass-header-nav .bg-\[\#001738\]\/95 {
       background-color: #ffffff !important;
       border-color: #e2e8f0 !important;
     }
+    html.light #desktop-user-profile,
+    html.light .glass-header-nav div[onclick="openUserSwitchModal()"] {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light #desktop-user-profile:hover,
+    html.light .glass-header-nav div[onclick="openUserSwitchModal()"]:hover {
+      border-color: #fd5f00 !important;
+      background-color: #fff7ed !important;
+    }
     html.light #desktop-user-name {
       color: #0f172a !important;
     }
     html.light #desktop-user-role-badge {
-      color: #ea580c !important;
+      color: #c2410c !important;
     }
     html.light .glass-header-nav .bg-slate-950\/80 {
       background-color: #f1f5f9 !important;
@@ -462,13 +482,42 @@
       color: #334155 !important;
     }
     html.light button#btn-theme-toggle {
-      background-color: #f8fafc !important;
+      background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
-      color: #4338ca !important;
+      color: #4f46e5 !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
     }
     html.light button#btn-theme-toggle:hover {
-      background-color: #f1f5f9 !important;
-      border-color: #94a3b8 !important;
+      background-color: #f8fafc !important;
+      border-color: #818cf8 !important;
+    }
+    html.light #badge-system-status {
+      background-color: #ffffff !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+      box-shadow: 0 1px 2px rgba(16, 185, 129, 0.06) !important;
+    }
+    html.light a[href="solicitar.html"] {
+      background-color: #ffffff !important;
+      border-color: #fed7aa !important;
+      color: #c2410c !important;
+      box-shadow: 0 1px 3px rgba(253, 95, 0, 0.06) !important;
+    }
+    html.light a[href="solicitar.html"]:hover {
+      background-color: #fff7ed !important;
+      border-color: #ea580c !important;
+      color: #9a3412 !important;
+    }
+    html.light button[onclick="handleDesktopLogout()"] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #64748b !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+    }
+    html.light button[onclick="handleDesktopLogout()"]:hover {
+      background-color: #fff1f2 !important;
+      border-color: #f43f5e !important;
+      color: #e11d48 !important;
     }
     html.light .glass-header-nav button[onclick="openNewEnvioModal()"] {
       background: linear-gradient(135deg, #fd5f00, #ea580c) !important;
@@ -517,11 +566,29 @@
       background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
       color: #475569 !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+    }
+    html.light #filter-urgencia-btn:hover,
+    html.light button[onclick="openReportFilterModal()"]:hover {
+      background-color: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    html.light #btn-sound-toggle,
+    html.light #btn-manual-sync {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03) !important;
+    }
+    html.light #btn-manual-sync:hover {
+      border-color: #fd5f00 !important;
+      background-color: #fff7ed !important;
+      color: #c2410c !important;
     }
 
     /* Colunas do Kanban */
     html.light #kanban-view-container > div.glass-surface {
-      background-color: #f8fafc !important;
+      background-color: #f1f5f9 !important;
       border: 1px solid #e2e8f0 !important;
       box-shadow: 0 4px 14px -3px rgba(15, 23, 42, 0.05) !important;
     }
@@ -538,9 +605,9 @@
     /* Cards de Pedido do Kanban */
     html.light .glass-surface-card {
       background: #ffffff !important;
-      border: 1px solid #cbd5e1 !important;
+      border: 1px solid #e2e8f0 !important;
       color: #0f172a !important;
-      box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+      box-shadow: 0 2px 8px -2px rgba(15, 23, 42, 0.07), 0 1px 3px rgba(15, 23, 42, 0.04) !important;
     }
     html.light .glass-surface-card:hover {
       border-color: #fd5f00 !important;
@@ -552,7 +619,7 @@
       border: 1px solid #e2e8f0 !important;
     }
     html.light .glass-surface-card li {
-      border-bottom-color: #e2e8f0 !important;
+      border-bottom-color: #f1f5f9 !important;
     }
     html.light .glass-surface-card li span {
       color: #0f172a !important;
@@ -564,17 +631,73 @@
       background-color: #ffffff !important;
       border: 1px solid #cbd5e1 !important;
       color: #c2410c !important;
+      font-weight: 800 !important;
     }
 
-    /* Botões dentro do card (Romaneio, Print, Zap, Voltar) */
+    /* Botões dentro do card (Romaneio, Print, Zap, Voltar, Excluir) */
     html.light .glass-surface-card button.bg-slate-900 {
       background-color: #ffffff !important;
       border: 1px solid #cbd5e1 !important;
       color: #475569 !important;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
     }
     html.light .glass-surface-card button.bg-slate-900:hover {
       background-color: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
       color: #0f172a !important;
+    }
+    html.light .glass-surface-card button[onclick*="openCardDetails"] {
+      background-color: #fff7ed !important;
+      border-color: #fed7aa !important;
+      color: #c2410c !important;
+    }
+    html.light .glass-surface-card button[onclick*="openCardDetails"]:hover {
+      background-color: #ffedd5 !important;
+      border-color: #ea580c !important;
+      color: #9a3412 !important;
+    }
+    html.light .glass-surface-card button[onclick*="printRomaneioDirect"] {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #334155 !important;
+    }
+    html.light .glass-surface-card button[onclick*="printRomaneioDirect"]:hover {
+      background-color: #f8fafc !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    html.light .glass-surface-card button[onclick*="printRomaneioDirect"] i {
+      color: #ea580c !important;
+    }
+    html.light .glass-surface-card button[onclick*="sendToWhatsApp"] {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+    }
+    html.light .glass-surface-card button[onclick*="sendToWhatsApp"]:hover {
+      background-color: #d1fae5 !important;
+      border-color: #34d399 !important;
+      color: #047857 !important;
+    }
+    html.light .glass-surface-card button[onclick*="movePedidoEnvio"]:not(.bg-gradient-to-r) {
+      background-color: #ffffff !important;
+      border-color: #cbd5e1 !important;
+      color: #475569 !important;
+    }
+    html.light .glass-surface-card button[onclick*="movePedidoEnvio"]:not(.bg-gradient-to-r):hover {
+      background-color: #f1f5f9 !important;
+      border-color: #94a3b8 !important;
+      color: #0f172a !important;
+    }
+    html.light .glass-surface-card button[onclick*="deletePedidoEnvio"] {
+      background-color: #ffffff !important;
+      border-color: #fecdd3 !important;
+      color: #e11d48 !important;
+    }
+    html.light .glass-surface-card button[onclick*="deletePedidoEnvio"]:hover {
+      background-color: #ffe4e6 !important;
+      border-color: #f43f5e !important;
+      color: #be123c !important;
     }
     html.light .glass-surface-card .bg-slate-800 {
       background-color: #cbd5e1 !important;
@@ -585,7 +708,7 @@
       border-bottom-color: #e2e8f0 !important;
     }
     html.light table tbody tr:hover {
-      background-color: #f1f5f9 !important;
+      background-color: #f8fafc !important;
     }
     html.light table td {
       color: #0f172a !important;
@@ -594,15 +717,45 @@
       color: #475569 !important;
       border-bottom-color: #cbd5e1 !important;
     }
+    html.light table button[onclick*="openCardDetails"] {
+      background-color: #fff7ed !important;
+      border-color: #fed7aa !important;
+      color: #c2410c !important;
+    }
+    html.light table button[onclick*="sendToWhatsApp"] {
+      background-color: #ecfdf5 !important;
+      border-color: #a7f3d0 !important;
+      color: #065f46 !important;
+    }
     html.light .divide-white\/5 > * {
       border-color: #e2e8f0 !important;
     }
 
-    /* Preserva texto branco apenas nos botões de CTA primários / gradientes reais */
+    /* Preserva texto branco apenas nos botões de CTA primários / gradientes / badges coloridos */
     html.light button.bg-gradient-to-r,
     html.light a.bg-gradient-to-r,
     html.light button.bg-gradient-to-r *,
-    html.light a.bg-gradient-to-r * {
+    html.light a.bg-gradient-to-r *,
+    html.light button.text-white,
+    html.light button.text-white *,
+    html.light a.text-white,
+    html.light a.text-white *,
+    html.light span.text-white[class*="bg-"],
+    html.light span.text-white[class*="bg-"] *,
+    html.light div.text-white[class*="bg-"],
+    html.light div.text-white[class*="bg-"] *,
+    html.light button[class*="bg-orange-"],
+    html.light button[class*="bg-orange-"] *,
+    html.light button[class*="bg-emerald-"],
+    html.light button[class*="bg-emerald-"] *,
+    html.light button[class*="bg-rose-"],
+    html.light button[class*="bg-rose-"] *,
+    html.light button[class*="bg-red-"],
+    html.light button[class*="bg-red-"] *,
+    html.light button[class*="bg-blue-"],
+    html.light button[class*="bg-blue-"] *,
+    html.light button[class*="bg-amber-"],
+    html.light button[class*="bg-amber-"] * {
       color: #ffffff !important;
     }
 
@@ -635,6 +788,40 @@
       border-color: #e2e8f0 !important;
     }
 
+    /* Modal Category Chips & Itens no Modo Claro */
+    html.light #category-chips-bar button:not([class*="bg-orange-"]):not([class*="bg-amber-"]) {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      color: #475569 !important;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    }
+    html.light #category-chips-bar button:not([class*="bg-orange-"]):not([class*="bg-amber-"]):hover {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      color: #0f172a !important;
+    }
+    html.light #modal-catalog-list > div {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04) !important;
+    }
+    html.light #modal-catalog-list > div:hover {
+      border-color: #fd5f00 !important;
+    }
+    html.light #modal-catalog-list .bg-slate-950 {
+      background-color: #f1f5f9 !important;
+      border-color: #cbd5e1 !important;
+    }
+    html.light #modal-catalog-list button[onclick*="decrementModalCart"] {
+      background-color: #ffffff !important;
+      border: 1px solid #cbd5e1 !important;
+      color: #334155 !important;
+    }
+    html.light #modal-catalog-list button[onclick*="decrementModalCart"]:hover {
+      background-color: #f8fafc !important;
+      color: #0f172a !important;
+    }
+
     html.light #view-login {
       background-color: #f1f5f9 !important;
     }
@@ -642,6 +829,7 @@
       background-color: #ffffff !important;
       border-color: #cbd5e1 !important;
       color: #0f172a !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03) !important;
     }
     html.light .quick-user-card:hover {
       background-color: #fff7ed !important;
@@ -728,8 +916,8 @@
       
       <!-- Brand Header com Logo Oficial VIGI -->
       <div class="text-center space-y-3">
-        <div class="inline-flex p-3.5 px-6 rounded-2xl bg-[#001738]/95 border border-white/10 shadow-2xl shadow-orange-600/15">
-          <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-12 max-w-[210px] object-contain drop-shadow" />
+        <div class="inline-flex p-3.5 px-6 rounded-2xl bg-gradient-to-b from-[#001738] to-[#002252] border border-orange-500/35 shadow-2xl shadow-orange-500/20 hover:scale-105 transition-all duration-300">
+          <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-14 max-w-[230px] object-contain drop-shadow-md" />
         </div>
         <div>
           <h1 class="text-xl font-black text-white tracking-tight flex items-center justify-center gap-2">
@@ -954,8 +1142,8 @@
         <!-- Official VIGI Brand Logo -->
         <div class="relative group cursor-pointer flex items-center" onclick="switchMainTab('envios')">
           <div class="absolute -inset-1.5 bg-gradient-to-r from-orange-500/30 to-[#00204A]/60 rounded-2xl blur-md opacity-60 group-hover:opacity-100 transition duration-300"></div>
-          <div class="relative h-12 px-3 py-1.5 rounded-xl bg-[#001738]/95 border border-white/10 hover:border-orange-500/40 flex items-center justify-center shadow-xl transition">
-            <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-8 max-w-[155px] object-contain drop-shadow" />
+          <div class="relative h-12 px-3.5 py-1.5 rounded-2xl bg-gradient-to-b from-[#001738] to-[#002252] border border-orange-500/35 hover:border-orange-500/60 shadow-xl shadow-orange-500/10 flex items-center justify-center transition-all duration-200 group-hover:scale-105">
+            <img src="vigi-logo.png" alt="VIGI Câmeras" class="h-9 max-w-[170px] object-contain drop-shadow" />
           </div>
         </div>
         
@@ -1014,20 +1202,20 @@
 
         <!-- LINK PARA O APP MOBILE -->
         <a href="solicitar.html" title="Abrir Aplicativo Mobile de Solicitação para Técnicos" 
-           class="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-orange-400 hover:text-white border border-orange-500/30 px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-md transition transform active:scale-95 cursor-pointer">
-          <i class="fa-solid fa-mobile-screen-button text-orange-400"></i>
+           class="flex items-center gap-2 bg-slate-900/90 hover:bg-slate-800 text-orange-400 hover:text-orange-300 border border-orange-500/30 hover:border-orange-500/60 px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+          <i class="fa-solid fa-mobile-screen-button text-orange-400 text-sm"></i>
           <span class="hidden xl:inline">Portal Mobile</span>
         </a>
 
         <!-- Botão Alternar Tema Claro / Escuro -->
         <button onclick="toggleTheme()" id="btn-theme-toggle" title="Alternar entre Tema Claro e Escuro" 
-                class="w-10 h-10 rounded-xl bg-slate-950 hover:bg-slate-900 border border-white/10 hover:border-amber-400/40 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs transition active:scale-95 cursor-pointer shrink-0" aria-label="Alternar Tema Claro/Escuro">
+                class="w-10 h-10 rounded-xl bg-slate-950/90 hover:bg-slate-900 border border-white/10 hover:border-amber-400/50 text-amber-400 hover:text-amber-300 flex items-center justify-center text-xs transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer shrink-0 shadow-sm" aria-label="Alternar Tema Claro/Escuro">
           <i class="fa-solid fa-sun text-sm" id="theme-icon"></i>
         </button>
 
         <!-- Badge de Status de Conexão (Tri-Agent) -->
         <div id="badge-system-status" title="Conexão com a Nuvem e Banco Supabase 100% Operacional"
-             class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-emerald-400 text-xs font-semibold shadow-sm backdrop-blur-md select-none shrink-0">
+             class="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-emerald-400 text-xs font-semibold shadow-sm backdrop-blur-md select-none shrink-0 transition-all hover:border-emerald-500/50">
           <span class="relative flex h-2 w-2">
             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -1036,23 +1224,25 @@
         </div>
 
         <!-- Botão Nova Solicitação -->
-        <button onclick="openNewEnvioModal()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none transition transform active:scale-95 shadow-lg shadow-orange-600/20 cursor-pointer">
+        <button onclick="openNewEnvioModal()" class="relative group overflow-hidden rounded-xl p-[1px] focus:outline-none transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95 shadow-lg shadow-orange-600/25 hover:shadow-orange-500/40 cursor-pointer">
           <span class="absolute inset-0 bg-gradient-to-r from-orange-500 via-[#FD5F00] to-amber-500 group-hover:opacity-100 transition duration-300"></span>
-          <span class="relative flex items-center gap-2 px-4 py-2.5 rounded-[11px] bg-slate-950 text-white font-bold text-xs tracking-wide group-hover:bg-opacity-80 transition duration-200">
+          <span class="relative flex items-center gap-2 px-4 py-2.5 rounded-[11px] bg-slate-950 text-white font-extrabold text-xs tracking-wide group-hover:bg-opacity-80 transition duration-200">
             <i class="fa-solid fa-plus-circle text-orange-400 text-sm group-hover:rotate-90 transition duration-300"></i>
             <span>Nova Solicitação</span>
           </span>
         </button>
 
         <!-- Botão Pedir Compra -->
-        <button id="btn-header-new-compra" onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-3.5 py-2.5 rounded-xl font-bold text-xs shadow-lg shadow-emerald-600/25 transition-all transform active:scale-95 cursor-pointer">
+        <button id="btn-header-new-compra" onclick="openNewCompraModal()" class="flex items-center gap-2 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-4 py-2.5 rounded-xl font-extrabold text-xs shadow-lg shadow-emerald-600/30 hover:shadow-emerald-500/40 transition-all duration-200 transform hover:-translate-y-0.5 active:scale-95 cursor-pointer">
           <i class="fa-solid fa-bag-shopping text-sm"></i>
           <span class="hidden sm:inline">Repor Estoque</span>
         </button>
 
         <!-- Botão Sair / Desconectar -->
         <button onclick="handleDesktopLogout()" title="Sair / Desconectar da conta" 
-                class="w-10 h-10 rounded-xl bg-slate-950 hover:bg-slate-900 border border-white/10 hover:border-rose-500/40 text-slate-400 hover:text-rose-400 flex items-center justify-center text-xs transition active:scale-95 cursor-pointer">
+                class="w-10 h-10 rounded-xl bg-slate-950/90 hover:bg-slate-900 border border-white/10 hover:border-rose-500/50 text-slate-400 hover:text-rose-400 flex items-center justify-center text-xs transition-all duration-200 transform hover:scale-105 active:scale-95 cursor-pointer shadow-sm">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
         </button>
       </div>
@@ -4050,29 +4240,29 @@ async function login(username, password) {
       ['todas', 'beltrao-cleverson', 'beltrao-iury', 'palotina', 'barracao', 'pato', 'smo'].forEach(f => {
         const btn = document.getElementById(`filter-btn-${f}`);
         if (!btn) return;
-        btn.className = "px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer";
+        btn.className = "branch-filter-btn px-3 py-1.5 rounded-lg font-semibold text-slate-400 hover:text-white transition cursor-pointer";
       });
 
       let activeId = 'filter-btn-todas';
-      let activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer";
+      let activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-gradient-to-r from-orange-600 to-amber-600 text-white shadow shadow-orange-600/30 cursor-pointer";
       if (filial === 'Beltrão (Iury)') {
         activeId = 'filter-btn-beltrao-iury';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-yellow-500/30 text-yellow-300 border border-yellow-500/50 shadow-glow-yellow cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-yellow-500/30 text-yellow-300 border border-yellow-500/50 shadow-glow-yellow cursor-pointer";
       } else if (filial === 'Beltrão (Cleverson)') {
         activeId = 'filter-btn-beltrao-cleverson';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-amber-500/30 text-amber-300 border border-amber-500/50 shadow-glow-amber cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-amber-500/30 text-amber-300 border border-amber-500/50 shadow-glow-amber cursor-pointer";
       } else if (filial === 'Palotina (Adilson)' || filial === 'Palotina') {
         activeId = 'filter-btn-palotina';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 shadow-glow-cyan cursor-pointer";
       } else if (filial === 'Barracão (Giseli)' || filial === 'Barracão') {
         activeId = 'filter-btn-barracao';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-glow-emerald cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-emerald-500/30 text-emerald-300 border border-emerald-500/50 shadow-glow-emerald cursor-pointer";
       } else if (filial === 'Pato Branco' || filial.includes('Pato')) {
         activeId = 'filter-btn-pato';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-purple-500/30 text-purple-300 border border-purple-500/50 shadow-glow-purple cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-purple-500/30 text-purple-300 border border-purple-500/50 shadow-glow-purple cursor-pointer";
       } else if (filial === 'Terceiros SMO' || filial.includes('SMO')) {
         activeId = 'filter-btn-smo';
-        activeClass = "px-3 py-1.5 rounded-lg font-bold transition-all bg-blue-500/30 text-blue-300 border border-blue-500/50 shadow-glow-blue cursor-pointer";
+        activeClass = "branch-filter-btn-active px-3 py-1.5 rounded-lg font-bold transition-all bg-blue-500/30 text-blue-300 border border-blue-500/50 shadow-glow-blue cursor-pointer";
       }
 
       const activeEl = document.getElementById(activeId);
